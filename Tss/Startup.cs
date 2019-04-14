@@ -33,12 +33,21 @@ namespace Tss
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            // For depbelopment in local environment
+            var connectionString = Configuration.GetConnectionString("DefaultConnection");
+            
+            // For deployment to Heroku
+            var isProduction = string.Equals(Environment.GetEnvironmentVariable("ENV"), "production");
+            
+            if (isProduction)
+            {
+                connectionString = Environment.GetEnvironmentVariable("CLEARDB_DATABASE_URL");
+            }
+
             services.Add(
                 new ServiceDescriptor(
                     typeof(TssContext), 
-                    new TssContext(
-                        Configuration.GetConnectionString("DefaultConnection")
-                    )
+                    new TssContext(connectionString)
                 )
             );  
 
