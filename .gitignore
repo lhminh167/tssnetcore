@@ -259,3 +259,7 @@ typings/
 
 # next.js build output
 .next
+
+# ignore appsettings
+Tss/appsettings\.Development\.json
+appsettings.local.json
