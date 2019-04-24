@@ -13,6 +13,9 @@ using Microsoft.Extensions.Options;
 using Microsoft.EntityFrameworkCore;
 using Tss.Models;
 using Swashbuckle.AspNetCore.Swagger;
+using Sieve.Services;
+using Sieve.Models;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Tss
 {
@@ -20,12 +23,12 @@ namespace Tss
     {
         public Startup(IHostingEnvironment env)
         {
-            var builder = new ConfigurationBuilder()  
-                .SetBasePath(env.ContentRootPath)  
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)  
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)  
-                .AddEnvironmentVariables();  
-            Configuration = builder.Build(); 
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+            Configuration = builder.Build();
         }
 
         public IConfiguration Configuration { get; }
@@ -33,24 +36,33 @@ namespace Tss
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // For depbelopment in local environment
+            services.Scan(scan =>
+                scan.FromCallingAssembly()
+                    .AddClasses()
+                    .AsMatchingInterface()
+            );
+
+            // For development in local environment
             var connectionString = Configuration.GetConnectionString("DefaultConnection");
-            
+
             // For deployment to Heroku
             var isProduction = string.Equals(Environment.GetEnvironmentVariable("ENV"), "production");
-            
+
             if (isProduction)
             {
                 connectionString = Environment.GetEnvironmentVariable("CLEARDB_DATABASE_URL");
             }
 
+            services.TryAddSingleton<SieveProcessor>();
+
+            services.Configure<SieveOptions>(Configuration.GetSection("Sieve"));
+
             services.Add(
                 new ServiceDescriptor(
-                    typeof(TssContext), 
+                    typeof(TssContext),
                     new TssContext(connectionString)
                 )
-            );  
-
+            );
 
             services
             .AddMvcCore()
@@ -59,7 +71,8 @@ namespace Tss
             .AddJsonFormatters()
             .AddApiExplorer();
 
-            services.AddSwaggerGen(c => {
+            services.AddSwaggerGen(c =>
+            {
                 c.SwaggerDoc("v1", new Info
                 {
                     Version = "v1",

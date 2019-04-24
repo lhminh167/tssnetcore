@@ -261,5 +261,4 @@ typings/
 .next
 
 # ignore appsettings
-Tss/appsettings\.Development\.json
-appsettings.local.json
+Tss/appsettings.Development.json
