@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class AttributeController : Controller<Attribute>
+    public class AttributesController : Controller<Attribute>
     {
-        public AttributeController (
+        public AttributesController (
             IService<Attribute> service
         ): base(
             service,

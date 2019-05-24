@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class CustomerController : Controller<Customer>
+    public class CustomersController : Controller<Customer>
     {
-        public CustomerController (
+        public CustomersController (
             IService<Customer> service
         ): base(
             service,

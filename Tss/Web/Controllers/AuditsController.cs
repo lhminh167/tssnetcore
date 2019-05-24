@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class AuditController : Controller<Audit>
+    public class AuditsController : Controller<Audit>
     {
-        public AuditController (
+        public AuditsController (
             IService<Audit> service
         ): base(
             service,

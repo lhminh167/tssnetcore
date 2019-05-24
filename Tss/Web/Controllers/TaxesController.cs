@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class TaxController : Controller<Tax>
+    public class TaxesController : Controller<Tax>
     {
-        public TaxController (
+        public TaxesController (
             IService<Tax> service
         ): base(
             service,

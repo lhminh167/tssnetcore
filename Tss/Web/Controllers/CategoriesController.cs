@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class CategoryController : Controller<Category>
+    public class CategoriesController : Controller<Category>
     {
-        public CategoryController (
+        public CategoriesController (
             IService<Category> service
         ): base(
             service,

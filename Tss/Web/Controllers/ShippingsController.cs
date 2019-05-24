@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class ShippingController : Controller<Shipping>
+    public class ShippingsController : Controller<Shipping>
     {
-        public ShippingController (
+        public ShippingsController (
             IService<Shipping> service
         ): base(
             service,

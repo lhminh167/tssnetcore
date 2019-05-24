@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class ReviewController : Controller<Review>
+    public class ReviewsController : Controller<Review>
     {
-        public ReviewController (
+        public ReviewsController (
             IService<Review> service
         ): base(
             service,

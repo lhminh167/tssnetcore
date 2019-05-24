@@ -3,9 +3,9 @@ using Tss.Core;
 
 namespace Tss.Web
 {
-    public class ShoppingCartController : Controller<ShoppingCart>
+    public class ShoppingCartsController : Controller<ShoppingCart>
     {
-        public ShoppingCartController (
+        public ShoppingCartsController (
             IService<ShoppingCart> service
         ): base(
             service,
