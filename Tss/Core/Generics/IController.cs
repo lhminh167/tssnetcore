@@ -1,12 +1,9 @@
 using System.Threading.Tasks;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Sieve.Models;
 
-namespace Tss.Core
+namespace Tss.Core.Generics
 {
     public interface IController
     {

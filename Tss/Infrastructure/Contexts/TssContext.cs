@@ -1,11 +1,10 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
-using MySql.Data.MySqlClient;    
-using Tss.Core;
+using MySql.Data.MySqlClient;
+using Tss.Core.Entities;
 
-namespace Tss.Infrastructure
+namespace Tss.Infrastructure.Contexts
 {
-    public partial class TssContext : DbContext
+    public class TssContext : DbContext
     {
         public TssContext()
         {

@@ -1,4 +1,6 @@
-namespace Tss.Core
+using Tss.Core.Entities;
+
+namespace Tss.Core.Exceptions
 {
     public class ProductsNotFoundException : ProductsApiException
     {

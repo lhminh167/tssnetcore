@@ -1,19 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Microsoft.EntityFrameworkCore;
-using Tss.Core;
-using Tss.Infrastructure;
-using Tss.Web;
+using Tss.Infrastructure.Contexts;
 using Swashbuckle.AspNetCore.Swagger;
 using Sieve.Services;
 using Sieve.Models;
@@ -21,6 +13,9 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using AutoMapper;
+using Tss.Core.ProductFilters;
+using Microsoft.EntityFrameworkCore;
 
 namespace Tss
 {
@@ -78,12 +73,26 @@ namespace Tss
 
             services.Configure<SieveOptions>(Configuration.GetSection("Sieve"));
 
-            services.Add(
-                new ServiceDescriptor(
-                    typeof(TssContext),
-                    new TssContext(connectionString)
-                )
-            );
+            // services.Add(
+            //     new ServiceDescriptor(
+            //         typeof(TssContext),
+            //         new TssContext(connectionString)
+            //     )
+            // );
+
+            services.AddDbContext<TssContext>(options => options.UseMySql(connectionString));
+
+
+            services.AddAutoMapper(typeof(ProductFiltersProductProfile));
+
+            var config = new AutoMapperConfiguration()
+                .Configure();
+            //     .CreateMapper();
+            // services.TryAddSingleton(mapper);
+
+            services.TryAddSingleton<IMapper>(serviceProvider  => config.CreateMapper());
+
+
 
             services
             .AddMvcCore()

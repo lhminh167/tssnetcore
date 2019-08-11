@@ -1,11 +1,7 @@
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Linq;
-using System;
-using Sieve.Models;
 
-namespace Tss.Core
+namespace Tss.Core.Generics
 {
     public interface IRepository
     {
@@ -13,15 +9,15 @@ namespace Tss.Core
 
     public interface IRepository<T> : IRepository where T : class
     {
-        List<T> Get(SieveModel sieveModel);
+        IQueryable<T> Get();
 
-        Task<T> Get(object id);
+        Task<T> Get(int id);
         
         void Put(T entity);
         
         void Post(T entity);
 
-        void Delete(object id);
+        void Delete(int id);
 
         void Delete(T entity);        
     }

@@ -1,11 +1,8 @@
 using System.Threading.Tasks;
-using System;
-using System.Linq;
-using System.Linq.Expressions;
 using System.Collections.Generic;
 using Sieve.Models;
 
-namespace Tss.Core
+namespace Tss.Core.Generics
 {
     public interface IService
     {
@@ -15,13 +12,13 @@ namespace Tss.Core
     {
         List<T> Get(SieveModel sieveModel);
 
-        Task<T> Get(object id);
+        Task<T> Get(int id);
         
         Task<int> Put(T entity);
         
         Task<int> Post(T entity);
 
-        Task<int> Delete(object id);
+        Task<int> Delete(int id);
 
         Task<int> Delete(T entity);        
     }

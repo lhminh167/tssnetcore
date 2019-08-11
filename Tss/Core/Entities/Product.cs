@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using Sieve.Attributes;
 
-namespace Tss.Core
+namespace Tss.Core.Entities
 {
-    public partial class Product
+    public class Product
     {
         [Sieve(CanFilter = true, CanSort = true)]
         public int ProductId { get; set; }

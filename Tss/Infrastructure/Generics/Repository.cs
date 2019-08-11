@@ -1,14 +1,12 @@
 using System.Threading.Tasks;
-using System.Collections.Generic;
-using System.Linq.Expressions;
 using System.Linq;
 using System;
 using Microsoft.EntityFrameworkCore;
 using Sieve.Services;
-using Sieve.Models;
-using Tss.Core;
+using Tss.Core.Generics;
+using Tss.Infrastructure.Contexts;
 
-namespace Tss.Infrastructure
+namespace Tss.Infrastructure.Generics
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
@@ -16,7 +14,6 @@ namespace Tss.Infrastructure
         
         private readonly TssContext _context;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly SieveProcessor _sieveProcessor;
 
 
         public Repository(
@@ -31,18 +28,15 @@ namespace Tss.Infrastructure
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _unitOfWork.Register(this);
 
-            _sieveProcessor = sieveProcessor ?? throw new ArgumentNullException(nameof(_sieveProcessor));
         }
 
-        public virtual List<TEntity> Get(
-            SieveModel sieveModel
+        public virtual IQueryable<TEntity> Get(
         )
         {
-            return _sieveProcessor.Apply<TEntity>(sieveModel, _dbSet)
-                .ToList();
+            return _dbSet.AsQueryable().AsNoTracking();
         }
 
-        public virtual Task<TEntity> Get(object id)
+        public virtual Task<TEntity> Get(int id)
         {
             return _dbSet.FindAsync(id);
         }
@@ -58,9 +52,9 @@ namespace Tss.Infrastructure
             _dbSet.Add(entity);
         }
 
-        public virtual void Delete(object id)
+        public virtual async void Delete(int id)
         {
-            TEntity entity = _dbSet.Find(id);
+            TEntity entity = await Get(id);
             Delete(entity);
         }
 

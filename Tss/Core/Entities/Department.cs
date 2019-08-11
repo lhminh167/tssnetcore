@@ -1,12 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sieve.Attributes;
 
-namespace Tss.Core
+namespace Tss.Core.Entities
 {
-    public partial class Department
+    public class Department
     {
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public int DepartmentId { get; set; }
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public string Name { get; set; }
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public string Description { get; set; }
     }
 }

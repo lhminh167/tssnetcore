@@ -1,10 +1,10 @@
 using System.Threading.Tasks;
-using System.Linq;
 using System.Collections.Generic;
 using System;
-using Tss.Core;
+using Tss.Core.Generics;
+using Tss.Infrastructure.Contexts;
 
-namespace Tss.Infrastructure
+namespace Tss.Infrastructure.Generics
 {
     public class UnitOfWork : IUnitOfWork
     {

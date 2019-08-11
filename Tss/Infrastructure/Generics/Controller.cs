@@ -1,14 +1,12 @@
-using System.Linq;
-using System.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Sieve.Models;
-using Tss.Core;
+using Tss.Core.Generics;
 
-namespace Tss.Infrastructure
+namespace Tss.Infrastructure.Generics
 {
     [Route("api/[controller]")]
     [ApiController]

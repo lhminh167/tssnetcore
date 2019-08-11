@@ -1,7 +1,6 @@
 using System.Threading.Tasks;
-using System;
 
-namespace Tss.Core
+namespace Tss.Core.Generics
 {
     public interface IUnitOfWork
     {

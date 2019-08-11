@@ -1,13 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
+using Sieve.Attributes;
 
-namespace Tss.Core
+namespace Tss.Core.Entities
 {
-    public partial class Shipping
+    public class Shipping
     {
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public int ShippingId { get; set; }
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public string ShippingType { get; set; }
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public decimal ShippingCost { get; set; }
+        
+        [Sieve(CanFilter = true, CanSort = true)]
         public int ShippingRegionId { get; set; }
     }
 }
