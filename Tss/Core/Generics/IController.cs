@@ -11,7 +11,7 @@ namespace Tss.Core.Generics
 
     public interface IController<T> : IController where T : class
     {
-        List<T> Get(SieveModel sieveModel);
+        Task<List<T>> Get(SieveModel sieveModel);
 
         Task<IActionResult> Get(int id);
         

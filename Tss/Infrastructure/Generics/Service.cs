@@ -25,12 +25,9 @@ namespace Tss.Infrastructure.Generics
             _sieveProcessor = sieveProcessor ?? throw new ArgumentNullException(nameof(sieveProcessor));
         }
 
-        public virtual List<TEntity> Get(SieveModel sieveModel)
+        public virtual Task<List<TEntity>> Get(SieveModel sieveModel)
         {   
-            IQueryable<TEntity> dbSet = _repository.Get();
-
-            return _sieveProcessor.Apply<TEntity>(sieveModel, dbSet)
-                .ToList();
+            return _repository.Get(sieveModel);
         }
 
         public virtual Task<TEntity> Get(int id)
@@ -41,25 +38,19 @@ namespace Tss.Infrastructure.Generics
         public virtual Task<int> Put(TEntity entity)
         {
             _repository.Put(entity);
-            return _unitOfWork.Save();
+            return _unitOfWork.SaveAsync();
         }
 
         public virtual Task<int> Post(TEntity entity)
         {
             _repository.Post(entity);
-            return _unitOfWork.Save();
-        }
-
-        public virtual Task<int> Delete(int id)
-        {
-            _repository.Delete(id);
-            return _unitOfWork.Save();            
+            return _unitOfWork.SaveAsync();
         }
 
         public virtual Task<int> Delete(TEntity entity)
         {
             _repository.Delete(entity);
-            return _unitOfWork.Save();            
+            return _unitOfWork.SaveAsync();            
         }
     }
 }

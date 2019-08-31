@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Sieve.Services;
 using Tss.Core.Generics;
 using Tss.Infrastructure.Contexts;
+using System.Collections.Generic;
+using Sieve.Models;
 
 namespace Tss.Infrastructure.Generics
 {
@@ -14,7 +16,7 @@ namespace Tss.Infrastructure.Generics
         
         private readonly TssContext _context;
         private readonly IUnitOfWork _unitOfWork;
-
+        private readonly SieveProcessor _sieveProcessor;
 
         public Repository(
             TssContext context,
@@ -28,43 +30,50 @@ namespace Tss.Infrastructure.Generics
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _unitOfWork.Register(this);
 
+            _sieveProcessor = sieveProcessor ?? throw new ArgumentNullException(nameof(sieveProcessor));
         }
 
-        public virtual IQueryable<TEntity> Get(
+        public virtual Task<List<TEntity>> Get(
+            SieveModel sieve
         )
         {
-            return _dbSet.AsQueryable().AsNoTracking();
+            return _sieveProcessor.Apply<TEntity>(sieve, _dbSet).ToListAsync();
         }
 
         public virtual Task<TEntity> Get(int id)
         {
             return _dbSet.FindAsync(id);
         }
-        public virtual void Put(TEntity entity)
-        {
-            _dbSet.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
 
+        public virtual TEntity Put(TEntity entity)
+        {
+            return _dbSet.Update(entity).Entity;
         }
 
-        public virtual void Post(TEntity entity)
+        public virtual TEntity Post(TEntity entity)
         {
-            _dbSet.Add(entity);
+            return _dbSet.Add(entity).Entity;
         }
 
-        public virtual async void Delete(int id)
+        public virtual TEntity Delete(TEntity entity)
         {
-            TEntity entity = await Get(id);
-            Delete(entity);
+            return _dbSet.Remove(entity).Entity;
         }
 
-        public virtual void Delete(TEntity entity)
+        public virtual void DeleteRange(List<TEntity> entity)
         {
-            if (_context.Entry(entity).State == EntityState.Detached)
-            {
-                _dbSet.Attach(entity);
-            }
-            _dbSet.Remove(entity);
+            _dbSet.RemoveRange(entity);
         }
+
+        public virtual void PutRange(List<TEntity> entity)
+        {
+            _dbSet.UpdateRange(entity);
+        }
+
+        public virtual void PostRange(List<TEntity> entity)
+        {
+            _dbSet.AddRange(entity);
+        }
+
     }
 }

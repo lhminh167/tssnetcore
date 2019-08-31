@@ -6,6 +6,6 @@ namespace Tss.Core.Generics
     {
         void Register(IRepository repository);
         
-        Task<int> Save();
+        Task<int> SaveAsync();
     }
 }

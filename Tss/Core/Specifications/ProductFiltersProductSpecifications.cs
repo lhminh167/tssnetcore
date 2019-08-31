@@ -1,9 +1,9 @@
 using Sieve.Attributes;
 using Tss.Core.Entities;
 
-namespace Tss.Core.ProductFilters
+namespace Tss.Core.Specifications
 {
-    public class ProductFiltersProductSpecifications
+    public class ProductFilterProductSpecifications
     {
         public string Keyword { get; }
         public int ColorId { get; }

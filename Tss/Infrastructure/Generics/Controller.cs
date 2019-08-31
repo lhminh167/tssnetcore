@@ -26,14 +26,13 @@ namespace Tss.Infrastructure.Generics
 
         // GET: api/Products
         [HttpGet]
-        public virtual List<TEntity> Get(
+        public virtual async Task<List<TEntity>> Get(
             [FromQuery] SieveModel sieveModel
         )
         {
-            return _service.Get(sieveModel);
+            return await _service.Get(sieveModel);
         }
 
-        // GET: api/Products/5
         [HttpGet("{id}")]
         public virtual async Task<IActionResult> Get([FromRoute] int id)
         {
@@ -52,7 +51,6 @@ namespace Tss.Infrastructure.Generics
             return Ok(entity);
         }
 
-        // PUT: api/Products/5
         [HttpPut("{id}")]
         public virtual async Task<IActionResult> Put([FromRoute] int id, [FromBody] TEntity entity)
         {
@@ -87,7 +85,6 @@ namespace Tss.Infrastructure.Generics
             return NoContent();
         }
 
-        // POST: api/Products
         [HttpPost]
         public virtual async Task<IActionResult> Post([FromBody] TEntity entity)
         {
@@ -99,13 +96,12 @@ namespace Tss.Infrastructure.Generics
             await _service.Post(entity);
 
             return CreatedAtAction(
-                "GetProduct",
+                nameof(Get),
                 new { id = EntityId(entity) },
                 entity
             );
         }
 
-        // DELETE: api/Products/5
         [HttpDelete("{id}")]
         public virtual async Task<IActionResult> Delete([FromRoute] int id)
         {
@@ -121,7 +117,7 @@ namespace Tss.Infrastructure.Generics
                 return NotFound();
             }
 
-            await _service.Delete(id);
+            await _service.Delete(entity);
 
             return Ok(entity);
         }

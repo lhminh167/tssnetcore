@@ -24,7 +24,7 @@ namespace Tss.Infrastructure.Generics
             _repositories.Add(repository.GetType().Name, repository);
         }
 
-        public Task<int> Save()
+        public Task<int> SaveAsync()
         {
             return _context.SaveChangesAsync();
         }

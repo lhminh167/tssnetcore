@@ -10,15 +10,13 @@ namespace Tss.Core.Generics
 
     public interface IService<T> : IService where T : class
     {
-        List<T> Get(SieveModel sieveModel);
+        Task<List<T>> Get(SieveModel sieveModel);
 
         Task<T> Get(int id);
         
         Task<int> Put(T entity);
         
         Task<int> Post(T entity);
-
-        Task<int> Delete(int id);
 
         Task<int> Delete(T entity);        
     }
