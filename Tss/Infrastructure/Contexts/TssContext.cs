@@ -516,7 +516,7 @@ namespace Tss.Infrastructure.Contexts
 
                 entity.Property(e => e.BuyNow)
                     .HasColumnName("buy_now")
-                    .HasColumnType("tinyint(1)")
+                    // .HasColumnType("tinyint(1)")
                     .HasDefaultValueSql("'1'");
 
                 entity.Property(e => e.CartId)

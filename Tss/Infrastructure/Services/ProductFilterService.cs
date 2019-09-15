@@ -9,6 +9,7 @@ using Tss.Core.Specifications;
 using Tss.Core.Services;
 using Tss.Core.Repositories;
 using Tss.Core.Models;
+using System.Threading.Tasks;
 
 namespace Tss.Infrastructure.Services
 {
@@ -27,13 +28,13 @@ namespace Tss.Infrastructure.Services
             _sieveProcessor = sieveProcessor ?? throw new ArgumentNullException(nameof(sieveProcessor));
         }
 
-        public ProductFilterFilter Filter()
+        public async Task<ProductFilterFilter> Filter()
         {   
             
-            return _ProductFilterRepository.Filter();
+            return await _ProductFilterRepository.Filter();
         }
 
-        public List<ProductFilterProduct> Product(
+        public async Task<List<Product>> Product(
             ProductFilterProductSpecifications specs
         )
         {   
@@ -45,10 +46,10 @@ namespace Tss.Infrastructure.Services
                 // PageSize = specs.PageSize
             };
 
-            var dbSet = _ProductFilterRepository.Product(specs);
+            var dbSet = (await _ProductFilterRepository.Product(specs)).AsQueryable();
 
             return _sieveProcessor
-                .Apply<ProductFilterProduct>(sieve, dbSet)
+                .Apply<Product>(sieve, dbSet)
                 .ToList();
         }
     }

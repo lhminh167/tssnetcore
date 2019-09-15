@@ -1,4 +1,6 @@
-using System.Linq;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Tss.Core.Entities;
 using Tss.Core.Generics;
 using Tss.Core.Models;
 using Tss.Core.Specifications;
@@ -9,9 +11,9 @@ namespace Tss.Core.Repositories
     public interface IProductFilterRepository : IRepository
     {
 
-        ProductFilterFilter Filter();
+        Task<ProductFilterFilter> Filter();
 
-        IQueryable<ProductFilterProduct> Product(
+        Task<List<Product>> Product(
             ProductFilterProductSpecifications specs
         );
     }

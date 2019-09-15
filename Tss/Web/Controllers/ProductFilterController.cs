@@ -4,6 +4,10 @@ using System.Collections.Generic;
 using Tss.Core.Services;
 using Tss.Core.Models;
 using Tss.Core.Specifications;
+using Tss.Core.Constants;
+using Microsoft.AspNetCore.Http;
+using System.Threading.Tasks;
+using Tss.Core.Entities;
 
 namespace Tss.Web.Controllers
 {
@@ -20,17 +24,35 @@ namespace Tss.Web.Controllers
         }
 
         [HttpGet("Filter")]
-        public ProductFilterFilter Filter()
+        public async Task<IActionResult> Filter()
         {
-            return _service.Filter();
+            var dbItem = await _service.Filter();
+            var status = StatusCodes.Status200OK;
+            var response = new Response
+            {
+                Content = dbItem,
+                Status = status,
+                Type = URL.GetErrorType(status),
+                Title = null
+            };
+            return Ok(response);
         }
 
         [HttpGet("Product")]
-        public List<ProductFilterProduct> Product(
+        public async Task<IActionResult> Product(
             ProductFilterProductSpecifications specs
         )
         {
-            return _service.Product(specs);
+            var dbItem = await _service.Product(specs);
+            var status = StatusCodes.Status200OK;
+            var response = new Response
+            {
+                Content = dbItem,
+                Status = status,
+                Type = URL.GetErrorType(status),
+                Title = "Product list was successfully retrieved."
+            };
+            return Ok(response);
         }
     }
 }

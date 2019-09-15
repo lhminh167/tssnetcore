@@ -25,7 +25,7 @@ namespace Tss.Core.Entities
         public int Quantity { get; set; }
         
         [Sieve(CanFilter = true, CanSort = true)]
-        public bool? BuyNow { get; set; }
+        public bool BuyNow { get; set; }
         
         [Sieve(CanFilter = true, CanSort = true)]
         public DateTime AddedOn { get; set; }

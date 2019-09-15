@@ -79,7 +79,7 @@ namespace Tss.Infrastructure.Repositories
                 join p in  _context.Product
                 on sc.ProductId equals p.ProductId
                 where sc.CartId == cartId
-                && sc.BuyNow.Value
+                && sc.BuyNow
                 select new ShoppingCartItemGet {
                     ItemId = sc.ItemId,
                     ProductId = sc.ProductId,
@@ -102,7 +102,7 @@ namespace Tss.Infrastructure.Repositories
                 join p in  _context.Product
                 on sc.ProductId equals p.ProductId
                 where sc.CartId == cartId
-                && !sc.BuyNow.Value
+                && !sc.BuyNow
                 select new ShoppingCartItemGet {
                     ItemId = sc.ItemId,
                     ProductId = sc.ProductId,
@@ -125,7 +125,7 @@ namespace Tss.Infrastructure.Repositories
                 join p in  _context.Product
                 on sc.ProductId equals p.ProductId
                 where sc.CartId == cartId
-                && sc.BuyNow.Value
+                && sc.BuyNow
                 select new ShoppingCartItemGet {
                     Quantity = sc.Quantity,
                     Price = p.Price,
