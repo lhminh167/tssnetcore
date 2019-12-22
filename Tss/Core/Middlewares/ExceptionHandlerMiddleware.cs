@@ -1,16 +1,11 @@
-using System.Net.Http;
 using System;
 using System.Net;
 using System.Threading.Tasks;
-// using DeviceManager.Api.Model;
-// using FluentValidation;
 using Microsoft.AspNetCore.Http;
 using Tss.Core.Constants;
 using Newtonsoft.Json;
-using Tss.Core.Exceptions;
-using Tss.Core.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Tss.Core.Models;
 
 namespace Tss.Core.Middlewares
 {
