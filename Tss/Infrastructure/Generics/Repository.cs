@@ -3,10 +3,11 @@ using System.Linq;
 using System;
 using Microsoft.EntityFrameworkCore;
 using Sieve.Services;
-using Tss.Core.Generics;
+using Tss.Core.Interfaces;
 using Tss.Infrastructure.Contexts;
 using System.Collections.Generic;
 using Sieve.Models;
+using System.Linq.Expressions;
 
 namespace Tss.Infrastructure.Generics
 {
@@ -33,16 +34,41 @@ namespace Tss.Infrastructure.Generics
             _sieveProcessor = sieveProcessor ?? throw new ArgumentNullException(nameof(sieveProcessor));
         }
 
-        public virtual Task<List<TEntity>> Get(
+        public virtual async Task<List<TEntity>> Get()
+        {
+            return await _dbSet.ToListAsync();
+        }
+
+        public virtual async Task<List<TEntity>> Get(
             SieveModel sieve
         )
         {
-            return _sieveProcessor.Apply<TEntity>(sieve, _dbSet).ToListAsync();
+            return await _sieveProcessor.Apply<TEntity>(sieve, _dbSet).ToListAsync();
         }
 
-        public virtual Task<TEntity> Get(int id)
+        public virtual async Task<List<TOut>> Get<TOut>(
+            ISpecification<TEntity, TOut> spec
+        )
         {
-            return _dbSet.FindAsync(id);
+            return await ApplySpecification(spec).ToListAsync();
+        }
+
+        public virtual async Task<TOut> GetOne<TOut>(
+            ISpecification<TEntity, TOut> spec
+        )
+        {
+            return await ApplySpecification(spec).FirstOrDefaultAsync();
+        }
+
+
+        public virtual async Task<TEntity> Get(int id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
+
+        public async Task<int> Count(ISpecification<TEntity, TEntity> spec)
+        {
+            return await ApplySpecification(spec).CountAsync();
         }
 
         public virtual TEntity Put(TEntity entity)
@@ -75,5 +101,9 @@ namespace Tss.Infrastructure.Generics
             _dbSet.AddRange(entity);
         }
 
+        private IQueryable<TOut> ApplySpecification<TOut>(ISpecification<TEntity, TOut> spec)
+        {
+            return SpecificationEvaluator<TEntity>.GetQuery(_dbSet, spec);
+        }
     }
 }

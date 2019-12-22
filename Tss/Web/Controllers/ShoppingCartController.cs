@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tss.Core.Entities;
-using Tss.Core.Models;
-using Tss.Core.Services;
+using Tss.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Tss.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Tss.Core.Models;
 
 namespace Tss.Web.Controllers
 {
@@ -67,19 +66,20 @@ namespace Tss.Web.Controllers
             return Ok(response);
         }
 
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> AddItem([FromBody] ShoppingCartAdd input)
+        public async Task<IActionResult> AddItem([FromBody] ShoppingCartAddItemRequest input)
         {
-            var dbItem = await _service.AddItem(input);
+            var result = await _service.AddItem(input);
             var status = StatusCodes.Status201Created;
             var response = new Response
             {
-                Content = dbItem,
+                Content = result,
                 Status = status,
                 Type = URL.GetErrorType(status),
                 Title = "Item was successfully added to cart.",
             };
-            return CreatedAtAction("GetProduct", new { id = dbItem.ItemId }, response);
+            return CreatedAtAction("GetProduct", new { id = result.Item.ItemId }, response);
         }
 
         [HttpPut("{itemId}")]
@@ -126,7 +126,7 @@ namespace Tss.Web.Controllers
             };
             return Ok(response);
         }
-        
+
         [HttpDelete("{itemId}")]
         public async Task<IActionResult> RemoveItem([FromRoute] int itemId)
         {
