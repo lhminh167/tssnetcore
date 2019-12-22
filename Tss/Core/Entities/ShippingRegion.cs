@@ -6,11 +6,16 @@ namespace Tss.Core.Entities
 {
     public class ShippingRegion
     {
-        
-        [Sieve(CanFilter = true, CanSort = true)]
+        public ShippingRegion()
+        {
+            Customer = new HashSet<Customer>();
+            Shipping = new HashSet<Shipping>();
+        }
+
         public int ShippingRegionId { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string ShippingRegion1 { get; set; }
+
+        public virtual ICollection<Customer> Customer { get; set; }
+        public virtual ICollection<Shipping> Shipping { get; set; }
     }
 }

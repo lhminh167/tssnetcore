@@ -1,36 +1,73 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Ardalis.GuardClauses;
+using Tss.Core.Extensions;
+using Tss.Core.Models;
 
 namespace Tss.Core.Entities
 {
     public class Product
     {
-        [Sieve(CanFilter = true, CanSort = true)]
-        public int ProductId { get; set; }
+        public Product()
+        {
+            OrderDetail = new HashSet<OrderDetail>();
+            ProductAttribute = new HashSet<ProductAttribute>();
+            ProductCategory = new HashSet<ProductCategory>();
+            Review = new HashSet<Review>();
+            ShoppingCart = new HashSet<ShoppingCart>();
+        }
 
-        [Sieve(CanFilter = true, CanSort = true)]
+        public int ProductId { get; set; }
         public string Name { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string Description { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
-        public decimal Price { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
-        public decimal DiscountedPrice { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
+        public double Price { get; set; }
+        public double DiscountedPrice { get; set; }
         public string Image { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string Image2 { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string Thumbnail { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public short Display { get; set; }
+
+        public virtual ICollection<OrderDetail> OrderDetail { get; set; }
+        public virtual ICollection<ProductAttribute> ProductAttribute { get; set; }
+        public virtual ICollection<ProductCategory> ProductCategory { get; set; }
+        public virtual ICollection<Review> Review { get; set; }
+        public virtual ICollection<ShoppingCart> ShoppingCart { get; set; }
+
+        // private IReadOnlyCollection<AttributeValueResponse> GetAttributes()
+        // {
+        //     return ProductAttribute.Select(pa => new AttributeValueResponse(pa.AttributeValue)).ToList();
+        // }
+
+        public bool CheckAttributes(string attributeList)
+        {
+            IDictionary<string, string> dict = AttributeValue.Decode(attributeList);
+
+            IEnumerable<ProductAttribute> matchedAttributeValues = ProductAttribute.Where(pa =>
+                dict.Contains(
+                    new KeyValuePair<string, string>(
+                        pa.AttributeValue.Attribute.Name,
+                        pa.AttributeValue.Value
+                    )
+                )
+            );
+
+            return dict.Count == matchedAttributeValues.Count();
+        }
+
+        private void AddProductAttribute(AttributeValue attributeValue)
+        {
+            Guard.Against.Null(attributeValue, nameof(attributeValue));
+
+            ProductAttribute.Add(new ProductAttribute(this, attributeValue));
+        }
+
+        public void UpdateProductAttribute(ProductAttribute currentProductAttribute, AttributeValue attributeValueToAdd)
+        {
+            Guard.Against.Null(currentProductAttribute, nameof(currentProductAttribute));
+            Guard.Against.Null(attributeValueToAdd, nameof(attributeValueToAdd));
+
+            ProductAttribute.Remove(currentProductAttribute);
+            AddProductAttribute(attributeValueToAdd);
+        }
     }
 }

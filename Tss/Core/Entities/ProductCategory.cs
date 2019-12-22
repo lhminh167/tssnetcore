@@ -1,15 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
-
-namespace Tss.Core.Entities
+﻿namespace Tss.Core.Entities
 {
     public class ProductCategory
     {
-        [Sieve(CanFilter = true, CanSort = true)]
         public int ProductId { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public int CategoryId { get; set; }
+
+        public virtual Category Category { get; set; }
+        public virtual Product Product { get; set; }
     }
 }

@@ -1,24 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+using Tss.Core.Interfaces;
 
 namespace Tss.Core.Entities
 {
     public class Audit
     {
-        [Sieve(CanFilter = true, CanSort = true)]
         public int AuditId { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public int OrderId { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public DateTime CreatedOn { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string Message { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public int Code { get; set; }
+
+        public virtual Orders Order { get; set; }
+
+        public Audit(string message, int code, int orderId)
+        {
+            OrderId = orderId;
+            CreatedOn = DateTime.Now;
+            Code = code;
+            Message = message;
+        }
     }
 }

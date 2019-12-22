@@ -1,15 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Ardalis.GuardClauses;
+using Tss.Core.Extensions;
+using Tss.Core.Models;
 
 namespace Tss.Core.Entities
 {
     public class Attribute
     {
-        [Sieve(CanFilter = true, CanSort = true)]
-        public int AttributeId { get; set; }
+        public Attribute(string name)
+        {
+            Guard.Against.NullOrWhiteSpace(name, nameof(name));
 
-        [Sieve(CanFilter = true, CanSort = true)]
+            Name = name;
+        }
+
+        public Attribute()
+        {
+            AttributeValue = new HashSet<AttributeValue>();
+        }
+
+        public int AttributeId { get; set; }
         public string Name { get; set; }
+
+        public virtual ICollection<AttributeValue> AttributeValue { get; set; }
     }
 }
