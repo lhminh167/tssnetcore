@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Tss.Infrastructure.Contexts;
+using Tss.Core.Models;
 
 namespace Tss.Core.Configs
 {
@@ -16,22 +17,9 @@ namespace Tss.Core.Configs
         /// Configures the service.
         /// </summary>
         /// <param name="services">The services.</param>
-        public static void ConfigureService(IServiceCollection services, IConfiguration configuration)
+        public static void ConfigureService(IServiceCollection services, AppSettings appSettings)
         {            
-            // For development in local environment
-            var connectionString = configuration.GetConnectionString("DefaultConnection");
-
-            // For deployment to Heroku
-            var isProduction = string.Equals(Environment.GetEnvironmentVariable("ENV"), "production");
-
-            if (isProduction)
-            {
-                connectionString = Environment.GetEnvironmentVariable("CLEARDB_DATABASE_URL");
-            }
-
-            services.AddDbContext<TssContext>(options => options.UseMySql(connectionString));
-
-
+            services.AddDbContext<TssContext>(options => options.UseMySql(appSettings.DatabaseConnectionString));
         }
 
         /// <summary>

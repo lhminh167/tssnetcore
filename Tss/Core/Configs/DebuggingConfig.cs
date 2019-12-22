@@ -4,6 +4,7 @@ using Tss.Core.Middlewares;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using Ardalis.ListStartupServices;
+using Microsoft.Extensions.Hosting;
 
 namespace Tss.Core.Configs
 {
@@ -18,11 +19,6 @@ namespace Tss.Core.Configs
         /// <param name="services">The services.</param>
         public static void ConfigureService(IServiceCollection services)
         {
-            services.Configure<ServiceConfig>(config =>
-            {
-                config.Services = new List<ServiceDescriptor>(services);
-                config.Path = "/allservices";
-            });
         }
 
         /// <summary>
@@ -31,12 +27,11 @@ namespace Tss.Core.Configs
         /// <param name="app">The application.</param>
         public static void Configure(
             IApplicationBuilder app,
-            IHostingEnvironment env
+            IWebHostEnvironment env
         )
         {
             if (env.IsDevelopment())
             {
-                app.UseShowAllServicesMiddleware();
                 app.UseDeveloperExceptionPage();
                 app.UseDatabaseErrorPage();
             }

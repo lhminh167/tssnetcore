@@ -7,6 +7,9 @@ using Tss.Web.ActionFilters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Tss.Core.Models;
+using System.Threading.Tasks;
+using Tss.Core.Interfaces;
 
 namespace Tss.Core.Configs
 {
@@ -19,54 +22,38 @@ namespace Tss.Core.Configs
         /// Configures the service.
         /// </summary>
         /// <param name="services">The services.</param>
-        public static void ConfigureService(IServiceCollection services)
+        public static void ConfigureService(IServiceCollection services, AppSettings appSettings)
         {
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+            byte[] key = Encoding.ASCII.GetBytes(appSettings.AuthenticationTokenSecret);
+
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
             .AddJwtBearer(options =>
             {
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
                 options.TokenValidationParameters = new TokenValidationParameters
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
                     ValidateIssuerSigningKey = true,
-
-                    ValidIssuer = "http://localhost:5000",
-                    ValidAudience = "http://localhost:5000",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
+                    IssuerSigningKey = new SymmetricSecurityKey(key),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
                 };
             });
-            
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies 
-                // is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
 
-            services.AddSession(options =>
-            {
-                // Set a short timeout for easy testing.
-                options.IdleTimeout = TimeSpan.FromDays(7);
-                options.Cookie.HttpOnly = true;
-                // Make the session cookie essential
-                options.Cookie.IsEssential = true;
-            });
-
-            services.AddHttpContextAccessor();
 
             services
-            .AddMvcCore()
-            .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
-            .AddCors()
-            .AddJsonFormatters()
-            .AddApiExplorer()
-            .AddMvcOptions(options =>
-            {
+            .AddMvc()
+            .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
+            .AddMvcOptions(options => {
                 options.Filters.Add(typeof(ValidateModelStateAttribute));
+            })
+            .AddNewtonsoftJson( options => {
+                options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
-
         }
 
         /// <summary>
@@ -75,18 +62,18 @@ namespace Tss.Core.Configs
         /// <param name="app">The application.</param>
         public static void Configure(IApplicationBuilder app)
         {
-            app.UseCors(builder =>
-                builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials()
-            );
-            app.UseCookiePolicy();
-            app.UseAuthentication();
-            app.UseSession();
-            app.UseHttpsRedirection();
-            app.UseMvcWithDefaultRoute();
+            app.UseRouting();
+            app.UseCors();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints
+                .MapControllers()
+                .RequireAuthorization();
+            });
         }
     }
 }
