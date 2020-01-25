@@ -8,12 +8,12 @@ namespace Tss.Core.Specifications
         public GetAttributeByIdSpecification(int attributeId, IAuthHelper authHelper)
         : base(
             a 
-            => (attributeId > 0 || a.AttributeId == attributeId)
+            => a.AttributeId == attributeId
             ,
             a => a
         )
         {
-            AddInclude(av => av.AttributeValue);
+            SetIsNoTracking(true);
         }
     }
 

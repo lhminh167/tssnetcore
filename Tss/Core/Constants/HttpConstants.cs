@@ -1,3 +1,5 @@
+using System.Net;
+
 namespace Tss.Core.Constants
 {
     public static class HttpContentType {
@@ -13,9 +15,9 @@ namespace Tss.Core.Constants
 
     public static class URL {
         private const string ErrorTypeUrl = "https://httpstatuses.com/";
-        public static string GetErrorType(int status)
+        public static string GetErrorType(HttpStatusCode status)
         {
-            return ErrorTypeUrl + status;
+            return ErrorTypeUrl + (int)status;
         }
     }
 }

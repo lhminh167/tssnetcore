@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Ardalis.GuardClauses;
-using Tss.Core.Extensions;
 
 namespace Tss.Core.Entities
 {
@@ -27,19 +26,22 @@ namespace Tss.Core.Entities
         public string Value { get; set; }
 
         public virtual Attribute Attribute { get; set; }
-        public virtual ICollection<CustomerAttribute> CustomerAttribute { get; set; }
-        public virtual ICollection<ProductAttribute> ProductAttribute { get; set; }
+        private ICollection<CustomerAttribute> CustomerAttribute { get; set; }
+        private ICollection<ProductAttribute> ProductAttribute { get; set; }
+
+        public string Name => Attribute?.Name;
 
         public void Update(AttributeValue attributeValue)
         {
             Guard.Against.Null(attributeValue, nameof(attributeValue));
-            Guard.Against.NullOrWhiteSpace(attributeValue.Value, nameof(attributeValue.Value));
             
             Value = attributeValue.Value;
         }
 
         public static IDictionary<string, string> Decode(string attributeList)
         {
+            Guard.Against.Null(attributeList, nameof(attributeList));
+
             List<string> attributesAndAttributeValues = attributeList.Split(":").ToList();
 
             List<string> attributes = attributesAndAttributeValues.FirstOrDefault().Split("/").ToList();
@@ -58,6 +60,8 @@ namespace Tss.Core.Entities
 
         public static string Encode(List<AttributeValue> attributeList)
         {            
+            Guard.Against.Null(attributeList, nameof(attributeList));
+
             string attributes = string.Join("/", attributeList.Select(av => av.Attribute.Name));
             string attributeValues = string.Join("/", attributeList.Select(av => av.Value));
             return string.Join(":", attributes, attributeValues);
@@ -65,6 +69,9 @@ namespace Tss.Core.Entities
 
         public void UpdateAttribute(int attributeId, string value)
         {
+            Guard.Against.OutOfRange(attributeId, nameof(attributeId), 1, int.MaxValue);
+            Guard.Against.NullOrWhiteSpace(value, nameof(value));
+
             AttributeId = attributeId;
             Value = value;
         }

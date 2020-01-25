@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace Tss.Core.Models
 {
-    public class ShoppingCartAddItemRequest
+    public class ShoppingCartItemAddRequest
     {        
         public int ProductId { get; set; }
         public int Quantity { get; set; }

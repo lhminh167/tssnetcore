@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ardalis.GuardClauses;
-using Sieve.Attributes;
 
 namespace Tss.Core.Entities
 {
@@ -11,6 +11,7 @@ namespace Tss.Core.Entities
         {
             Guard.Against.Null(product, nameof(product));
             Guard.Against.Null(attributeValue, nameof(attributeValue));
+            Guard.Against.BadRequest(AllowedValues.Contains(attributeValue.Attribute.Name), $"{attributeValue.Attribute.Name} is not a product's attribute.");
 
             ProductId = product.ProductId;
             AttributeValueId = attributeValue.AttributeValueId;
@@ -28,5 +29,7 @@ namespace Tss.Core.Entities
 
         public virtual AttributeValue AttributeValue { get; set; }
         public virtual Product Product { get; set; }
+
+        public static IReadOnlyList<string> AllowedValues => new List<string>{"Color", "Size"};
     }
 }

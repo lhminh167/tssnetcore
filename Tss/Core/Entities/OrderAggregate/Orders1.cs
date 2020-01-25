@@ -13,12 +13,20 @@ namespace Tss.Core.Entities
             List<ShoppingCart> shoppingCart,
             Customer customer,
             Shipping shipping,
-            Tax tax
+            Tax tax,
+            ShippingRegion shippingRegion
         )
         {
-            Guard.Against.Null(shoppingCart, nameof(shoppingCart));
+            Guard.Against.Null(shoppingCart, nameof(ShoppingCart));
             Guard.Against.OutOfRange(shoppingCart.Count, nameof(shoppingCart.Count), 1, int.MaxValue);
-            Guard.Against.Null(customer, nameof(customer));
+            Guard.Against.Null(customer, nameof(Customer));
+            Guard.Against.Null(shipping, nameof(Shipping));
+            Guard.Against.Null(tax, nameof(Tax));
+            Guard.Against.Null(shippingRegion, nameof(ShippingRegion));
+            Guard.Against.BadRequest(
+                shipping.ShippingRegionId == shippingRegion.ShippingRegionId, 
+                "This shipping option is not available at your chosen region."
+            );
 
             CreatedOn = DateTime.Now;
             Status = OrderStatus.OrderPlacedNotifyingCustomer.Id;
@@ -29,6 +37,7 @@ namespace Tss.Core.Entities
             Tax = tax;
             Customer = customer;
             Shipping = shipping;
+            Audit = new List<Audit>();
             OrderDetail = shoppingCart.Select(item => new OrderDetail(
                 item.Product,
                 this,
@@ -82,8 +91,6 @@ namespace Tss.Core.Entities
 
         private void SetDateShipped()
         {
-            Guard.Against.OutOfRange(ShippingId, nameof(ShippingId), 1, int.MaxValue);
-
             ShippedOn = DateTime.Now;
         }
 

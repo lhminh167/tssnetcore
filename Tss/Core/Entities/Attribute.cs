@@ -11,7 +11,6 @@ namespace Tss.Core.Entities
         public Attribute(string name)
         {
             Guard.Against.NullOrWhiteSpace(name, nameof(name));
-
             Name = name;
         }
 
@@ -24,5 +23,11 @@ namespace Tss.Core.Entities
         public string Name { get; set; }
 
         public virtual ICollection<AttributeValue> AttributeValue { get; set; }
+
+        public void Update(string name)
+        {
+            Guard.Against.NullOrWhiteSpace(name, nameof(name));
+            Name = name;
+        }
     }
 }

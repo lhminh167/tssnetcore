@@ -1,6 +1,6 @@
 namespace Tss.Core.Models
 {
-    public class ShoppingCartUpdate
+    public class ShoppingCartItemUpdateRequest
     {
         public int Quantity;
     }

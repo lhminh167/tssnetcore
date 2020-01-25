@@ -6,6 +6,7 @@ using Tss.Core.Constants;
 using Tss.Core.Models;
 using Tss.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace Tss.Web.Controllers
 {
@@ -25,75 +26,61 @@ namespace Tss.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Get([FromQuery] string name)
         {
-            var dbAttributeValue = await _service.Get(name);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbAttributeValue,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Attribute values were successfully retrieved."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Attribute values were successfully retrieved.",
+                await _service.Get(name)
+            );
             return Ok(response);
         }
 
         [HttpGet("{attributeValueId}")]
         public async Task<IActionResult> GetOne([FromRoute] int attributeValueId)
         {
-            var dbAttributeValue = await _service.GetOne(attributeValueId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbAttributeValue,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Attribute value was successfully retrieved."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Attribute value was successfully retrieved.",
+                await _service.GetOne(attributeValueId)
+            );
             return Ok(response);
         }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] AttributeValueCreateRequest input)
         {
-            var dbAttributeValue = await _service.Create(input);
-            var status = StatusCodes.Status201Created;
-            var response = new Response
-            {
-                Content = null,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Attribute value was created successfully.",
-            };
-            return CreatedAtAction(nameof(GetOne), new { attributeValueId = dbAttributeValue.AttributeValueId }, response);
+            AttributeValue content = await _service.Create(input);
+            Response response = new Response
+            (            
+                HttpStatusCode.Created,
+                "Attribute value was created successfully.",
+                content
+            );
+            return CreatedAtAction(nameof(GetOne), new { attributeValueId = content.AttributeValueId }, response);
         }
 
         [HttpPut("{attributeValueId}")]
         public async Task<IActionResult> Update([FromBody] AttributeValue input)
         {
-            var dbAttributeValue = await _service.Update(input);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbAttributeValue,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Attribute value was updated successfully.",
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Attribute value was updated successfully.",
+                await _service.Update(input)
+            );
             return Ok(response);
         }
 
         [HttpDelete("{attributeValueId}")]
         public async Task<IActionResult> Delete([FromRoute] int attributeValueId)
         {
-            var dbAttributeValue = await _service.Delete(attributeValueId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbAttributeValue,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Attribute value was successfully deleted."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Attribute value was successfully deleted.",
+                await _service.Delete(attributeValueId)
+            );
             return Ok(response);
         }
     }

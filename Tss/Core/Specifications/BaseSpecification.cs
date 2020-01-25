@@ -14,34 +14,48 @@ namespace Tss.Core.Specifications
         {
             Criteria = criteria;
             Select = select;
+            _includes = new List<Expression<Func<T, object>>>();
+            _includeStrings = new List<string>();
+            IsPagingEnabled = false;
         }
         
-        public Expression<Func<T, bool>> Criteria { get; }
-        public Expression<Func<T, TOut>> Select { get; }
-        public List<Expression<Func<T, object>>> Includes { get; } = new List<Expression<Func<T, object>>>();
-        public List<string> IncludeStrings { get; } = new List<string>();
+        public Expression<Func<T, bool>> Criteria { get; private set; }
+        public Expression<Func<T, TOut>> Select { get; private set; }
+        public IReadOnlyList<Expression<Func<T, object>>> Includes => _includes;
+        public IReadOnlyList<string> IncludeStrings => _includeStrings;
         public Expression<Func<T, object>> OrderBy { get; private set; }
         public Expression<Func<T, object>> OrderByDescending { get; private set; }
         public Expression<Func<T, object>> GroupBy { get; private set; }
 
-        public int Take { get; private set; }
-        public int Skip { get; private set; }
-        public bool IsPagingEnabled { get; private set; } = false;
+        public bool IsNoTracking { get; private set; }
+
+        public int PageIndex { get; private set; }
+        public int PageSize { get; private set; }
+        public bool IsPagingEnabled { get; private set; }
+
+
+        private List<Expression<Func<T, object>>> _includes;
+        private List<string> _includeStrings;
 
         protected virtual void AddInclude(Expression<Func<T, object>> includeExpression)
         {
-            Includes.Add(includeExpression);
+            _includes.Add(includeExpression);
         }
 
         protected virtual void AddInclude(string includeString)
         {
-            IncludeStrings.Add(includeString);
+            _includeStrings.Add(includeString);
         }
 
-        protected virtual void ApplyPaging(int skip, int take)
+        protected virtual void SetIsNoTracking(bool isNoTracking)
         {
-            Skip = skip;
-            Take = take;
+            IsNoTracking = isNoTracking;
+        }
+
+        protected virtual void ApplyPaging(int pageIndex, int pageSize)
+        {
+            PageIndex = pageIndex;
+            PageSize = pageSize;
             IsPagingEnabled = true;
         }
         

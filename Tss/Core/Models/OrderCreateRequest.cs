@@ -1,20 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using Tss.Core.Entities;
-
 namespace Tss.Core.Models
 {
-    public class RegistrationForm
+    public class OrderCreateRequest
     {
+        public string Comments { get; set; }
+        public int ShippingId { get; set; }
         public int CustomerId { get; set; }
-        [Required]
         public string Name { get; set; }
-        [Required]
         public string Email { get; set; }
-        [Required]
-        public string Password { get; set; }
-        public string CreditCard { get; set; }
+        // public string CreditCard { get; set; }
         public string Address1 { get; set; }
         public string Address2 { get; set; }
         public string City { get; set; }
@@ -25,6 +18,6 @@ namespace Tss.Core.Models
         public string DayPhone { get; set; }
         public string EvePhone { get; set; }
         public string MobPhone { get; set; }
-        public string Role { get; set; }
+        public string PaymentMethodId { get; set; }
     }
 }

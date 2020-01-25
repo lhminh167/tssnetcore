@@ -3,6 +3,7 @@ using Tss.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Tss.Core.Entities;
 using Tss.Core.Models;
+using System.Net;
 
 namespace Tss.Core.Exceptions
 {
@@ -13,15 +14,13 @@ namespace Tss.Core.Exceptions
             $"This email address is already taken. Please use another email address."
         )
         {
-            var status = StatusCodes.Status400BadRequest;
-            var response = new Response
-            {
-                Status = status,
-                Title = base.Message,
-                Detail = $"This email address is already taken. Please use another email address."
-            };
-
-            base.Data.Add("Response", response);
+            Response response = new Response
+            (
+                HttpStatusCode.BadRequest,
+                base.Message,
+                $"This email address is already taken. Please use another email address."
+            );
+            base.Data.Add(nameof(Response), response);
         }
     }
 }

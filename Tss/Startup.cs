@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -10,31 +11,47 @@ namespace Tss
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        public IConfiguration AppSettingsSection { get; }
-        public AppSettings AppSettings { get; }
 
         public Startup(IWebHostEnvironment env, IConfiguration configuration)
         {
-            Configuration = configuration;
-            AppSettingsSection = Configuration.GetSection("AppSettings");
-            AppSettings = AppSettingsSection.Get<AppSettings>();
+            var builder = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
+                .AddEnvironmentVariables();
+
+
+            Configuration = builder.Build();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddOptions();
-            services.Configure<AppSettings>(AppSettingsSection);
 
-            HttpConfig.ConfigureService(services, AppSettings);
+
+            IConfiguration appSettingsSection = Configuration.GetSection("AppSettings");
+            AppSettings appSettings = appSettingsSection.Get<AppSettings>();
+            services.AddOptions();
+            services.Configure<AppSettings>(appSettingsSection);
+
+            
+            // For deployment to Heroku
+            var isProduction = string.Equals(Environment.GetEnvironmentVariable("ENV"), "production");
+
+            if (isProduction)
+            {
+                appSettings = new AppSettings();
+            }
+
+
+
+            HttpConfig.ConfigureService(services, appSettings);
             
             DIConfig.ConfigureService(services);
 
-            DatabaseConfig.ConfigureService(services, AppSettings);
+            DatabaseConfig.ConfigureService(services, appSettings);
 
             CachingConfig.ConfigureService(services);
-
-            SieveConfig.ConfigureService(services, Configuration);
 
             AutomapperConfig.ConfigureService(services);
 

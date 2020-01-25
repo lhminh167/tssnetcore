@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+﻿using System.Collections.Generic;
 
 namespace Tss.Core.Entities
 {
@@ -16,5 +14,10 @@ namespace Tss.Core.Entities
         public double TaxPercentage { get; set; }
 
         public virtual ICollection<Orders> Orders { get; set; }
+
+        public static int GetTaxId(Shipping shipping)
+        {
+            return shipping.ShippingRegionId == 2 ? 2 : 1;
+        }
     }
 }

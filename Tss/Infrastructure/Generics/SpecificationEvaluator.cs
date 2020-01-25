@@ -30,6 +30,9 @@ namespace Tss.Infrastructure.Generics
                     (current, include) => current.Include(include));
             }
 
+            if (specification.IsNoTracking)
+                query = query.AsNoTracking();
+
             // Apply ordering if expressions are set
             if (specification.OrderBy != null)
             {
@@ -48,8 +51,9 @@ namespace Tss.Infrastructure.Generics
             // Apply paging if enabled
             if (specification.IsPagingEnabled)
             {
-                query = query.Skip(specification.Skip)
-                             .Take(specification.Take);
+                query = query
+                    .Skip((specification.PageIndex - 1) * specification.PageSize)
+                    .Take(specification.PageSize);
             }
 
             if (typeof(TOut) == typeof(T))

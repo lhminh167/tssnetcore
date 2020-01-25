@@ -1,17 +1,21 @@
-using System.ComponentModel.DataAnnotations;
 using Ardalis.GuardClauses;
+using Tss.Core.Entities;
+using Tss.Core.Interfaces;
 
 namespace Tss.Core.Models
 {
     public class LoginResponse
     {
-        public LoginResponse(string token)
+        public LoginResponse(Customer customer, IAuthHelper authHelper)
         {
-            Guard.Against.Null(token, nameof(token));
-            
-            Token = token;
+            Guard.Against.Null(authHelper, nameof(authHelper));
+            Guard.Against.Null(customer, nameof(customer));
+
+            LoginToken = authHelper.GetLoginToken(customer);
+            Customer = customer;
         }
 
-        public string Token { get; set; }
+        public string LoginToken { get; private set; }
+        public Customer Customer { get; private set; }
     }
 }

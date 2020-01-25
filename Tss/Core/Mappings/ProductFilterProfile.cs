@@ -7,7 +7,7 @@ namespace Tss.Core.Mappings
     {
         public CustomerProfile()
         {
-            CreateMap<DeliveryForm, RegistrationForm>();
+            CreateMap<OrderCreateRequest, CustomerCreateRequest>();
         }
     }
 }

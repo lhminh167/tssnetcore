@@ -4,18 +4,41 @@ namespace Tss.Core.Models
 {
     public class AppSettings
     {
-        public string SendgridApiKey { get; set; } = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
-        public string StripeSecretKey { get; set; } = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
-        public string StripePublicKey { get; set; } = Environment.GetEnvironmentVariable("STRIPE_PUBLIC_KEY");
-        public string CustomerServiceEmail { get; set; } = Environment.GetEnvironmentVariable("CUSTOMER_SERVICE_EMAIL");
-        public string CustomerServiceName { get; set; } = Environment.GetEnvironmentVariable("CUSTOMER_SERVICE_NAME");
-        public string SupplierEmail { get; set; } = Environment.GetEnvironmentVariable("SUPPLIER_EMAIL");
-        public string SupplierName { get; set; } = Environment.GetEnvironmentVariable("SUPPLIER_NAME");
-        public string OrderProcessorEmail { get; set; } = Environment.GetEnvironmentVariable("ORDER_PROCESSOR_EMAIL");
-        public string OrderProcessorName { get; set; } = Environment.GetEnvironmentVariable("ORDER_PROCESSOR_NAME");
-        public string AdminEmail { get; set; } = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
-        public string AdminName { get; set; } = Environment.GetEnvironmentVariable("ADMIN_NAME");
-        public string AuthenticationTokenSecret { get; set; } = Environment.GetEnvironmentVariable("AUTHORIZATION_TOKEN_SECRET");
-        public string DatabaseConnectionString { get; set; } = Environment.GetEnvironmentVariable("CLEARDB_DATABASE_URL");
+        public AppSettings()
+        {
+            SendgridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            StripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
+            StripePublicKey = Environment.GetEnvironmentVariable("STRIPE_PUBLIC_KEY");
+            CustomerServiceEmail = Environment.GetEnvironmentVariable("CUSTOMER_SERVICE_EMAIL");
+            CustomerServiceName = Environment.GetEnvironmentVariable("CUSTOMER_SERVICE_NAME");
+            SupplierEmail = Environment.GetEnvironmentVariable("SUPPLIER_EMAIL");
+            SupplierName = Environment.GetEnvironmentVariable("SUPPLIER_NAME");
+            // OrderProcessorEmail = Environment.GetEnvironmentVariable("ORDER_PROCESSOR_EMAIL");
+            // OrderProcessorName = Environment.GetEnvironmentVariable("ORDER_PROCESSOR_NAME");
+            AdminEmail = Environment.GetEnvironmentVariable("ADMIN_EMAIL");
+            AdminName = Environment.GetEnvironmentVariable("ADMIN_NAME");
+            AuthenticationTokenSecret = Environment.GetEnvironmentVariable("AUTHORIZATION_TOKEN_SECRET");
+            DatabaseConnectionString = Environment.GetEnvironmentVariable("JAWSDB_CONNECTION");
+            CloudinaryCloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
+            CloudinaryApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
+            CloudinaryApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET");
+        }
+
+        public string SendgridApiKey { get; set; }
+        public string StripeSecretKey { get; set; }
+        public string StripePublicKey { get; set; }
+        public string CustomerServiceEmail { get; set; }
+        public string CustomerServiceName { get; set; }
+        public string SupplierEmail { get; set; }
+        public string SupplierName { get; set; }
+        // public string OrderProcessorEmail { get; set; }
+        // public string OrderProcessorName { get; set; }
+        public string AdminEmail { get; set; }
+        public string AdminName { get; set; }
+        public string AuthenticationTokenSecret { get; set; }
+        public string DatabaseConnectionString { get; set; }
+        public string CloudinaryCloudName { get; set; }
+        public string CloudinaryApiKey { get; set; }
+        public string CloudinaryApiSecret { get; set; }
     }
 }

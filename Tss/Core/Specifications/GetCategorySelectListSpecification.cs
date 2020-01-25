@@ -13,6 +13,7 @@ namespace Tss.Core.Specifications
             c => new ProductFilterCategoryResponse(c)
         )
         {
+            SetIsNoTracking(true);
         }
     }
 

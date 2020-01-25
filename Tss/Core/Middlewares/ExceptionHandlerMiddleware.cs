@@ -21,7 +21,6 @@ namespace Tss.Core.Middlewares
         {
             _next = next ?? throw new ArgumentNullException(nameof(next));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-
         }
 
         public async Task InvokeAsync(HttpContext httpContext)
@@ -36,39 +35,22 @@ namespace Tss.Core.Middlewares
             }
         }
 
-        private Task HandleExceptionAsync(HttpContext context, Exception exception)
+        private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            var instance = Guid.NewGuid().ToString();
-            
-            var response = exception.Data["Response"] as Response;
-            
-            if (response == null) 
-            {
-                response = new Response
-                {
-                    Status = (int)HttpStatusCode.InternalServerError,
-                    Title = HttpMessage.InternalServerErrorTitle,
-                    Detail = exception.Message,
-                };
-            }
+            Response response = exception.Data[nameof(Response)] as Response ?? 
+                new Response
+                (
+                    HttpStatusCode.InternalServerError,
+                    HttpMessage.InternalServerErrorTitle,
+                    exception.Message
+                );
 
             context.Response.StatusCode = (int)response.Status;
             context.Response.ContentType = HttpContentType.ProblemJson;
 
-            response.Type = $"https://httpstatuses.com/{response.Status}";
-            response.Title += $" Error Instance ID: {instance}";
-            response.Instance = instance ;
-
             _logger.LogError(exception, exception.Message);
 
-            return WriteAsync(context, response);
+            await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
         }
-
-        private Task WriteAsync(HttpContext context, Response response)
-        {
-            return context.Response.WriteAsync(JsonConvert.SerializeObject(response));
-        }
-
-
     }
 }

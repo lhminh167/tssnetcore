@@ -2,36 +2,30 @@ using System.Threading.Tasks;
 using System.Linq;
 using System;
 using Microsoft.EntityFrameworkCore;
-using Sieve.Services;
 using Tss.Core.Interfaces;
 using Tss.Infrastructure.Contexts;
 using System.Collections.Generic;
-using Sieve.Models;
-using System.Linq.Expressions;
+using Tss.Core.Models;
 
 namespace Tss.Infrastructure.Generics
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {
         private readonly DbSet<TEntity> _dbSet;
-        
+
         private readonly TssContext _context;
         private readonly IUnitOfWork _unitOfWork;
-        private readonly SieveProcessor _sieveProcessor;
 
         public Repository(
             TssContext context,
-            IUnitOfWork unitOfWork,
-            SieveProcessor sieveProcessor
+            IUnitOfWork unitOfWork
         )
         {
             _context = context ?? throw new ArgumentNullException(nameof(context));
             _dbSet = context.Set<TEntity>() ?? throw new ArgumentNullException(nameof(context));
-            
+
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _unitOfWork.Register(this);
-
-            _sieveProcessor = sieveProcessor ?? throw new ArgumentNullException(nameof(sieveProcessor));
         }
 
         public virtual async Task<List<TEntity>> Get()
@@ -39,11 +33,13 @@ namespace Tss.Infrastructure.Generics
             return await _dbSet.ToListAsync();
         }
 
-        public virtual async Task<List<TEntity>> Get(
-            SieveModel sieve
+        public virtual async Task<PaginatedList<TOut>> GetPaginated<TOut>(
+            ISpecification<TEntity, TOut> spec
         )
         {
-            return await _sieveProcessor.Apply<TEntity>(sieve, _dbSet).ToListAsync();
+            int count = await ApplySpecification(spec).CountAsync();
+            List<TOut> items = await ApplySpecification(spec).ToListAsync();
+            return new PaginatedList<TOut>(items, count, spec.PageIndex, spec.PageSize);
         }
 
         public virtual async Task<List<TOut>> Get<TOut>(

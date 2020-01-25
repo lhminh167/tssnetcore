@@ -7,7 +7,11 @@ namespace Tss.Core.Interfaces
 {
     public interface IProductService
     {
-        Task<ProductFilter> GetFilters();
-        Task<List<Product>> GetProducts();
+        Task<ProductFilterResponse> GetFilters();
+        Task<List<Product>> Get();
+        Task<Product> GetOne(int productId);
+        Task<Product> Create(ProductCreateRequest input);
+        Task<Product> Update(Product input);
+        Task<Product> Delete(int productId);
     }
 }

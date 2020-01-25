@@ -1,10 +1,13 @@
 using System.Threading.Tasks;
 using Tss.Core.Entities;
+using Tss.Core.Models;
 
 namespace Tss.Core.Interfaces
 {
     public interface IPaymentHelper
     {
-        Task TakePaymentAsync(Orders order);
+        Task<PaymentCreateResponse> CreatePayment(Orders order);
+        Task<PaymentCreateResponse> CompletePayment(string paymentId);
+
     }
 }

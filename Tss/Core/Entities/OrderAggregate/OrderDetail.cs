@@ -9,22 +9,14 @@ namespace Tss.Core.Entities
             Product product,
             Orders order,
             string attributes,
-            int quantity = 1
+            int quantity
         )
         {
             Guard.Against.Null(product, nameof(product));
             Guard.Against.Null(order, nameof(order));
             Guard.Against.NullOrWhiteSpace(attributes, nameof(attributes));
-
-            if (quantity <= 0)
-            {
-                throw new Exception("Invalid quantity");
-            }
-
-            if (product.Price * quantity < product.DiscountedPrice)
-            {
-                throw new Exception("The total of order item is lower than applied discount");
-            }
+            Guard.Against.BadRequest(quantity <= 0, "Invalid quantity");
+            Guard.Against.BadRequest(product.Price * quantity < product.DiscountedPrice, "The total of order item is lower than applied discount");
 
             OrderId = order.OrderId;
             ProductId = product.ProductId;

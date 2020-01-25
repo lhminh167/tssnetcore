@@ -13,7 +13,8 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
     public class PaymentHelper : IPaymentHelper
     {
         private readonly AppSettings _settings;
-        private readonly PaymentIntentService _paymentIntentService = new PaymentIntentService();
+        private readonly PaymentIntentService _paymentIntentService;
+        private readonly PaymentMethodService _paymentMethodService;
 
         public PaymentHelper(IOptions<AppSettings> settings)
         {
@@ -21,93 +22,45 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
 
             _settings = settings.Value;
             _paymentIntentService = new PaymentIntentService();
+            _paymentMethodService = new PaymentMethodService();
 
             StripeConfiguration.ApiKey = _settings.StripeSecretKey;
         }
 
-        public async Task TakePaymentAsync(Orders order)
+        public async Task<PaymentCreateResponse> CreatePayment(Orders order)
         {
-            try
+            var options = new PaymentIntentCreateOptions
             {
-                await HandlePaymentAsync(order);
-            }
-            catch (StripeException exception)
-            {
-                HandleException(exception);
-            }
-        }
-
-        private async Task HandlePaymentAsync(Orders order)
-        {
-            PaymentIntentCreateOptions options = new PaymentIntentCreateOptions
-            {
-                Amount = (long)(order.TotalAmount * 100),
+                PaymentMethod = order.Reference,
                 Currency = "usd",
-                PaymentMethodTypes = new List<string> {
-                    "card"
-                },
+                CaptureMethod = "manual",
+                // Confirm = false,
+                // PaymentMethodTypes = new List<string> { "card" },
                 Metadata = new Dictionary<string, string>
                 {
                     { "OrderId", order.OrderId.ToString() },
                 },
-                // Confirm = true,
-                // OffSession = true,
-
+                Amount = (long)(order.TotalAmount * 100),
             };
+            PaymentIntent response = await _paymentIntentService.CreateAsync(options);
+            return new PaymentCreateResponse(response.Id);
 
-            var response = await _paymentIntentService.CreateAsync(options);
-
-            HandleResponse(response);
         }
 
-        private void HandleResponse(PaymentIntent response)
+        public async Task<PaymentCreateResponse> CompletePayment(string paymentId)
         {
-            switch (response.Status)
-            {
-                case "requires_payment_method":
-                    break;
-                case "requires_confirmation":
-                    break;
-                case "requires_action":
-                    break;
-                case "processing":
-                    break;
-                case "requires_capture":
-                    break;
-                case "canceled":
-                    break;
-                case "succeeded":
-                    break;
-                default:
-                    // Unknown Error Type
-                    break;
-            }
+            // PaymentIntentCaptureOptions options = new PaymentIntentCaptureOptions
+            // {
+            //     // AmountToCapture = 750,
+            // };
+            PaymentIntent confirmResponse = await _paymentIntentService.ConfirmAsync(paymentId);
+            PaymentIntent captureResponse = await _paymentIntentService.CaptureAsync(paymentId);
+
+            return new PaymentCreateResponse(captureResponse.ClientSecret);
+
         }
 
-        private void HandleException(StripeException exception)
-        {
-            switch (exception.StripeError.ErrorType)
-            {
-                case "card_error":
-                    Console.WriteLine("Code: " + exception.StripeError.Code);
-                    Console.WriteLine("Message: " + exception.StripeError.Message);
-                    break;
-                case "api_connection_error":
-                    break;
-                case "api_error":
-                    break;
-                case "authentication_error":
-                    break;
-                case "invalid_request_error":
-                    break;
-                case "rate_limit_error":
-                    break;
-                case "validation_error":
-                    break;
-                default:
-                    // Unknown Error Type
-                    break;
-            }
-        }
+
+
     }
 }

@@ -2,11 +2,9 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Tss.Core.Models
 {
-    public class LoginForm
+    public class LoginRequest
     {
-        [Required]
         public string Email { get; set; }
-        [Required]
         public string Password { get; set; }
     }
 }

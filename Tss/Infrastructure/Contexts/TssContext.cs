@@ -306,7 +306,7 @@ namespace Tss.Infrastructure.Contexts
                     .HasColumnType("int(11)");
 
                 entity.HasOne(d => d.AttributeValue)
-                    .WithMany(p => p.CustomerAttribute)
+                    .WithMany("CustomerAttribute")
                     .HasForeignKey(d => d.AttributeValueId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("customer_attribute_fk_1");
@@ -557,7 +557,7 @@ namespace Tss.Infrastructure.Contexts
                     .HasColumnType("int(11)");
 
                 entity.HasOne(d => d.AttributeValue)
-                    .WithMany(p => p.ProductAttribute)
+                    .WithMany("ProductAttribute")
                     .HasForeignKey(d => d.AttributeValueId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
                     .HasConstraintName("product_attribute_fk_1");
@@ -735,7 +735,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.Property(e => e.CartId)
                     .IsRequired()
                     .HasColumnName("cart_id")
-                    .HasColumnType("char(32)")
+                    .HasColumnType("varchar(1000)")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 

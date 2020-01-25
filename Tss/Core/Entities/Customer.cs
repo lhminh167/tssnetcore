@@ -10,16 +10,22 @@ namespace Tss.Core.Entities
 {
     public class Customer : IAggregateRoot
     {
-        public Customer(RegistrationForm input, AttributeValue role, IAuthHelper authHelper)
+        public Customer(CustomerCreateRequest input, AttributeValue role, IAuthHelper authHelper)
         {
+            Guard.Against.Null(input, nameof(CustomerCreateRequest));
+            Guard.Against.Null(role, nameof(Role));
+            Guard.Against.Null(authHelper, nameof(authHelper));
+            Guard.Against.NullOrWhiteSpace(input.Name, nameof(input.Name));
+            Guard.Against.NullOrWhiteSpace(input.Email, nameof(input.Email));
+            Guard.Against.NullOrWhiteSpace(input.Password, nameof(input.Password));
+
             CustomerAttribute = new List<CustomerAttribute>();
             Orders = new List<Orders>();
             Review = new List<Review>();
-            
             SetPassword(input.Password);
-            AddInfo(input);
             AddRole(role, authHelper);
-
+            Name = input.Name;
+            Email = input.Email;
         }
 
         public Customer()
@@ -51,10 +57,11 @@ namespace Tss.Core.Entities
         public virtual ICollection<Orders> Orders { get; set; }
         public virtual ICollection<Review> Review { get; set; }
 
-        public void SetPassword(string password)
-        {
-            Guard.Against.NullOrWhiteSpace(password, nameof(password));
+        public virtual IReadOnlyCollection<AttributeValueResponse> Attributes => 
+            CustomerAttribute?.Select(pa => new AttributeValueResponse(pa?.AttributeValue))?.ToList();
 
+        private void SetPassword(string password)
+        {
             using (HMACSHA512 hmac = new HMACSHA512())
             {
                 PasswordSalt = hmac.Key;
@@ -86,73 +93,70 @@ namespace Tss.Core.Entities
             return true;
         }
 
-        public void UpdateInfo(RegistrationForm input)
+        public void UpdateInfo(CustomerUpdateRequest input)
         {
             Guard.Against.Null(input, nameof(input));
-
-            Name = ValidateAndUpdateString(Name, input.Name);
-            Email = ValidateAndUpdateString(Email, input.Email);
-            Address1 = ValidateAndUpdateString(Address1, input.Address1);
-            Address2 = ValidateAndUpdateString(Address2, input.Address2);
-            City = ValidateAndUpdateString(City, input.City);
-            Region = ValidateAndUpdateString(Region, input.Region);
-            PostalCode = ValidateAndUpdateString(PostalCode, input.PostalCode);
-            Country = ValidateAndUpdateString(Country, input.Country);
-            ShippingRegionId = input.ShippingRegionId > 0 ? input.ShippingRegionId : ShippingRegionId;
-            DayPhone = ValidateAndUpdateString(DayPhone, input.DayPhone);
-            EvePhone = ValidateAndUpdateString(EvePhone, input.EvePhone);
-            MobPhone = ValidateAndUpdateString(MobPhone, input.MobPhone);
-            if (!IsCorrectPassword(input.Password)) SetPassword(input.Password);
-        }
-
-        private string ValidateAndUpdateString(string currentValue, string newValue)
-        {
-            Guard.Against.NullOrWhiteSpace(currentValue, nameof(currentValue));
-            Guard.Against.NullOrWhiteSpace(newValue, nameof(newValue));
-
-            return newValue == currentValue ? currentValue : newValue;
-        }
-
-        public void AddInfo(RegistrationForm input)
-        {
-            Guard.Against.Null(input, nameof(input));
+            Guard.Against.NullOrWhiteSpace(input.Name, nameof(input.Name));
+            Guard.Against.NullOrWhiteSpace(input.Address1, nameof(input.Address1));
+            Guard.Against.NullOrWhiteSpace(input.Address2, nameof(input.Address2));
+            Guard.Against.NullOrWhiteSpace(input.City, nameof(input.City));
+            Guard.Against.NullOrWhiteSpace(input.Region, nameof(input.Region));
+            Guard.Against.NullOrWhiteSpace(input.PostalCode, nameof(input.PostalCode));
+            Guard.Against.NullOrWhiteSpace(input.Country, nameof(input.Country));
             Guard.Against.OutOfRange(input.ShippingRegionId, nameof(input.ShippingRegionId), 1, int.MaxValue);
+            Guard.Against.NullOrWhiteSpace(input.DayPhone, nameof(input.DayPhone));
+            Guard.Against.NullOrWhiteSpace(input.EvePhone, nameof(input.EvePhone));
+            Guard.Against.NullOrWhiteSpace(input.MobPhone, nameof(input.MobPhone));
 
-            Name = ValidateAndAddString(input.Name);
-            Email = ValidateAndAddString(input.Email);
-            Address1 = ValidateAndAddString(input.Address1);
-            Address2 = ValidateAndAddString(input.Address2);
-            City = ValidateAndAddString(input.City);
-            Region = ValidateAndAddString(input.Region);
-            PostalCode = ValidateAndAddString(input.PostalCode);
-            Country = ValidateAndAddString(input.Country);
-            ShippingRegionId = input.ShippingRegionId > 0 ? input.ShippingRegionId : ShippingRegionId;
-            DayPhone = ValidateAndAddString(input.DayPhone);
-            EvePhone = ValidateAndAddString(input.EvePhone);
-            MobPhone = ValidateAndAddString(input.MobPhone);
-            SetPassword(input.Password);
+            Name =  input.Name;
+            Address1 = input.Address1;
+            Address2 = input.Address2;
+            City =  input.City;
+            Region = input.Region;
+            PostalCode = input.PostalCode;
+            Country = input.Country;
+            ShippingRegionId = input.ShippingRegionId;
+            DayPhone = input.DayPhone;
+            EvePhone = input.EvePhone;
+            MobPhone = input.MobPhone;
         }
 
-
-        private string ValidateAndAddString(string value)
+        public void UpdateInfoOnCheckout(OrderCreateRequest input)
         {
-            Guard.Against.NullOrWhiteSpace(value, nameof(value));
+            Guard.Against.Null(input, nameof(input));
+            Guard.Against.NullOrWhiteSpace(input.Name, nameof(input.Name));
+            Guard.Against.NullOrWhiteSpace(input.Address1, nameof(input.Address1));
+            Guard.Against.NullOrWhiteSpace(input.Address2, nameof(input.Address2));
+            Guard.Against.NullOrWhiteSpace(input.City, nameof(input.City));
+            Guard.Against.NullOrWhiteSpace(input.Region, nameof(input.Region));
+            Guard.Against.NullOrWhiteSpace(input.PostalCode, nameof(input.PostalCode));
+            Guard.Against.NullOrWhiteSpace(input.Country, nameof(input.Country));
+            Guard.Against.OutOfRange(input.ShippingRegionId, nameof(input.ShippingRegionId), 1, int.MaxValue);
+            Guard.Against.NullOrWhiteSpace(input.DayPhone, nameof(input.DayPhone));
+            Guard.Against.NullOrWhiteSpace(input.EvePhone, nameof(input.EvePhone));
+            Guard.Against.NullOrWhiteSpace(input.MobPhone, nameof(input.MobPhone));
 
-            return value;
+            Name =  input.Name;
+            Address1 = input.Address1;
+            Address2 = input.Address2;
+            City =  input.City;
+            Region = input.Region;
+            PostalCode = input.PostalCode;
+            Country = input.Country;
+            ShippingRegionId = input.ShippingRegionId;
+            DayPhone = input.DayPhone;
+            EvePhone = input.EvePhone;
+            MobPhone = input.MobPhone;
         }
+
 
         private void AddCustomerAttribute(AttributeValue attributeValue)
         {
-            Guard.Against.Null(attributeValue, nameof(attributeValue));
-
             CustomerAttribute?.Add(new CustomerAttribute(this, attributeValue));
         }
 
-        public void UpdateCustomerAttribute(CustomerAttribute customerAttribute, AttributeValue attributeValue)
+        private void UpdateCustomerAttribute(CustomerAttribute customerAttribute, AttributeValue attributeValue)
         {
-            Guard.Against.Null(customerAttribute, nameof(customerAttribute));
-            Guard.Against.Null(attributeValue, nameof(attributeValue));
-
             CustomerAttribute?.Remove(customerAttribute);
             AddCustomerAttribute(attributeValue);
         }
@@ -173,49 +177,34 @@ namespace Tss.Core.Entities
 
         public void UpdateRole(AttributeValue role, IAuthHelper authHelper)
         {
-            Guard.Against.Null(role, nameof(role));
             AllowToAddRole(role, authHelper);
-
+            
             CustomerAttribute customerAttribute = CustomerAttribute?.FirstOrDefault(ca => ca.AttributeValue.Attribute.Name == "Role");
             UpdateCustomerAttribute(customerAttribute, role);
         }
 
         private void AddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            Guard.Against.Null(role, nameof(role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
             AllowToAddRole(role, authHelper);
-
+            
             AddCustomerAttribute(role);
         }
 
         private void AllowToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            Guard.Against.Null(role, nameof(role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
-
             AllowAdminToAddRole(role, authHelper);
-            AllowSupplierToAddRole(role, authHelper);
             AllowCustomerToAddRole(role, authHelper);
             AllowAnonymousUserToAddRole(role, authHelper);
         }
 
         private void AllowAdminToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            Guard.Against.Null(role, nameof(role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
             if (authHelper.GetRole() != "Admin") return;
-
-            bool isAuthorized = role.Value == "Admin";
-
-            Guard.Against.Unauthorized(!isAuthorized);
         }
 
-        private void AllowSupplierToAddRole(AttributeValue role, IAuthHelper authHelper)
+        private void AllowCustomerToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            Guard.Against.Null(role, nameof(role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
-            if (authHelper.GetRole() != "Supplier") return;
+            if (authHelper.GetRole() != "Customer") return;
 
             bool isAuthorized =
                 CustomerId == authHelper.GetCustomerId()
@@ -224,28 +213,12 @@ namespace Tss.Core.Entities
             Guard.Against.Unauthorized(!isAuthorized);
         }
 
-        private void AllowCustomerToAddRole(AttributeValue role, IAuthHelper authHelper)
-        {
-            Guard.Against.Null(role, nameof(role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
-            if (authHelper.GetRole() != "Customer") return;
-
-            bool isAuthorized =
-                CustomerId == authHelper.GetCustomerId()
-                && role.Value == "Supplier";
-
-            Guard.Against.Unauthorized(!isAuthorized);
-        }
-
         private void AllowAnonymousUserToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            Guard.Against.Null(role, nameof(role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
             if (authHelper.GetCustomerId() > 0) return;
 
             bool isAuthorized = 
-                role.Value == "Customer"
-                || role.Value == "Supplier";
+                role.Value == "Customer";
 
             Guard.Against.Unauthorized(isAuthorized);
         }

@@ -13,6 +13,7 @@ namespace Tss.Core.Specifications
             o => o
         )
         {
+            SetIsNoTracking(true);
             AddInclude(o => o.Tax);
             AddInclude(o => o.Shipping);
             AddInclude(o => o.Customer);

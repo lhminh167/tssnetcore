@@ -18,7 +18,7 @@ namespace Tss.Core.Configs
         /// </summary>
         /// <param name="services">The services.</param>
         public static void ConfigureService(IServiceCollection services, AppSettings appSettings)
-        {            
+        {      
             services.AddDbContext<TssContext>(options => options.UseMySql(appSettings.DatabaseConnectionString));
         }
 

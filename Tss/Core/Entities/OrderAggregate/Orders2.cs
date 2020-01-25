@@ -1,33 +1,38 @@
 using System;
 using System.Threading.Tasks;
+using Ardalis.GuardClauses;
 using Tss.Core.Interfaces;
+using Tss.Core.Models;
 
 namespace Tss.Core.Entities
 {
     public partial class Orders
     {
-        public async Task PsInitialNotification(IEmailHelper emailHelper)
+        public async Task<OrderCreateResponse> PsInitialNotification(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string paymentMethodId)
         {
             if (Status != OrderStatus.OrderPlacedNotifyingCustomer.Id) StatusChangeException(OrderStatus.AwaitingConfirmationOfFunds);
             CreateAudit(OrderAudit.OrderProcessorStarted);
             await emailHelper.SendOrderInitialNotification(this);
             SetOrderStatus(OrderStatus.AwaitingConfirmationOfFunds);
             CreateAudit(OrderAudit.OrderProcessorFinished);
-            await PsCheckFunds(emailHelper);
+            return await PsCheckFunds(emailHelper, paymentHelper, paymentMethodId);
         }
 
-        private async Task PsCheckFunds(IEmailHelper emailHelper)
+        private async Task<OrderCreateResponse> PsCheckFunds(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string paymentMethodId)
         {
             if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.NotifyingSupplierStockCheck);
             CreateAudit(OrderAudit.PsCheckFundsStarted);
-            SetCreditCardInfo("DummyAuthCode", "DummyReference");
+            Reference = paymentMethodId;
+            PaymentCreateResponse response = await paymentHelper.CreatePayment(this);
+            AuthCode = response.PaymentId;
             CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);
             SetOrderStatus(OrderStatus.NotifyingSupplierStockCheck);
             CreateAudit(OrderAudit.PsCheckFundsFinished);
-            await PsCheckStock(emailHelper);
+            await PsCheckStock(emailHelper, paymentHelper);
+            return new OrderCreateResponse(this, response.PaymentId);
         }
 
-        private async Task PsCheckStock(IEmailHelper emailHelper)
+        private async Task PsCheckStock(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.NotifyingSupplierStockCheck.Id) StatusChangeException(OrderStatus.AwaitingStockConfirmation);
             CreateAudit(OrderAudit.PsCheckStockStarted);
@@ -51,14 +56,14 @@ namespace Tss.Core.Entities
         {
             if (Status != OrderStatus.AwaitingCreditCardPayment.Id) StatusChangeException(OrderStatus.NotifyingSupplierShipping);
             CreateAudit(OrderAudit.PsTakePaymentStarted);
-            await paymentHelper.TakePaymentAsync(this);
+            await paymentHelper.CompletePayment(this.AuthCode);
             CreateAudit(OrderAudit.PsTakePaymentFundsDeducted);
             SetOrderStatus(OrderStatus.NotifyingSupplierShipping);
             CreateAudit(OrderAudit.PsTakePaymentFinished);
-            await PsShipGoods(emailHelper);
+            await PsShipGoods(emailHelper, paymentHelper);
         }
 
-        private async Task PsShipGoods(IEmailHelper emailHelper)
+        private async Task PsShipGoods(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.NotifyingSupplierShipping.Id) StatusChangeException(OrderStatus.AwaitingShipmentConfirmation);
             CreateAudit(OrderAudit.PsShipGoodsStarted);
@@ -68,7 +73,7 @@ namespace Tss.Core.Entities
             CreateAudit(OrderAudit.PsShipGoodsFinished);
         }
 
-        public async Task PsShipOk(IEmailHelper emailHelper)
+        public async Task PsShipOk(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.AwaitingShipmentConfirmation.Id) StatusChangeException(OrderStatus.SendingFinalNotification);
             CreateAudit(OrderAudit.PsShipOkStarted);
@@ -76,10 +81,10 @@ namespace Tss.Core.Entities
             CreateAudit(OrderAudit.PsShipOkOrderDispatched);
             SetOrderStatus(OrderStatus.SendingFinalNotification);
             CreateAudit(OrderAudit.PsShipOkFinished);
-            await PsFinalNotification(emailHelper);
+            await PsFinalNotification(emailHelper, paymentHelper);
         }
 
-        private async Task PsFinalNotification(IEmailHelper emailHelper)
+        private async Task PsFinalNotification(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.SendingFinalNotification.Id) StatusChangeException(OrderStatus.OrderCompleted);
             CreateAudit(OrderAudit.PsFinalNotificationStarted);
@@ -89,14 +94,22 @@ namespace Tss.Core.Entities
             CreateAudit(OrderAudit.PsFinalNotificationFinished);
         }
 
-        // public async Task SetOrderCanceledStatus(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
+        // public async Task SetOrderCanceledStatus(
+        //     IEmailHelper emailHelper, 
+        //     IPaymentHelper paymentHelper,
+        //     OrderAudit sectionEndingAudit,
+        //     OrderAudit cancellationAudit
+        // )
         // {
-        //     if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.OrderCanceled);
+        // Guard.Against.Null(emailHelper, nameof(emailHelper), paymentHelper);
+        // Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
+        //     CreateAudit(sectionEndingAudit);
         //     CreateAudit(OrderAudit.PsCheckFundsStarted);
-        //     SetCreditCardInfo("DummyAuthCode", "DummyReference");
+        //     // await emailHelper.SendOrderCancellationNotification(this);
         //     CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);
-        //     SetOrderStatus(OrderStatus.OrderCanceled);
-        //     CreateAudit(OrderAudit.PsCheckFundsFinished);
+        //     // SetOrderStatus(cancellationAudit);
+        //     // CreateAudit(OrderAudit.PsCancelOrderFinished);
         // }
 
         private void StatusChangeException(OrderStatus orderStatusToChange)

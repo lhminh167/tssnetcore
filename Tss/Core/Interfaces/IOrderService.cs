@@ -9,7 +9,7 @@ namespace Tss.Core.Interfaces
     {
         Task<List<Orders>> Get();
         Task<Orders> Get(int orderId);
-        Task<Orders> Create(DeliveryForm input);
+        Task<OrderCreateResponse> Create(OrderCreateRequest input);
         Task<Orders> StockOk(int orderId);
         Task<Orders> ShipOk(int orderId);
     }

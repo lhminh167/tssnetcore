@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+﻿using System.Collections.Generic;
 
 namespace Tss.Core.Entities
 {

@@ -27,43 +27,44 @@ namespace Tss.Core.Services
 
         public async Task<List<Attribute>> Get()
         {
-            return await _attributeRepo.Get(new GetAttributeByNameSpecification(null, _authHelper));
+            return await _attributeRepo.Get(new GetAttributeSpecification(_authHelper));
         }
 
         public async Task<Attribute> Get(int attributeId)
         {
-            return await _attributeRepo.Get(attributeId);
+            return await _attributeRepo.GetOne(new GetAttributeByIdSpecification(attributeId, _authHelper));
         }
 
         public async Task<Attribute> Create(AttributeCreateRequest input)
         {
-            Attribute dbAttribute = await _attributeRepo.GetOne(new GetAttributeByNameSpecification(input.Name, _authHelper));
-            Guard.Against.AlreadyExist(dbAttribute, nameof(Attribute));
+            Attribute attribute = await _attributeRepo.GetOne(new GetAttributeByNameSpecification(input.Name, _authHelper));
+            Guard.Against.AlreadyExist(attribute, nameof(Attribute));
 
-            dbAttribute = new Attribute(input.Name);
-            _attributeRepo.Post(dbAttribute);
+            attribute = new Attribute(input.Name);
+            _attributeRepo.Post(attribute);
             await _unitOfWork.SaveAsync();
-            return dbAttribute;
+            return attribute;
         }
 
-        public async Task<Attribute> Update(Attribute attribute)
+        public async Task<Attribute> Update(Attribute input)
         {
-            Attribute dbAttribute = await _attributeRepo.Get(attribute.AttributeId);
-            Guard.Against.NotFound(dbAttribute, nameof(Attribute));
+            Attribute attribute = await _attributeRepo.Get(input.AttributeId);
+            Guard.Against.NotFound(attribute, nameof(Attribute));
 
-            _attributeRepo.Put(dbAttribute);
+            attribute.Update(input.Name);
+            _attributeRepo.Put(attribute);
             await _unitOfWork.SaveAsync();
-            return dbAttribute;
+            return attribute;
         }
 
         public async Task<Attribute> Delete(int attributeId)
         {
-            Attribute dbAttribute = await _attributeRepo.Get(attributeId);
-            Guard.Against.NotFound(dbAttribute, nameof(Attribute));
+            Attribute attribute = await _attributeRepo.Get(attributeId);
+            Guard.Against.NotFound(attribute, nameof(Attribute));
 
-            _attributeRepo.Delete(dbAttribute);
+            _attributeRepo.Delete(attribute);
             await _unitOfWork.SaveAsync();
-            return dbAttribute;
+            return attribute;
         }
     }
 }

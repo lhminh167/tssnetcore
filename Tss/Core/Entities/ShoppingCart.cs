@@ -6,7 +6,7 @@ namespace Tss.Core.Entities
 {
     public class ShoppingCart
     {
-        public ShoppingCart(ShoppingCartAddItemRequest input, string cartId)
+        public ShoppingCart(ShoppingCartItemAddRequest input, string cartId)
         {
             Guard.Against.Null(input, nameof(input));
             Guard.Against.NullOrWhiteSpace(cartId, nameof(cartId));
@@ -34,7 +34,7 @@ namespace Tss.Core.Entities
 
         public virtual Product Product { get; set; }
 
-        public void UpdateItem(ShoppingCartUpdate input)
+        public void UpdateItem(ShoppingCartItemUpdateRequest input)
         {            
             Quantity = input.Quantity;
             AddedOn = DateTime.Now;
@@ -56,6 +56,11 @@ namespace Tss.Core.Entities
         {
             AddedOn = DateTime.Now;
             BuyNow = true;
-        }           
+        }
+
+        public void AssociateToCustomer(int customerId)
+        {
+            CartId = customerId.ToString();
+        }      
     }
 }

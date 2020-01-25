@@ -17,6 +17,7 @@ namespace Tss.Core.Services
         private readonly IRepository<ShoppingCart> _shoppingCartRepo;
         private readonly IRepository<Customer> _customerRepo;
         private readonly IRepository<Shipping> _shippingRepo;
+        private readonly IRepository<ShippingRegion> _shippingRegionRepo;
         private readonly IRepository<Tax> _taxRepo;
         private readonly IEmailHelper _emailHelper;
         private readonly IPaymentHelper _paymentHelper;
@@ -29,6 +30,7 @@ namespace Tss.Core.Services
             IRepository<ShoppingCart> shoppingCartRepo,
             IRepository<Customer> customerRepo,
             IRepository<Shipping> shippingRepo,
+            IRepository<ShippingRegion> shippingRegionRepo,
             IRepository<Tax> taxRepo,
             IEmailHelper emailHelper,
             IPaymentHelper paymentHelper,
@@ -41,6 +43,7 @@ namespace Tss.Core.Services
             _shoppingCartRepo = shoppingCartRepo ?? throw new ArgumentNullException(nameof(shoppingCartRepo));
             _customerRepo = customerRepo ?? throw new ArgumentNullException(nameof(customerRepo));
             _shippingRepo = shippingRepo ?? throw new ArgumentNullException(nameof(shippingRepo));
+            _shippingRegionRepo = shippingRegionRepo ?? throw new ArgumentNullException(nameof(shippingRegionRepo));
             _taxRepo = taxRepo ?? throw new ArgumentNullException(nameof(taxRepo));
             _emailHelper = emailHelper ?? throw new ArgumentNullException(nameof(emailHelper));
             _paymentHelper = paymentHelper ?? throw new ArgumentNullException(nameof(paymentHelper));
@@ -55,48 +58,46 @@ namespace Tss.Core.Services
 
         public async Task<Orders> Get(int orderId)
         {
-            Orders order = await _ordersRepo.GetOne(new GetOrderSpecification(orderId, _authHelper)); 
+            Orders order = await _ordersRepo.GetOne(new GetOrderSpecification(orderId, _authHelper));
             Guard.Against.NotFound(order, nameof(order));
 
             return order;
         }
 
-        public async Task<Orders> Create(DeliveryForm input)
+        public async Task<OrderCreateResponse> Create(OrderCreateRequest input)
         {
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(input.CartId));
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetCustomerId().ToString()));
             Guard.Against.NotFound(items, nameof(ShoppingCart));
 
 
-            Customer customer = await _customerRepo.Get(int.Parse(input.CartId));
-            Guard.Against.NotFound(customer, nameof(customer));
-            RegistrationForm customerInfo = _mapper.Map<RegistrationForm>(input);
-            customer.UpdateInfo(customerInfo);
+            ShippingRegion shippingRegion = await _shippingRegionRepo.Get(input.ShippingRegionId);
+            Guard.Against.NotFound(shippingRegion, nameof(ShippingRegion));
 
 
             Shipping shipping = await _shippingRepo.Get(input.ShippingId);
             Guard.Against.NotFound(shipping, nameof(Shipping));
 
 
-            int taxId = GetTaxId(shipping);
+            Customer customer = await _customerRepo.Get(_authHelper.GetCustomerId());
+            Guard.Against.NotFound(customer, nameof(Customer));
+            customer.UpdateInfoOnCheckout(input);
+
+
+            int taxId = Tax.GetTaxId(shipping);
             Tax tax = await _taxRepo.Get(taxId);
             Guard.Against.NotFound(tax, nameof(Tax));
 
 
-            Orders order = new Orders(items, customer, shipping, tax);
-            await order.PsInitialNotification(_emailHelper);
-
-
-            _shoppingCartRepo.DeleteRange(items);
+            Orders order = new Orders(items, customer, shipping, tax, shippingRegion);
             _ordersRepo.Post(order);
-
-
             await _unitOfWork.SaveAsync();
-            return order;
-        }
 
-        private int GetTaxId(Shipping shipping)
-        {
-            return shipping.ShippingRegionId == 2 ? 2 : 1;
+
+            OrderCreateResponse response = await order.PsInitialNotification(_emailHelper, _paymentHelper, input.PaymentMethodId);
+            _shoppingCartRepo.DeleteRange(items);
+            await _unitOfWork.SaveAsync();
+
+            return response;
         }
 
         public async Task<Orders> StockOk(int orderId)
@@ -115,7 +116,7 @@ namespace Tss.Core.Services
             Orders order = await _ordersRepo.GetOne(new GetOrderSpecification(orderId, _authHelper));
             Guard.Against.NotFound(order, nameof(order));
 
-            await order.PsShipOk(_emailHelper);
+            await order.PsShipOk(_emailHelper, _paymentHelper);
             _ordersRepo.Put(order);
             await _unitOfWork.SaveAsync();
             return order;

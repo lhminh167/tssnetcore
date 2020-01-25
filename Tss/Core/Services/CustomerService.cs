@@ -15,6 +15,7 @@ namespace Tss.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Customer> _customerRepo;
         private readonly IRepository<AttributeValue> _attributeValueRepo;
+        private readonly IRepository<ShoppingCart> _shoppingCartRepo;
         private readonly IEmailHelper _emailHelper;
         private readonly IAuthHelper _authHelper;
 
@@ -22,6 +23,7 @@ namespace Tss.Core.Services
             IUnitOfWork unitOfWork,
             IRepository<Customer> customerRepo,
             IRepository<AttributeValue> attributeValueRepo,
+            IRepository<ShoppingCart> shoppingCartRepo,
             IEmailHelper emailHelper,
             IAuthHelper authHelper
         )
@@ -29,6 +31,7 @@ namespace Tss.Core.Services
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _customerRepo = customerRepo ?? throw new ArgumentNullException(nameof(customerRepo));
             _attributeValueRepo = attributeValueRepo ?? throw new ArgumentNullException(nameof(attributeValueRepo));
+            _shoppingCartRepo = shoppingCartRepo ?? throw new ArgumentNullException(nameof(shoppingCartRepo));
             _emailHelper = emailHelper ?? throw new ArgumentNullException(nameof(emailHelper));
             _authHelper = authHelper ?? throw new ArgumentNullException(nameof(authHelper));
         }
@@ -46,30 +49,47 @@ namespace Tss.Core.Services
             return customer;
         }
 
-        public async Task<LoginResponse> Login(LoginForm input)
+        public async Task AssociateShoppingCartToCustomer(int customerId)
+        {
+            string cartId = _authHelper.GetShoppingCartId();
+            if (string.IsNullOrWhiteSpace(cartId)) return;
+
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(cartId));
+            Guard.Against.NotFound(items, nameof(ShoppingCart));
+            
+            items.ForEach(i => i.AssociateToCustomer(customerId));
+            _shoppingCartRepo.PutRange(items);
+        }
+
+        public async Task<LoginResponse> Login(LoginRequest input)
         {
             Customer customer = await _customerRepo.GetOne(new GetCustomerByEmailSpecification(input.Email));
             Guard.Against.IncorrectLoginInfo(input, customer);
 
-            string token = _authHelper.GetLoginToken(customer);
-            return new LoginResponse(token);
+            await AssociateShoppingCartToCustomer(customer.CustomerId);
+            await _unitOfWork.SaveAsync();
+            
+            return new LoginResponse(customer, _authHelper);
         }
 
-        public async Task<Customer> Create(RegistrationForm input)
+        public async Task<LoginResponse> Create(CustomerCreateRequest input)
         {
             Customer duplicateCustomer = await _customerRepo.GetOne(new GetCustomerByEmailSpecification(input.Email));
             Guard.Against.EmailAddressTaken(duplicateCustomer);
             
-            AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), null, _authHelper));
+            AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), input.Role, _authHelper));
             Guard.Against.NotFound(role, nameof(Role));
 
             Customer customer = new Customer(input, role, _authHelper);
-            _customerRepo.Post(customer);
+            customer = _customerRepo.Post(customer);
+
+            await AssociateShoppingCartToCustomer(customer.CustomerId);
+            
             await _unitOfWork.SaveAsync();
-            return customer;
+            return new LoginResponse(customer, _authHelper);
         }
 
-        public async Task<Customer> Update(RegistrationForm input)
+        public async Task<Customer> Update(CustomerUpdateRequest input)
         {
             Customer customer = await _customerRepo.GetOne(new GetCustomerByIdSpecification(input.CustomerId, _authHelper));
             Guard.Against.NotFound(customer, "User");

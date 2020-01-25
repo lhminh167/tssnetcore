@@ -41,7 +41,8 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
 
             Claim[] claims = new Claim[]
             {
-                new Claim(ClaimTypes.Name, customer.CustomerId.ToString()),
+                new Claim(ClaimTypes.NameIdentifier, customer.CustomerId.ToString()),
+                new Claim(ClaimTypes.Name, customer.Name),
                 new Claim(ClaimTypes.Role, customer.GetRole()),
             };
 
@@ -50,12 +51,22 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
 
         public ShoppingCartAuthInfo GetShoppingCartAuthInfo()
         {
-            string cartId = GetShoppingCartId();
+            string cartId = GetShoppingCartId() ?? GenerateShoppingCartId();
 
             Claim[] claims = new Claim[]
             {
-                new Claim(ClaimTypes.Name, cartId),
-                new Claim(ClaimTypes.Role, Tss.Core.Entities.Role.Customer.Message.ToString())
+                new Claim(
+                    ClaimTypes.NameIdentifier, 
+                    cartId
+                ),
+                new Claim(
+                    ClaimTypes.Name, 
+                    GetClaim(ClaimTypes.Name) ?? "Visitor"
+                ),
+                new Claim(
+                    ClaimTypes.Role,
+                    GetClaim(ClaimTypes.Role) ?? Role.Customer.Message
+                )
             };
 
             return new ShoppingCartAuthInfo(cartId, GetAuthToken(claims));
@@ -66,18 +77,19 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
             return GetClaim(ClaimTypes.Role);
         }
 
+        private string GenerateShoppingCartId()
+        {
+            return Guid.NewGuid().ToString();
+        }
+
         public string GetShoppingCartId()
         {
-            int customerId = GetCustomerId();
-
-            return customerId == 0 ? 
-                Guid.NewGuid().ToString() :
-                customerId.ToString();
+            return GetClaim(ClaimTypes.NameIdentifier);
         }
 
         public int GetCustomerId()
         {
-            return GetClaim(ClaimTypes.Name).ToInt();
+            return GetClaim(ClaimTypes.NameIdentifier).ToInt();
         }
 
         private string GetClaim(string type)
@@ -88,6 +100,8 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
 
         private string GetAuthToken(Claim[] claims)
         {
+            Guard.Against.Zero(claims.Length, nameof(claims.Length));
+
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_settings.AuthenticationTokenSecret);
             var tokenDescriptor = new SecurityTokenDescriptor

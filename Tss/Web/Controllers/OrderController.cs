@@ -2,10 +2,10 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tss.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Tss.Core.Constants;
 using Tss.Core.Models;
 using Microsoft.AspNetCore.Authorization;
+using System.Net;
+using Tss.Core.Entities;
 
 namespace Tss.Web.Controllers
 {
@@ -24,77 +24,64 @@ namespace Tss.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            var dbOrder = await _service.Get();
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbOrder,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Orders were successfully retrieved."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Orders were successfully retrieved.",
+                await _service.Get()
+            );
             return Ok(response);
         }
 
         [HttpGet("{orderId}")]
-        public async Task<IActionResult> Get([FromRoute] int orderId)
+        public async Task<IActionResult> GetOne([FromRoute] int orderId)
         {
-            var dbOrder = await _service.Get(orderId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbOrder,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Order was successfully retrieved."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Order was successfully retrieved.",
+                await _service.Get(orderId)
+            );
             return Ok(response);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] DeliveryForm input)
+        public async Task<IActionResult> Create([FromBody] OrderCreateRequest input)
         {
-            var dbOrder = await _service.Create(input);
-            var status = StatusCodes.Status201Created;
-            var response = new Response
-            {
-                Content = dbOrder,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Your order was placed successfully.",
-            };
-            return CreatedAtAction("GetProduct", new { id = dbOrder.OrderId }, response);
+            OrderCreateResponse content = await _service.Create(input);
+            Response response = new Response
+            (
+                HttpStatusCode.Created,
+                "Your order was placed successfully.",
+                content
+            );
+            return CreatedAtAction(nameof(GetOne), new { orderId = content.Order.OrderId }, response);
         }
 
-        [Authorize(Roles = "Supplier")]
+        [Authorize(Roles = "Admin")]
         [HttpPut("StockOk/{orderId}")]
         public async Task<IActionResult> StockOk([FromRoute] int orderId)
         {
-            var dbOrder = await _service.StockOk(orderId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbOrder,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Thank you for confirming the stock. We will send you shipping notiication once payment was taken."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Thank you for confirming the stock. We will send you shipping notiication once payment was taken.",
+                await _service.StockOk(orderId)
+            );
             return Ok(response);
         }
 
-        [Authorize(Roles = "Supplier")]
+
+        [Authorize(Roles = "Admin")]
         [HttpPut("ShipOk/{orderId}")]
         public async Task<IActionResult> ShipOk([FromRoute] int orderId)
         {
-            var dbOrder = await _service.ShipOk(orderId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbOrder,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Thank you for shipping the goods. We will now send a notification to the customer."
-            };
+            Response response = new Response
+            (            
+                HttpStatusCode.OK,
+                "Thank you for confirming that the order has been dispatched. We will now send a notification to customer.",
+                await _service.ShipOk(orderId)
+            );
             return Ok(response);
         }
     }

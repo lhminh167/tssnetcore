@@ -30,7 +30,7 @@ namespace Tss.Core.Services
 
         public async Task<List<AttributeValue>> Get(string name)
         {
-            return await _attributeValueRepo.Get(new GetAttributeValueByNameAndValueSpecification(name, null, _authHelper));
+            return await _attributeValueRepo.Get(new GetAttributeValueByNameSpecification(name, _authHelper));
         }
 
         public async Task<AttributeValue> GetOne(int attributeValueId)

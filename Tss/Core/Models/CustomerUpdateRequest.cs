@@ -1,10 +1,7 @@
 namespace Tss.Core.Models
 {
-    public class DeliveryForm
+    public class CustomerUpdateRequest
     {
-        public string CartId { get; set; } = "1";
-        public string Comments { get; set; }
-        public int ShippingId { get; set; }    
         public int CustomerId { get; set; }
         public string Name { get; set; }
         public string Email { get; set; }
@@ -19,5 +16,6 @@ namespace Tss.Core.Models
         public string DayPhone { get; set; }
         public string EvePhone { get; set; }
         public string MobPhone { get; set; }
+        public string Role { get; set; }
     }
 }

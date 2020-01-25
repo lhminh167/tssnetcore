@@ -8,12 +8,12 @@ namespace Tss.Core.Specifications
         public GetAttributeByNameSpecification(string name, IAuthHelper authHelper)
         : base(
             a
-            => (string.IsNullOrWhiteSpace(name) || a.Name == name)
+            => a.Name == name
             ,
             a => a
         )
         {
-            AddInclude(av => av.AttributeValue);
+            SetIsNoTracking(true);
         }
     }
 

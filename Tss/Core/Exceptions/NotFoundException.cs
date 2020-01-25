@@ -1,5 +1,5 @@
 using System;
-using Microsoft.AspNetCore.Http;
+using System.Net;
 using Tss.Core.Models;
 
 namespace Tss.Core.Exceptions
@@ -11,15 +11,13 @@ namespace Tss.Core.Exceptions
             $"{name} not found."
         )
         {
-            var status = StatusCodes.Status404NotFound;
-            var response = new Response
-            {
-                Status = status,
-                Title = base.Message,
-                Detail = $"This/these {name} does/do not exist in the database."
-            };
-
-            base.Data.Add("Response", response);
+            Response response = new Response
+            (
+                HttpStatusCode.NotFound,
+                base.Message,
+                $"This/these {name} does/do not exist in the database."
+            );
+            base.Data.Add(nameof(Response), response);
         }
     }
 }

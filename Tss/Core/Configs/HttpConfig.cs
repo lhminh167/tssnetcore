@@ -1,15 +1,11 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Tss.Web.ActionFilters;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tss.Core.Models;
-using System.Threading.Tasks;
-using Tss.Core.Interfaces;
 
 namespace Tss.Core.Configs
 {
@@ -26,7 +22,9 @@ namespace Tss.Core.Configs
         {
             byte[] key = Encoding.ASCII.GetBytes(appSettings.AuthenticationTokenSecret);
 
-            services.AddAuthentication(options =>
+            services
+            .AddAuthorization()
+            .AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -63,7 +61,7 @@ namespace Tss.Core.Configs
         public static void Configure(IApplicationBuilder app)
         {
             app.UseRouting();
-            app.UseCors();
+            app.UseCors(builder => builder.AllowAnyMethod().AllowAnyOrigin().AllowAnyHeader());
 
             app.UseAuthentication();
             app.UseAuthorization();

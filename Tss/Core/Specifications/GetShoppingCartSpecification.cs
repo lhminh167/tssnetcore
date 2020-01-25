@@ -13,7 +13,8 @@ namespace Tss.Core.Specifications
             cart => cart
         )
         {
-            AddInclude("ProductAttribute.AttributeValue.Attribute");
+            SetIsNoTracking(true);
+            AddInclude(c => c.Product);
         }
     }
 }

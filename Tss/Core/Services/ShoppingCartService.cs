@@ -7,6 +7,8 @@ using Ardalis.GuardClauses;
 using Tss.Core.Specifications;
 using System.Linq;
 using Tss.Core.Models;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Tss.Core.Services
 {
@@ -35,19 +37,17 @@ namespace Tss.Core.Services
             return await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
         }
 
-        public async Task<ShoppingCartItemAddResponse> AddItem(ShoppingCartAddItemRequest input)
+        public async Task<ShoppingCartItemAddResponse> AddItem(ShoppingCartItemAddRequest input)
         {
+            Product product = await _productRepo.GetOne(new GetShoppingCartProductSpecification(input));  
+            if (!product.CheckAttributes(input.Attributes))
+                Guard.Against.NotFound(null, "product with such attributes was");
+
             ShoppingCartAuthInfo authInfo = _authHelper.GetShoppingCartAuthInfo();
-
-            Product product = await _productRepo.GetOne(new GetShoppingCartProductSpecification(input));
-            Guard.Against.NotFound(product, "Product with such attributes");
-
-            ShoppingCart item = await _shoppingCartRepo.GetOne(new GetShoppingCartItemSpecification(input, _authHelper.GetShoppingCartId()));
-            Guard.Against.NotFound(item, "Item");
-
+            ShoppingCart item = await _shoppingCartRepo.GetOne(new GetShoppingCartItemSpecification(input, authInfo.CartId));
             if (item == null)
             {
-                item = new ShoppingCart(input, _authHelper.GetShoppingCartId());
+                item = new ShoppingCart(input, authInfo.CartId);
                 _shoppingCartRepo.Post(item);
             }
             else
@@ -55,17 +55,14 @@ namespace Tss.Core.Services
                 item.AddUpQuantity(input.Quantity);
                 _shoppingCartRepo.Put(item);
             }
-
             await _unitOfWork.SaveAsync();
+            
+            int totalQuantity = await GetTotalQuantity();
 
-            return new ShoppingCartItemAddResponse
-            {
-                Token = authInfo.Token,
-                Item = item
-            };
+            return new ShoppingCartItemAddResponse(item, totalQuantity, authInfo.Token);
         }
 
-        public async Task<ShoppingCart> UpdateItem(int itemId, ShoppingCartUpdate input)
+        public async Task<ShoppingCart> UpdateItem(int itemId, ShoppingCartItemUpdateRequest input)
         {
             var item = await _shoppingCartRepo.Get(itemId);
             Guard.Against.NotFound(item, "Item");
@@ -122,7 +119,7 @@ namespace Tss.Core.Services
             return await _shoppingCartRepo.Get(new GetWishlistSpecification(_authHelper.GetShoppingCartId()));
         }
 
-        public async Task<double> GetTotalAmount()
+        public async Task<double> GetTotalCost()
         {
             List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
 
@@ -134,6 +131,13 @@ namespace Tss.Core.Services
                 )
                 * item.Quantity
             );
+        }
+
+        public async Task<int> GetTotalQuantity()
+        {
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
+
+            return items.Sum(item => item.Quantity);
         }
 
         public async Task RemoveCart()

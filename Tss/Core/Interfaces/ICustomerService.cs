@@ -9,9 +9,9 @@ namespace Tss.Core.Interfaces
     {
         Task<List<Customer>> Get();
         Task<Customer> Get(int customerId);
-        Task<LoginResponse> Login(LoginForm input);
-        Task<Customer> Create(RegistrationForm input);
-        Task<Customer> Update(RegistrationForm input);
+        Task<LoginResponse> Login(LoginRequest input);
+        Task<LoginResponse> Create(CustomerCreateRequest input);
+        Task<Customer> Update(CustomerUpdateRequest input);
         Task<Customer> Delete(int customerId);
     }
 }

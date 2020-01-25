@@ -6,7 +6,7 @@ namespace Ardalis.GuardClauses
 {
     public static class IncorrectLoginInfoGuard
     {
-        public static void IncorrectLoginInfo(this IGuardClause guardClause, LoginForm input, Customer customer)
+        public static void IncorrectLoginInfo(this IGuardClause guardClause, LoginRequest input, Customer customer)
         {
             if (customer == null || !customer.IsCorrectPassword(input.Password))
                 throw new IncorrectLoginInfoException();
