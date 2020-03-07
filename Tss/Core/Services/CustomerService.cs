@@ -56,7 +56,7 @@ namespace Tss.Core.Services
 
             List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(cartId));
             Guard.Against.NotFound(items, nameof(ShoppingCart));
-            
+
             items.ForEach(i => i.AssociateToCustomer(customerId));
             _shoppingCartRepo.PutRange(items);
         }
@@ -68,7 +68,7 @@ namespace Tss.Core.Services
 
             await AssociateShoppingCartToCustomer(customer.CustomerId);
             await _unitOfWork.SaveAsync();
-            
+
             return new LoginResponse(customer, _authHelper);
         }
 
@@ -76,15 +76,17 @@ namespace Tss.Core.Services
         {
             Customer duplicateCustomer = await _customerRepo.GetOne(new GetCustomerByEmailSpecification(input.Email));
             Guard.Against.EmailAddressTaken(duplicateCustomer);
-            
+
             AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), input.Role, _authHelper));
             Guard.Against.NotFound(role, nameof(Role));
 
-            Customer customer = new Customer(input, role, _authHelper);
-            customer = _customerRepo.Post(customer);
+            Customer customer = new Customer(input);
+            _customerRepo.Post(customer);
+            await _unitOfWork.SaveAsync();
+            customer.AddRole(role, _authHelper);
 
             await AssociateShoppingCartToCustomer(customer.CustomerId);
-            
+
             await _unitOfWork.SaveAsync();
             return new LoginResponse(customer, _authHelper);
         }
@@ -97,7 +99,8 @@ namespace Tss.Core.Services
             AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), input.Role, _authHelper));
             Guard.Against.NotFound(role, nameof(Role));
 
-            if (input.Email != customer.Email) {
+            if (input.Email != customer.Email)
+            {
                 Customer duplicateCustomer = await _customerRepo.GetOne(new GetCustomerByEmailSpecification(input.Email));
                 Guard.Against.EmailAddressTaken(duplicateCustomer);
             }

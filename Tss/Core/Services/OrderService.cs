@@ -6,7 +6,6 @@ using Tss.Core.Models;
 using System.Collections.Generic;
 using Tss.Core.Specifications;
 using Ardalis.GuardClauses;
-using AutoMapper;
 
 namespace Tss.Core.Services
 {
@@ -22,7 +21,6 @@ namespace Tss.Core.Services
         private readonly IEmailHelper _emailHelper;
         private readonly IPaymentHelper _paymentHelper;
         private readonly IAuthHelper _authHelper;
-        private readonly IMapper _mapper;
 
         public OrderService(
             IUnitOfWork unitOfWork,
@@ -34,8 +32,7 @@ namespace Tss.Core.Services
             IRepository<Tax> taxRepo,
             IEmailHelper emailHelper,
             IPaymentHelper paymentHelper,
-            IAuthHelper authHelper,
-            IMapper mapper
+            IAuthHelper authHelper
         )
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
@@ -48,20 +45,28 @@ namespace Tss.Core.Services
             _emailHelper = emailHelper ?? throw new ArgumentNullException(nameof(emailHelper));
             _paymentHelper = paymentHelper ?? throw new ArgumentNullException(nameof(paymentHelper));
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
-            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
         }
 
         public async Task<List<Orders>> Get()
         {
-            return await _ordersRepo.Get();
+            return await _ordersRepo.Get(new GetOrderSpecification(_authHelper));
         }
 
         public async Task<Orders> Get(int orderId)
         {
-            Orders order = await _ordersRepo.GetOne(new GetOrderSpecification(orderId, _authHelper));
+            Orders order = await _ordersRepo.GetOne(new GetOrderByIdSpecification(orderId, _authHelper));
             Guard.Against.NotFound(order, nameof(order));
 
             return order;
+        }
+
+        public async Task<CreateOrderFormResponse> GetCreateOrderForm()
+        {
+            return new CreateOrderFormResponse(
+                await _shippingRepo.Get(),
+                await _shippingRegionRepo.Get(),
+                await _taxRepo.Get()
+            );
         }
 
         public async Task<OrderCreateResponse> Create(OrderCreateRequest input)
@@ -102,7 +107,7 @@ namespace Tss.Core.Services
 
         public async Task<Orders> StockOk(int orderId)
         {
-            Orders order = await _ordersRepo.GetOne(new GetOrderSpecification(orderId, _authHelper));
+            Orders order = await _ordersRepo.GetOne(new GetOrderByIdSpecification(orderId, _authHelper));
             Guard.Against.NotFound(order, nameof(order));
 
             await order.PsStockOk(_emailHelper, _paymentHelper);
@@ -111,9 +116,20 @@ namespace Tss.Core.Services
             return order;
         }
 
+        public async Task<Orders> StockNotOk(int orderId, string comments)
+        {
+            Orders order = await _ordersRepo.GetOne(new GetOrderByIdSpecification(orderId, _authHelper));
+            Guard.Against.NotFound(order, nameof(order));
+
+            await order.PsStockNotOk(_emailHelper, _paymentHelper, comments);
+            _ordersRepo.Put(order);
+            await _unitOfWork.SaveAsync();
+            return order;
+        }
+
         public async Task<Orders> ShipOk(int orderId)
         {
-            Orders order = await _ordersRepo.GetOne(new GetOrderSpecification(orderId, _authHelper));
+            Orders order = await _ordersRepo.GetOne(new GetOrderByIdSpecification(orderId, _authHelper));
             Guard.Against.NotFound(order, nameof(order));
 
             await order.PsShipOk(_emailHelper, _paymentHelper);

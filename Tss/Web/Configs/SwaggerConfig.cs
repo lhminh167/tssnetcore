@@ -7,7 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.Swagger;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     /// <summary>
     /// Swagger API documentation components start-up configuration

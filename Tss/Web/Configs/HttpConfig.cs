@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Tss.Core.Models;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     /// <summary>
     /// Https start-up configuration
@@ -46,10 +46,12 @@ namespace Tss.Core.Configs
             services
             .AddMvc()
             .SetCompatibilityVersion(CompatibilityVersion.Version_3_0)
-            .AddMvcOptions(options => {
+            .AddMvcOptions(options =>
+            {
                 options.Filters.Add(typeof(ValidateModelStateAttribute));
             })
-            .AddNewtonsoftJson( options => {
+            .AddNewtonsoftJson(options =>
+            {
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore;
             });
         }

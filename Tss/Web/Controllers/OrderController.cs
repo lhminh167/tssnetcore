@@ -25,7 +25,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Get()
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Orders were successfully retrieved.",
                 await _service.Get()
@@ -37,10 +37,22 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> GetOne([FromRoute] int orderId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Order was successfully retrieved.",
                 await _service.Get(orderId)
+            );
+            return Ok(response);
+        }
+
+        [HttpGet("New")]
+        public async Task<IActionResult> GetGetCreateOrderForm()
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Checkout form was successfully retrieved.",
+                await _service.GetCreateOrderForm()
             );
             return Ok(response);
         }
@@ -63,10 +75,23 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> StockOk([FromRoute] int orderId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Thank you for confirming the stock. We will send you shipping notiication once payment was taken.",
                 await _service.StockOk(orderId)
+            );
+            return Ok(response);
+        }
+
+        [Authorize(Roles = "Admin")]
+        [HttpPut("StockNotOk/{orderId}")]
+        public async Task<IActionResult> StockNotOk([FromRoute] int orderId, [FromBody] string comments)
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Thank you for confirming the stock. We will send you shipping notiication once payment was taken.",
+                await _service.StockNotOk(orderId, comments)
             );
             return Ok(response);
         }
@@ -77,7 +102,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> ShipOk([FromRoute] int orderId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Thank you for confirming that the order has been dispatched. We will now send a notification to customer.",
                 await _service.ShipOk(orderId)

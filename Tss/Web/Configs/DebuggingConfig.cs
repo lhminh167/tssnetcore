@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Tss.Core.Middlewares;
+using Tss.Web.Middlewares;
 using Microsoft.AspNetCore.Hosting;
 using System.Collections.Generic;
 using Ardalis.ListStartupServices;
 using Microsoft.Extensions.Hosting;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     /// <summary>
     /// Https start-up configuration

@@ -18,7 +18,7 @@ namespace Tss.Core.Specifications
             _includeStrings = new List<string>();
             IsPagingEnabled = false;
         }
-        
+
         public Expression<Func<T, bool>> Criteria { get; private set; }
         public Expression<Func<T, TOut>> Select { get; private set; }
         public IReadOnlyList<Expression<Func<T, object>>> Includes => _includes;
@@ -52,18 +52,18 @@ namespace Tss.Core.Specifications
             IsNoTracking = isNoTracking;
         }
 
-        protected virtual void ApplyPaging(int pageIndex, int pageSize)
+        protected virtual void ApplyPaging(int pageIndex, int pageSize, bool isPagingEnabled)
         {
             PageIndex = pageIndex;
             PageSize = pageSize;
-            IsPagingEnabled = true;
+            IsPagingEnabled = isPagingEnabled;
         }
-        
+
         protected virtual void ApplyOrderBy(Expression<Func<T, object>> orderByExpression)
         {
             OrderBy = orderByExpression;
         }
-        
+
         protected virtual void ApplyOrderByDescending(Expression<Func<T, object>> orderByDescendingExpression)
         {
             OrderByDescending = orderByDescendingExpression;

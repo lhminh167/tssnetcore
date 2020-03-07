@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Threading.Tasks;
 using Tss.Core.Interfaces;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     public static class AuthConfig
     {
@@ -23,7 +23,7 @@ namespace Tss.Core.Configs
         public static Task OnAuthenticationFailed(AuthenticationFailedContext context)
         {
             context.Fail("Unauthorized");
-            
+
             return Task.CompletedTask;
         }
 

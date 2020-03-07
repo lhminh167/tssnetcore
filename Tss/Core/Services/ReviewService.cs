@@ -1,7 +1,6 @@
 using Tss.Core.Entities;
 using Tss.Core.Interfaces;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Ardalis.GuardClauses;
 using Tss.Core.Specifications;
 using Tss.Core.Models;
@@ -31,9 +30,9 @@ namespace Tss.Core.Services
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<List<Review>> Get(int productId)
+        public async Task<PaginatedList<Review>> Get(int productId)
         {
-            return await _reviewRepo.Get(new GetReviewByProductIdSpecification(productId, _authHelper));
+            return await _reviewRepo.GetPaginated(new GetReviewByProductIdSpecification(productId, _authHelper));
         }
 
         public async Task<Review> GetOne(int reviewId)
@@ -71,7 +70,7 @@ namespace Tss.Core.Services
             Review review = await _reviewRepo.GetOne(new GetReviewByIdSpecification(reviewId, _authHelper));
             Guard.Against.NotFound(review, nameof(Review));
 
-            bool isAuthorized = 
+            bool isAuthorized =
                 _authHelper.GetCustomerId() == review.CustomerId
                 || _authHelper.GetRole() == "Admin";
             Guard.Against.Unauthorized(!isAuthorized);

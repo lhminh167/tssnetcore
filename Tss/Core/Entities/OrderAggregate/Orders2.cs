@@ -12,9 +12,11 @@ namespace Tss.Core.Entities
         {
             if (Status != OrderStatus.OrderPlacedNotifyingCustomer.Id) StatusChangeException(OrderStatus.AwaitingConfirmationOfFunds);
             CreateAudit(OrderAudit.OrderProcessorStarted);
+            CreateAudit(OrderAudit.PsInitialNotificationStarted);
             await emailHelper.SendOrderInitialNotification(this);
+            CreateAudit(OrderAudit.PsInitialNotificationEmailSent);
             SetOrderStatus(OrderStatus.AwaitingConfirmationOfFunds);
-            CreateAudit(OrderAudit.OrderProcessorFinished);
+            CreateAudit(OrderAudit.PsInitialNotificationFinished);
             return await PsCheckFunds(emailHelper, paymentHelper, paymentMethodId);
         }
 
@@ -22,14 +24,15 @@ namespace Tss.Core.Entities
         {
             if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.NotifyingSupplierStockCheck);
             CreateAudit(OrderAudit.PsCheckFundsStarted);
-            Reference = paymentMethodId;
+            Customer.CreditCard = paymentMethodId;
             PaymentCreateResponse response = await paymentHelper.CreatePayment(this);
-            AuthCode = response.PaymentId;
+            Reference = response.PaymentId;
+            AuthCode = response.PaymentSecret;
             CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);
             SetOrderStatus(OrderStatus.NotifyingSupplierStockCheck);
             CreateAudit(OrderAudit.PsCheckFundsFinished);
             await PsCheckStock(emailHelper, paymentHelper);
-            return new OrderCreateResponse(this, response.PaymentId);
+            return new OrderCreateResponse(this, response);
         }
 
         private async Task PsCheckStock(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
@@ -56,7 +59,7 @@ namespace Tss.Core.Entities
         {
             if (Status != OrderStatus.AwaitingCreditCardPayment.Id) StatusChangeException(OrderStatus.NotifyingSupplierShipping);
             CreateAudit(OrderAudit.PsTakePaymentStarted);
-            await paymentHelper.CompletePayment(this.AuthCode);
+            await paymentHelper.CompletePayment(this.Reference);
             CreateAudit(OrderAudit.PsTakePaymentFundsDeducted);
             SetOrderStatus(OrderStatus.NotifyingSupplierShipping);
             CreateAudit(OrderAudit.PsTakePaymentFinished);
@@ -92,6 +95,18 @@ namespace Tss.Core.Entities
             CreateAudit(OrderAudit.PsFinalNotificationEmailSent);
             SetOrderStatus(OrderStatus.OrderCompleted);
             CreateAudit(OrderAudit.PsFinalNotificationFinished);
+            CreateAudit(OrderAudit.OrderProcessorFinished);
+        }
+
+        public async Task PsStockNotOk(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string comments)
+        {
+            if (Status != OrderStatus.AwaitingStockConfirmation.Id) StatusChangeException(OrderStatus.AwaitingCreditCardPayment);
+            CreateAudit(OrderAudit.PsStockNotOkStarted);
+            await emailHelper.SendOrderFinalNotification(this);
+            CreateAudit(OrderAudit.PsStockNotOkEmailSent);
+            SetOrderStatus(OrderStatus.OutOfStock);
+            CreateAudit(OrderAudit.PsStockNotOkFinished);
+            CreateAudit(OrderAudit.OrderProcessorFinished);
         }
 
         // public async Task SetOrderCanceledStatus(

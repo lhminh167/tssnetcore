@@ -7,17 +7,17 @@ namespace Tss.Core.Entities
 {
     public class ProductAttribute
     {
-        public ProductAttribute(Product product, AttributeValue attributeValue)
+        public ProductAttribute(int productId, int attributeValueId)
         {
-            Guard.Against.Null(product, nameof(product));
-            Guard.Against.Null(attributeValue, nameof(attributeValue));
-            Guard.Against.BadRequest(AllowedValues.Contains(attributeValue.Attribute.Name), $"{attributeValue.Attribute.Name} is not a product's attribute.");
+            // Guard.Against.Null(product, nameof(product));
+            // Guard.Against.Null(attributeValue, nameof(attributeValue));
+            // Guard.Against.BadRequest(!AllowedValues.Contains(attributeValue.Attribute.Name), $"{attributeValue.Attribute.Name} is not a product's attribute.");
 
-            ProductId = product.ProductId;
-            AttributeValueId = attributeValue.AttributeValueId;
+            ProductId = productId;
+            AttributeValueId = attributeValueId;
 
-            Product = product;
-            AttributeValue = attributeValue;
+            // Product = product;
+            // AttributeValue = attributeValue;
         }
 
         public ProductAttribute()
@@ -30,6 +30,6 @@ namespace Tss.Core.Entities
         public virtual AttributeValue AttributeValue { get; set; }
         public virtual Product Product { get; set; }
 
-        public static IReadOnlyList<string> AllowedValues => new List<string>{"Color", "Size"};
+        public static IReadOnlyList<string> AllowedValues => new List<string> { "Color", "Size" };
     }
 }

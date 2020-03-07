@@ -5,7 +5,7 @@ using Tss.Core.Entities;
 namespace Tss.Core.Models
 {
     public class AttributeValueResponse
-    {   
+    {
         public AttributeValueResponse(AttributeValue attributeValue)
         {
             Guard.Against.Null(attributeValue, nameof(AttributeValue));
@@ -19,7 +19,7 @@ namespace Tss.Core.Models
         private AttributeValueResponse()
         {
         }
-        [Key]
+
         public int AttributeValueId { get; set; }
         public int AttributeId { get; set; }
         public string Value { get; set; }

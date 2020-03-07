@@ -10,7 +10,7 @@ namespace Tss.Core.Entities
         {
             Guard.Against.Null(customer, nameof(customer));
             Guard.Against.Null(attributeValue, nameof(attributeValue));
-            Guard.Against.BadRequest(AllowedValues.Contains(attributeValue.Attribute.Name), $"{attributeValue.Attribute.Name} is not a customer's attribute.");
+            Guard.Against.BadRequest(!AllowedValues.Contains(attributeValue.Attribute.Name), $"{attributeValue.Attribute.Name} is not a customer's attribute.");
 
             CustomerId = customer.CustomerId;
             AttributeValueId = attributeValue.AttributeValueId;
@@ -29,6 +29,6 @@ namespace Tss.Core.Entities
         public virtual AttributeValue AttributeValue { get; set; }
         public virtual Customer Customer { get; set; }
 
-        public static IReadOnlyList<string> AllowedValues => new List<string>{"Role"};
+        public static IReadOnlyList<string> AllowedValues => new List<string> { "Role" };
     }
 }

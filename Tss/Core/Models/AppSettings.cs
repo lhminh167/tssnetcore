@@ -20,6 +20,7 @@ namespace Tss.Core.Models
             AuthenticationTokenSecret = Environment.GetEnvironmentVariable("AUTHORIZATION_TOKEN_SECRET");
             DatabaseConnectionString = Environment.GetEnvironmentVariable("JAWSDB_CONNECTION");
             CloudinaryCloudName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_NAME");
+            CloudinaryFolderName = Environment.GetEnvironmentVariable("CLOUDINARY_CLOUD_FOLDER");
             CloudinaryApiKey = Environment.GetEnvironmentVariable("CLOUDINARY_API_KEY");
             CloudinaryApiSecret = Environment.GetEnvironmentVariable("CLOUDINARY_API_SECRET");
         }
@@ -38,6 +39,7 @@ namespace Tss.Core.Models
         public string AuthenticationTokenSecret { get; set; }
         public string DatabaseConnectionString { get; set; }
         public string CloudinaryCloudName { get; set; }
+        public string CloudinaryFolderName { get; set; }
         public string CloudinaryApiKey { get; set; }
         public string CloudinaryApiSecret { get; set; }
     }

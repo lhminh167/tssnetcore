@@ -10,7 +10,7 @@ using Serilog.Exceptions.SqlServer.Destructurers;
 using Serilog.Formatting.Elasticsearch;
 // using Serilog.Exceptions.EntityFrameworkCore;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     /// <summary>
     /// Https start-up configuration

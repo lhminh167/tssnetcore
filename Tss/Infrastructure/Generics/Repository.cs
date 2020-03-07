@@ -6,6 +6,7 @@ using Tss.Core.Interfaces;
 using Tss.Infrastructure.Contexts;
 using System.Collections.Generic;
 using Tss.Core.Models;
+using System.Linq.Expressions;
 
 namespace Tss.Infrastructure.Generics
 {
@@ -37,9 +38,17 @@ namespace Tss.Infrastructure.Generics
             ISpecification<TEntity, TOut> spec
         )
         {
-            int count = await ApplySpecification(spec).CountAsync();
-            List<TOut> items = await ApplySpecification(spec).ToListAsync();
-            return new PaginatedList<TOut>(items, count, spec.PageIndex, spec.PageSize);
+            List<TOut> list = spec.IsPagingEnabled
+                ? await ApplySpecification(spec).Skip(spec.PageIndex * spec.PageSize).Take(spec.PageSize).ToListAsync()
+                : await ApplySpecification(spec).ToListAsync();
+
+            return new PaginatedList<TOut>(
+                list,
+                await ApplySpecification(spec).CountAsync(),
+                spec.PageIndex,
+                spec.PageSize,
+                spec.IsPagingEnabled
+            );
         }
 
         public virtual async Task<List<TOut>> Get<TOut>(
@@ -56,7 +65,6 @@ namespace Tss.Infrastructure.Generics
             return await ApplySpecification(spec).FirstOrDefaultAsync();
         }
 
-
         public virtual async Task<TEntity> Get(int id)
         {
             return await _dbSet.FindAsync(id);
@@ -65,6 +73,20 @@ namespace Tss.Infrastructure.Generics
         public async Task<int> Count(ISpecification<TEntity, TEntity> spec)
         {
             return await ApplySpecification(spec).CountAsync();
+        }
+
+        public virtual async Task<TOut> GetMax<TOut>(
+            Expression<Func<TEntity, TOut>> spec
+        )
+        {
+            return await _dbSet.MaxAsync<TEntity, TOut>(spec);
+        }
+
+        public virtual async Task<TOut> GetMin<TOut>(
+            Expression<Func<TEntity, TOut>> spec
+        )
+        {
+            return await _dbSet.MinAsync<TEntity, TOut>(spec);
         }
 
         public virtual TEntity Put(TEntity entity)
@@ -100,6 +122,11 @@ namespace Tss.Infrastructure.Generics
         private IQueryable<TOut> ApplySpecification<TOut>(ISpecification<TEntity, TOut> spec)
         {
             return SpecificationEvaluator<TEntity>.GetQuery(_dbSet, spec);
+        }
+
+        public void Detach(object input)
+        {
+            _context.Entry(input).State = EntityState.Detached;
         }
     }
 }

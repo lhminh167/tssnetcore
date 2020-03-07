@@ -24,7 +24,7 @@ namespace Tss.Core.Entities
             Guard.Against.Null(tax, nameof(Tax));
             Guard.Against.Null(shippingRegion, nameof(ShippingRegion));
             Guard.Against.BadRequest(
-                shipping.ShippingRegionId == shippingRegion.ShippingRegionId, 
+                shipping.ShippingRegionId == shippingRegion.ShippingRegionId,
                 "This shipping option is not available at your chosen region."
             );
 
@@ -33,7 +33,7 @@ namespace Tss.Core.Entities
             ShippingId = shipping.ShippingId;
             CustomerId = customer.CustomerId;
             TaxId = tax.TaxId;
-            
+
             Tax = tax;
             Customer = customer;
             Shipping = shipping;
@@ -70,23 +70,14 @@ namespace Tss.Core.Entities
         public virtual Tax Tax { get; set; }
         public virtual ICollection<Audit> Audit { get; set; }
         public virtual ICollection<OrderDetail> OrderDetail { get; set; }
-        
+
         public virtual OrderStatus OrderStatus => OrderStatus.FromValue<OrderStatus>(Status);
 
         private void SetOrderStatus(OrderStatus status)
         {
             Guard.Against.Null(status, nameof(status));
-            
+
             Status = status.Id;
-        }
-
-        private void SetCreditCardInfo(string authCode, string reference)
-        {
-            Guard.Against.NullOrEmpty(authCode, nameof(authCode));
-            Guard.Against.NullOrEmpty(reference, nameof(reference));
-
-            AuthCode = authCode;
-            Reference = reference;
         }
 
         private void SetDateShipped()

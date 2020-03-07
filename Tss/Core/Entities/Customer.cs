@@ -10,11 +10,9 @@ namespace Tss.Core.Entities
 {
     public class Customer : IAggregateRoot
     {
-        public Customer(CustomerCreateRequest input, AttributeValue role, IAuthHelper authHelper)
+        public Customer(CustomerCreateRequest input)
         {
             Guard.Against.Null(input, nameof(CustomerCreateRequest));
-            Guard.Against.Null(role, nameof(Role));
-            Guard.Against.Null(authHelper, nameof(authHelper));
             Guard.Against.NullOrWhiteSpace(input.Name, nameof(input.Name));
             Guard.Against.NullOrWhiteSpace(input.Email, nameof(input.Email));
             Guard.Against.NullOrWhiteSpace(input.Password, nameof(input.Password));
@@ -23,7 +21,6 @@ namespace Tss.Core.Entities
             Orders = new List<Orders>();
             Review = new List<Review>();
             SetPassword(input.Password);
-            AddRole(role, authHelper);
             Name = input.Name;
             Email = input.Email;
         }
@@ -57,7 +54,7 @@ namespace Tss.Core.Entities
         public virtual ICollection<Orders> Orders { get; set; }
         public virtual ICollection<Review> Review { get; set; }
 
-        public virtual IReadOnlyCollection<AttributeValueResponse> Attributes => 
+        public virtual IReadOnlyCollection<AttributeValueResponse> Attributes =>
             CustomerAttribute?.Select(pa => new AttributeValueResponse(pa?.AttributeValue))?.ToList();
 
         private void SetPassword(string password)
@@ -108,10 +105,10 @@ namespace Tss.Core.Entities
             Guard.Against.NullOrWhiteSpace(input.EvePhone, nameof(input.EvePhone));
             Guard.Against.NullOrWhiteSpace(input.MobPhone, nameof(input.MobPhone));
 
-            Name =  input.Name;
+            Name = input.Name;
             Address1 = input.Address1;
             Address2 = input.Address2;
-            City =  input.City;
+            City = input.City;
             Region = input.Region;
             PostalCode = input.PostalCode;
             Country = input.Country;
@@ -136,10 +133,10 @@ namespace Tss.Core.Entities
             Guard.Against.NullOrWhiteSpace(input.EvePhone, nameof(input.EvePhone));
             Guard.Against.NullOrWhiteSpace(input.MobPhone, nameof(input.MobPhone));
 
-            Name =  input.Name;
+            Name = input.Name;
             Address1 = input.Address1;
             Address2 = input.Address2;
-            City =  input.City;
+            City = input.City;
             Region = input.Region;
             PostalCode = input.PostalCode;
             Country = input.Country;
@@ -178,15 +175,15 @@ namespace Tss.Core.Entities
         public void UpdateRole(AttributeValue role, IAuthHelper authHelper)
         {
             AllowToAddRole(role, authHelper);
-            
+
             CustomerAttribute customerAttribute = CustomerAttribute?.FirstOrDefault(ca => ca.AttributeValue.Attribute.Name == "Role");
             UpdateCustomerAttribute(customerAttribute, role);
         }
 
-        private void AddRole(AttributeValue role, IAuthHelper authHelper)
+        public void AddRole(AttributeValue role, IAuthHelper authHelper)
         {
             AllowToAddRole(role, authHelper);
-            
+
             AddCustomerAttribute(role);
         }
 
@@ -199,12 +196,14 @@ namespace Tss.Core.Entities
 
         private void AllowAdminToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            if (authHelper.GetRole() != "Admin") return;
+            if (authHelper.GetRole() != "Admin")
+                return;
         }
 
         private void AllowCustomerToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            if (authHelper.GetRole() != "Customer") return;
+            if (authHelper.GetRole() != "Customer")
+                return;
 
             bool isAuthorized =
                 CustomerId == authHelper.GetCustomerId()
@@ -217,10 +216,10 @@ namespace Tss.Core.Entities
         {
             if (authHelper.GetCustomerId() > 0) return;
 
-            bool isAuthorized = 
+            bool isAuthorized =
                 role.Value == "Customer";
 
-            Guard.Against.Unauthorized(isAuthorized);
+            Guard.Against.Unauthorized(!isAuthorized);
         }
     }
 }

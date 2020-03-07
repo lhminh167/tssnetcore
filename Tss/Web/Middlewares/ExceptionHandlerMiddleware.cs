@@ -7,7 +7,7 @@ using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using Tss.Core.Models;
 
-namespace Tss.Core.Middlewares
+namespace Tss.Web.Middlewares
 {
     public class ExceptionHandlerMiddleware
     {
@@ -37,7 +37,7 @@ namespace Tss.Core.Middlewares
 
         private async Task HandleExceptionAsync(HttpContext context, Exception exception)
         {
-            Response response = exception.Data[nameof(Response)] as Response ?? 
+            Response response = exception.Data[nameof(Response)] as Response ??
                 new Response
                 (
                     HttpStatusCode.InternalServerError,

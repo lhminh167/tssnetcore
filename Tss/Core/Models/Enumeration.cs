@@ -14,7 +14,7 @@ namespace Tss.Core.Models
 
         protected Enumeration(int id, string message)
         {
-            Guard.Against.OutOfRange(id, nameof(id), 0, int.MaxValue);
+            Guard.Against.OutOfRange(id, nameof(id), 1, int.MaxValue);
             Guard.Against.NullOrWhiteSpace(message, nameof(message));
 
             Id = id;

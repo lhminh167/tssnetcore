@@ -96,7 +96,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Attribute)
                     .WithMany(p => p.AttributeValue)
                     .HasForeignKey(d => d.AttributeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("attribute_value_fk");
             });
 
@@ -133,7 +133,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.Audit)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("audit_fk");
             });
 
@@ -168,7 +168,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Department)
                     .WithMany(p => p.Category)
                     .HasForeignKey(d => d.DepartmentId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("category_fk");
             });
 
@@ -283,8 +283,10 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.ShippingRegion)
                     .WithMany(p => p.Customer)
                     .HasForeignKey(d => d.ShippingRegionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("customer_fk");
+
+                entity.Ignore(e => e.Attributes);
             });
 
             modelBuilder.Entity<CustomerAttribute>(entity =>
@@ -308,13 +310,13 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.AttributeValue)
                     .WithMany("CustomerAttribute")
                     .HasForeignKey(d => d.AttributeValueId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("customer_attribute_fk_1");
 
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.CustomerAttribute)
                     .HasForeignKey(d => d.CustomerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("customer_attribute_fk");
             });
 
@@ -390,7 +392,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Order)
                     .WithMany(p => p.OrderDetail)
                     .HasForeignKey(d => d.OrderId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("order_detail_fk");
 
                 entity.HasOne(d => d.Product)
@@ -536,6 +538,10 @@ namespace Tss.Infrastructure.Contexts
                     .HasColumnType("varchar(150)")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
+
+                // entity.Ignore(e => e.Attributes);
+
+                // entity.Ignore(e => e.Category);
             });
 
             modelBuilder.Entity<ProductAttribute>(entity =>
@@ -559,13 +565,13 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.AttributeValue)
                     .WithMany("ProductAttribute")
                     .HasForeignKey(d => d.AttributeValueId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("product_attribute_fk_1");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ProductAttribute)
                     .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("product_attribute_fk");
             });
 
@@ -590,13 +596,13 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Category)
                     .WithMany(p => p.ProductCategory)
                     .HasForeignKey(d => d.CategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("product_category_fk_1");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ProductCategory)
                     .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("product_category_fk");
             });
 
@@ -640,13 +646,13 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Customer)
                     .WithMany(p => p.Review)
                     .HasForeignKey(d => d.CustomerId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("review_fk");
 
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.Review)
                     .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("review_fk_1");
             });
 
@@ -679,7 +685,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.ShippingRegion)
                     .WithMany(p => p.Shipping)
                     .HasForeignKey(d => d.ShippingRegionId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("shipping_fk");
             });
 
@@ -750,7 +756,7 @@ namespace Tss.Infrastructure.Contexts
                 entity.HasOne(d => d.Product)
                     .WithMany(p => p.ShoppingCart)
                     .HasForeignKey(d => d.ProductId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .OnDelete(DeleteBehavior.ClientCascade)
                     .HasConstraintName("shopping_cart_fk");
             });
 

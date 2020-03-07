@@ -6,15 +6,16 @@ using Microsoft.AspNetCore.Authorization;
 using Tss.Core.Models;
 using System.Net;
 using Tss.Core.Entities;
+using System.Collections.Generic;
 
 namespace Tss.Web.Controllers
 {
     [Authorize(Roles = "Admin")]
     [Route("api/[controller]")]
-    public class ProductController: ControllerBase
-    {        
+    public class ProductController : ControllerBase
+    {
         private readonly IProductService _service;
-        
+
         public ProductController(
             IProductService service
         )
@@ -36,12 +37,36 @@ namespace Tss.Web.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending,
+            [FromQuery] string keyword,
+            [FromQuery] string color,
+            [FromQuery] string size,
+            [FromQuery] List<string> category,
+            [FromQuery] double minPrice,
+            [FromQuery] double maxPrice
+        )
         {
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Products were successfully retrieved.",
-                await _service.Get()
+                await _service.Get(new ProductSearchRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending,
+                    keyword,
+                    color,
+                    size,
+                    category,
+                    minPrice,
+                    maxPrice
+                ))
             );
             return Ok(response);
         }
@@ -61,21 +86,21 @@ namespace Tss.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] ProductCreateRequest input)
         {
-            Product content = await _service.Create(input);
+            ProductResponse content = await _service.Create(input);
             Response response = new Response
             (
                 HttpStatusCode.Created,
                 "Product was created successfully.",
                 content
             );
-            return CreatedAtAction(nameof(GetOne), new { id = content.ProductId }, response);
+            return CreatedAtAction(nameof(GetOne), new { productId = content.ProductId }, response);
         }
 
         [HttpPut("{productId}")]
-        public async Task<IActionResult> Update([FromBody] Product input)
+        public async Task<IActionResult> Update([FromBody] ProductUpdateRequest input)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Product was updated successfully.",
                 await _service.Update(input)
@@ -87,7 +112,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Delete([FromRoute] int productId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Product was successfully deleted.",
                 await _service.Delete(productId)

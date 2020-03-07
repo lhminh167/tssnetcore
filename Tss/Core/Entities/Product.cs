@@ -1,6 +1,12 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Threading.Tasks;
 using Ardalis.GuardClauses;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Tss.Core.Interfaces;
 using Tss.Core.Models;
 
 namespace Tss.Core.Entities
@@ -10,9 +16,13 @@ namespace Tss.Core.Entities
         public Product(ProductCreateRequest input)
         {
             Guard.Against.Null(input, nameof(input));
-            
-            AddCommonInfo(input);
-            AddProductAttributes(input.Attributes);
+
+            OrderDetail = new List<OrderDetail>();
+            ProductAttribute = new List<ProductAttribute>();
+            ProductCategory = new List<ProductCategory>();
+            Review = new List<Review>();
+            ShoppingCart = new List<ShoppingCart>();
+            AddInfo(input);
         }
 
         public Product()
@@ -40,70 +50,179 @@ namespace Tss.Core.Entities
         public virtual ICollection<Review> Review { get; set; }
         public virtual ICollection<ShoppingCart> ShoppingCart { get; set; }
 
-        public virtual IReadOnlyCollection<AttributeValueResponse> Attributes => ProductAttribute?.Select(pa => new AttributeValueResponse(pa?.AttributeValue))?.ToList();
+        // public virtual IReadOnlyCollection<AttributeValueResponse> Attributes => ProductAttribute?.Select(pa => new AttributeValueResponse(pa?.AttributeValue))?.ToList();
+        // public virtual ProductFilterCategoryResponse Category => ProductCategory?.Select(pc => new ProductFilterCategoryResponse(pc?.Category))?.FirstOrDefault();
 
-        public bool CheckAttributes(string attributeList)
+        public void CheckAttributes(string attributeList)
         {
             Guard.Against.NullOrEmpty(attributeList, nameof(attributeList));
 
             IDictionary<string, string> dict = AttributeValue.Decode(attributeList);
 
-            List<AttributeValueResponse> matchedAttributeValues = Attributes?.Where(a =>
+            List<ProductAttribute> matchedAttributeValues = ProductAttribute?.Where(a =>
                 dict.Contains(
                     new KeyValuePair<string, string>(
-                        a?.Name,
-                        a?.Value
+                        a?.AttributeValue.Name,
+                        a?.AttributeValue.Value
                     )
                 )
             ).ToList();
 
-            return dict.Count == matchedAttributeValues.Count;
+            if (dict.Count == matchedAttributeValues.Count) return;
+
+            Guard.Against.NotFound(null, "product with such attributes was");
         }
 
-        private void AddProductAttributes(List<AttributeValue> attributeValues)
-        {
-            Guard.Against.NullOrEmpty(attributeValues, nameof(attributeValues));
-            
-            List<ProductAttribute> productAttributes = attributeValues.Select(av => new ProductAttribute(this, av)).ToList();
-            ProductAttribute.ToList().AddRange(productAttributes);
-        }
-
-        private void UpdateProductAttributes(List<AttributeValue> attributeValues)
-        {
-            Guard.Against.Null(attributeValues, nameof(attributeValues));
-
-            ProductAttribute.ToList().RemoveAll(pa => pa.ProductId == ProductId);
-            AddProductAttributes(attributeValues);
-        }
-
-        public void UpdateInfo(ProductCreateRequest input)
+        public void Create(ProductCreateRequest input, List<AttributeValue> attributeValues, Category category)
         {
             Guard.Against.Null(input, nameof(input));
+            Guard.Against.NullOrEmpty(attributeValues, nameof(attributeValues));
+            Guard.Against.Null(category, nameof(category));
+            input.Attributes.Except(attributeValues.Select(a => a.AttributeValueId))
+            .ToList().ForEach(a => Guard.Against.NotFound(a, nameof(AttributeValue)));
 
-            AddCommonInfo(input);
-            UpdateProductAttributes(input.Attributes);
+            AddProductCategory(input);
+            AddProductAttributes(input);
         }
 
-        private void AddCommonInfo(ProductCreateRequest input)
+        public void UpdateAttributes(ProductCreateRequest input)
+        {
+            UpdateProductAttributes(input);
+            UpdateProductCategory(input);
+        }
+
+        private void AddProductAttributes(ProductCreateRequest input)
+        {
+            input.Attributes.ForEach(item => ProductAttribute.Add(new ProductAttribute(ProductId, item)));
+        }
+
+        private void AddProductCategory(ProductCreateRequest input)
+        {
+            ProductCategory.Add(new ProductCategory(ProductId, input.CategoryId));
+        }
+
+        private void UpdateProductAttributes(ProductCreateRequest input)
+        {
+            RemoveProductAttributes();
+            AddProductAttributes(input);
+        }
+
+        private void UpdateProductCategory(ProductCreateRequest category)
+        {
+            RemoveProductCategory();
+            AddProductCategory(category);
+        }
+
+        private void RemoveProductAttributes()
+        {
+            ProductAttribute = new List<ProductAttribute>();
+        }
+
+        private void RemoveProductCategory()
+        {
+            ProductCategory = new List<ProductCategory>();
+        }
+
+        public async Task Update(
+            ProductUpdateRequest input,
+            List<AttributeValue> attributes,
+            Category category,
+            IMediaHelper mediaHelper
+        )
+        {
+            Guard.Against.Null(input, nameof(input));
+            Guard.Against.Null(attributes, nameof(attributes));
+            Guard.Against.Null(category, nameof(category));
+            Guard.Against.Null(mediaHelper, nameof(mediaHelper));
+
+            await RenameImages(input, mediaHelper);
+            AddInfo(input);
+        }
+
+        private void AddInfo(ProductCreateRequest input)
         {
             Guard.Against.NullOrWhiteSpace(input.Name, nameof(input.Name));
             Guard.Against.NullOrWhiteSpace(input.Description, nameof(input.Description));
-            Guard.Against.BadRequest(input.Price <= 0, "Price should be greater than zero.");
-            Guard.Against.BadRequest(input.DiscountedPrice <= 0, "Discounted price should be greater than zero.");
+            Guard.Against.BadRequest(input.Price <= 0.0, "Price should be greater than zero.");
+            Guard.Against.BadRequest(input.DiscountedPrice < 0.0, "Discounted price should be greater than or equal to zero.");
             Guard.Against.BadRequest(input.DiscountedPrice >= input.Price, "Discounted price should be less than price.");
+            Guard.Against.BadRequest(input.Display < 0.0, "Display value should be greater than or equal to zero.");
             Guard.Against.NullOrWhiteSpace(input.Image, nameof(Image));
             Guard.Against.NullOrWhiteSpace(input.Image2, nameof(Image2));
             Guard.Against.NullOrWhiteSpace(input.Thumbnail, nameof(Thumbnail));
-            Guard.Against.BadRequest(input.Display <= 0, "Display value should be greater than zero.");
 
             Name = input.Name;
             Description = input.Description;
             Price = input.Price;
             DiscountedPrice = input.DiscountedPrice;
-            Image = input.Image;
-            Image2 = input.Image2;
-            Thumbnail = input.Thumbnail;
             Display = input.Display;
+            AddImages(input);
+        }
+
+        public async Task Remove(IMediaHelper mediaHelper)
+        {
+            Guard.Against.Null(mediaHelper, nameof(mediaHelper));
+
+            await DeleteImages(mediaHelper);
+            // RemoveProductAttributes();
+            // RemoveProductCategory();
+            // RemoveReviews();
+            // RemoveShoppingCarts();
+        }
+
+        // private void RemoveReviews()
+        // {
+        //     Review.ToList().RemoveAll(pa => pa.ProductId == ProductId);
+        // }
+
+        // private void RemoveShoppingCarts()
+        // {
+        //     ShoppingCart.ToList().RemoveAll(pa => pa.ProductId == ProductId);
+        // }
+
+        private string GetImageName(string productName)
+        {
+            return productName.ToLower().Replace(' ', '-');
+        }
+
+        private List<string> GetImagePrefixes()
+        {
+            return new List<string>() {
+                "-thumbnail",
+                "",
+                "-2"
+            };
+        }
+
+        private List<string> GetImageNames(string productName)
+        {
+            string imageName = GetImageName(productName);
+            List<string> imagePrefixes = GetImagePrefixes();
+            return imagePrefixes.Select(prefix => imageName + prefix).ToList();
+        }
+
+        private async Task DeleteImages(IMediaHelper mediaHelper)
+        {
+            List<ImageDeleteRequest> images = GetImageNames(Name).Select(e => new ImageDeleteRequest(e)).ToList();
+            await mediaHelper.Delete(new ImagesDeleteRequest(images));
+        }
+
+        private async Task RenameImages(ProductUpdateRequest input, IMediaHelper mediaHelper)
+        {
+            if (input.Name == Name) return;
+            List<ImageRenameRequest> images = GetImageNames(Name)
+                .Select((e, i) => new ImageRenameRequest(e, GetImageNames(input.Name)[i])).ToList();
+            await mediaHelper.Rename(new ImagesRenameRequest(images));
+            AddImages(input);
+        }
+
+        private void AddImages(ProductCreateRequest input)
+        {
+            List<string> images = GetImageNames(input.Name);
+
+            Image = images[0];
+            Image2 = images[1];
+            Thumbnail = images[2];
         }
     }
 }

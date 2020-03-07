@@ -1,4 +1,7 @@
+using System;
 using Ardalis.GuardClauses;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Tss.Core.Models;
 
 namespace Tss.Core.Entities
@@ -21,7 +24,7 @@ namespace Tss.Core.Entities
         public BaseOrderAudit(string message, int id)
         : base(id, message)
         {
-            Guard.Against.OutOfRange(id, nameof(id), 10000, 20702);
+            // Guard.Against.OutOfRange(id, nameof(id), 10000, 20702);
         }
     }
 
@@ -155,6 +158,21 @@ namespace Tss.Core.Entities
         public static OrderAudit PsFinalNotificationEmailSent = new OrderAudit(
             "Dispatch email sent to customer.",
             20702
+        );
+
+        public static OrderAudit PsStockNotOkStarted = new OrderAudit(
+            "PsStockNotOk started.",
+            20800
+        );
+
+        public static OrderAudit PsStockNotOkFinished = new OrderAudit(
+            "PsStockNotOk finished.",
+            20801
+        );
+
+        public static OrderAudit PsStockNotOkEmailSent = new OrderAudit(
+            "Out-of-stock email sent to customer.",
+            20802
         );
 
         OrderAudit(string message, int id)

@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
+using System.Threading.Tasks;
 using Tss.Core.Interfaces;
+using Tss.Core.Models;
 
 namespace Tss.Infrastructure.Generics
 {
@@ -31,7 +33,9 @@ namespace Tss.Infrastructure.Generics
             }
 
             if (specification.IsNoTracking)
+            {
                 query = query.AsNoTracking();
+            }
 
             // Apply ordering if expressions are set
             if (specification.OrderBy != null)
@@ -48,19 +52,11 @@ namespace Tss.Infrastructure.Generics
                 query = query.GroupBy(specification.GroupBy).SelectMany(x => x);
             }
 
-            // Apply paging if enabled
-            if (specification.IsPagingEnabled)
-            {
-                query = query
-                    .Skip((specification.PageIndex - 1) * specification.PageSize)
-                    .Take(specification.PageSize);
-            }
-
             if (typeof(TOut) == typeof(T))
             {
                 return (IQueryable<TOut>)query;
             }
-            
+
             return query.Select(specification.Select);
         }
     }

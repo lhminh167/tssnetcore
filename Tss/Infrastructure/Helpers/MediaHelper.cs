@@ -1,13 +1,15 @@
 using System.Threading.Tasks;
 using Tss.Core.Interfaces;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using Microsoft.Extensions.Options;
 using Tss.Core.Models;
 using Ardalis.GuardClauses;
-using Tss.Core.Entities;
 using CloudinaryDotNet.Actions;
 using CloudinaryDotNet;
+using System.Collections.Generic;
+using System;
+using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Microsoft.eShopWeb.Infrastructure.Helpers
 {
@@ -16,7 +18,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
         private readonly AppSettings _settings;
         private readonly Account _account;
         private readonly Cloudinary _cloudinary;
-    
+
         public MediaHelper(
             IOptions<AppSettings> settings
         )
@@ -35,17 +37,59 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
             _cloudinary = new Cloudinary(_account);
         }
 
-        public async Task UploadImage(IEmail email)
+        public List<ImageGetUploadTokenResponse> GetImageUploadToken(ImagesGetUploadTokenRequest input)
         {
-            var uploadParams = new ImageUploadParams()
+            return input.Content.Select(entry =>
             {
-                File = new FileDescription(@"http://www.example.com/mysample.jpg"),
-                PublicId = "sample_woman"
-            };
-            var uploadResult = await _cloudinary.UploadAsync(uploadParams);
-// _cloudinary.Api.SignParameters(IDictionary<string, object> parameters)
+                double now = (
+                        TimeZoneInfo.ConvertTimeToUtc(DateTime.Now)
+                        - new DateTime(1970, 1, 1, 0, 0, 0, 0, System.DateTimeKind.Utc)
+                    ).TotalSeconds;
 
-            return;
+                SortedDictionary<string, object> parameters = new SortedDictionary<string, object>();
+
+                parameters.Add("public_id", entry.Name);
+                parameters.Add("eager", entry.Settings);
+                parameters.Add("timestamp", now);
+                parameters.Add("upload_preset", "tss");
+
+                return new ImageGetUploadTokenResponse(
+                    _cloudinary.Api.SignParameters(parameters),
+                    now
+                );
+            }).ToList();
+        }
+
+        public async Task Rename(ImagesRenameRequest input)
+        {
+            foreach (var entry in input.Content)
+            {
+                RenameResult result = await _cloudinary.RenameAsync(_settings.CloudinaryFolderName + entry.OldName, _settings.CloudinaryFolderName + entry.NewName);
+
+                string json = JsonConvert.SerializeObject(result);
+                string jsonFormatted = JValue.Parse(json).ToString(Formatting.Indented);
+                Console.WriteLine(jsonFormatted);
+
+                // if (string.IsNullOrWhiteSpace(result.Error.Message))
+                //     Guard.Against.NotFound(true, "Image");
+
+                // if (string.IsNullOrWhiteSpace(result.Error.Message))
+                //     Guard.Against.BadRequest(true, "Image");
+
+            }
+        }
+
+        public async Task Delete(ImagesDeleteRequest input)
+        {
+            DelResParams deletionParams = new DelResParams()
+            {
+                PublicIds = input.Content.Select(e => _settings.CloudinaryFolderName + e.Name).ToList()
+            };
+            var hbh = await _cloudinary.DeleteResourcesAsync(deletionParams);
+
+            string json = JsonConvert.SerializeObject(hbh);
+            string jsonFormatted = JValue.Parse(json).ToString(Formatting.Indented);
+            Console.WriteLine(jsonFormatted);
         }
     }
 }

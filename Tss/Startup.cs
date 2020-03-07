@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Tss.Core.Configs;
+using Tss.Web.Configs;
 using Tss.Core.Models;
 
 namespace Tss
@@ -34,7 +34,7 @@ namespace Tss
             services.AddOptions();
             services.Configure<AppSettings>(appSettingsSection);
 
-            
+
             // For deployment to Heroku
             var isProduction = string.Equals(Environment.GetEnvironmentVariable("ENV"), "production");
 
@@ -46,7 +46,7 @@ namespace Tss
 
 
             HttpConfig.ConfigureService(services, appSettings);
-            
+
             DIConfig.ConfigureService(services);
 
             DatabaseConfig.ConfigureService(services, appSettings);
@@ -64,10 +64,10 @@ namespace Tss
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             DebuggingConfig.Configure(app, env);
-            
+
             HttpConfig.Configure(app);
-            
-            SwaggerConfig.Configure(app);   
+
+            SwaggerConfig.Configure(app);
         }
     }
 }

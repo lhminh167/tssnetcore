@@ -1,20 +1,25 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Configuration;
+using Microsoft.EntityFrameworkCore;
+using Tss.Infrastructure.Contexts;
+using Tss.Core.Models;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     /// <summary>
-    /// Https start-up configuration
+    /// HTTPS documentation components start-up configuration
     /// </summary>
-    public static class CachingConfig
+    public static class DatabaseConfig
     {
         /// <summary>
         /// Configures the service.
         /// </summary>
         /// <param name="services">The services.</param>
-        public static void ConfigureService(IServiceCollection services)
+        public static void ConfigureService(IServiceCollection services, AppSettings appSettings)
         {
-            services.AddDistributedMemoryCache();
+            services.AddDbContext<TssContext>(options => options.UseMySql(appSettings.DatabaseConnectionString));
         }
 
         /// <summary>

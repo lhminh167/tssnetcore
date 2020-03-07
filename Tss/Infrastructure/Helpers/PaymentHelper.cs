@@ -31,11 +31,12 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
         {
             var options = new PaymentIntentCreateOptions
             {
-                PaymentMethod = order.Reference,
+                PaymentMethod = order.Customer.CreditCard,
                 Currency = "usd",
                 CaptureMethod = "manual",
                 // Confirm = false,
                 // PaymentMethodTypes = new List<string> { "card" },
+                // SavePaymentMethod = true,
                 Metadata = new Dictionary<string, string>
                 {
                     { "OrderId", order.OrderId.ToString() },
@@ -43,24 +44,25 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
                 Amount = (long)(order.TotalAmount * 100),
             };
             PaymentIntent response = await _paymentIntentService.CreateAsync(options);
-            return new PaymentCreateResponse(response.Id);
+            PaymentIntent confirmResponse = await _paymentIntentService.ConfirmAsync(response.Id);
+            return new PaymentCreateResponse(confirmResponse.Id, confirmResponse.Status, confirmResponse.ClientSecret);
 
         }
 
         public async Task<PaymentCreateResponse> CompletePayment(string paymentId)
         {
-            // PaymentIntentCaptureOptions options = new PaymentIntentCaptureOptions
-            // {
-            //     // AmountToCapture = 750,
-            // };
-            PaymentIntent confirmResponse = await _paymentIntentService.ConfirmAsync(paymentId);
-            PaymentIntent captureResponse = await _paymentIntentService.CaptureAsync(paymentId);
+            PaymentIntent response = await _paymentIntentService.CaptureAsync(paymentId);
 
-            return new PaymentCreateResponse(captureResponse.ClientSecret);
-
+            return new PaymentCreateResponse(response.Id, response.Status, response.ClientSecret);
         }
 
 
+        public async Task<PaymentCreateResponse> CancelPayment(string paymentId)
+        {
+            PaymentIntent response = await _paymentIntentService.CancelAsync(paymentId);
+
+            return new PaymentCreateResponse(response.Id, response.Status, response.ClientSecret);
+        }
 
     }
 }

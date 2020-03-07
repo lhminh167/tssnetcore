@@ -4,7 +4,7 @@ using AutoMapper;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Reflection;
 
-namespace Tss.Core.Configs
+namespace Tss.Web.Configs
 {
     /// <summary>
     /// Https start-up configuration
