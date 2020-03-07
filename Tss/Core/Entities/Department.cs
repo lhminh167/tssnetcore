@@ -1,19 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+﻿using System.Collections.Generic;
 
 namespace Tss.Core.Entities
 {
     public class Department
     {
-        
-        [Sieve(CanFilter = true, CanSort = true)]
+        public Department()
+        {
+            Category = new HashSet<Category>();
+        }
+
         public int DepartmentId { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string Name { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string Description { get; set; }
+
+        public virtual ICollection<Category> Category { get; set; }
     }
 }

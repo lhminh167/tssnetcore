@@ -1,19 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using Sieve.Attributes;
+﻿using System.Collections.Generic;
 
 namespace Tss.Core.Entities
 {
     public class Tax
     {
-        
-        [Sieve(CanFilter = true, CanSort = true)]
+        public Tax()
+        {
+            Orders = new HashSet<Orders>();
+        }
+
         public int TaxId { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
         public string TaxType { get; set; }
-        
-        [Sieve(CanFilter = true, CanSort = true)]
-        public decimal TaxPercentage { get; set; }
+        public double TaxPercentage { get; set; }
+
+        public virtual ICollection<Orders> Orders { get; set; }
+
+        public static int GetTaxId(Shipping shipping)
+        {
+            return shipping.ShippingRegionId == 2 ? 2 : 1;
+        }
     }
 }

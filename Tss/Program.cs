@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Serilog;
-using Tss.Core.Configs;
+using Tss.Web.Configs;
 
 namespace Tss
 {

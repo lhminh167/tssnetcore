@@ -1,8 +1,9 @@
 using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
-using Tss.Core.Generics;
+using Tss.Core.Interfaces;
 using Tss.Infrastructure.Contexts;
+using System.Linq;
 
 namespace Tss.Infrastructure.Generics
 {
@@ -11,7 +12,7 @@ namespace Tss.Infrastructure.Generics
         private readonly TssContext _context;
         private readonly Dictionary<string, IRepository> _repositories;
 
-        public UnitOfWork (
+        public UnitOfWork(
             TssContext context
         )
         {
@@ -26,7 +27,20 @@ namespace Tss.Infrastructure.Generics
 
         public Task<int> SaveAsync()
         {
-            return _context.SaveChangesAsync();
+            try {
+                return _context.SaveChangesAsync();
+            }
+            catch(Exception ex)
+            {
+                this.Rollback();
+                throw ex;
+            }
         }
+
+        public void Rollback()
+        {
+            _context.ChangeTracker.Entries().ToList().ForEach(x => x.Reload());
+        }
+
     }
 }

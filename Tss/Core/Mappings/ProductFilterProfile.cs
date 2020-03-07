@@ -1,20 +1,13 @@
 using AutoMapper;
-using Tss.Core.Entities;
 using Tss.Core.Models;
 
 namespace Tss.Core.Mappings
 {
-    public class ProductFilterProfile : Profile
+    public class CustomerProfile : Profile
     {
-
-    }
-
-    public class ShoppingCartProfile : Profile
-    {
-        public ShoppingCartProfile()
+        public CustomerProfile()
         {
-		    CreateMap<ShoppingCart, ShoppingCartItemGet>();
-            CreateMap<ShoppingCart, ShoppingCartItemAdd>();
+            CreateMap<OrderCreateRequest, CustomerCreateRequest>();
         }
     }
 }

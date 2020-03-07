@@ -1,12 +1,12 @@
 using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Tss.Core.Entities;
-using Tss.Core.Models;
-using Tss.Core.Services;
+using Tss.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Tss.Core.Constants;
+using Microsoft.AspNetCore.Authorization;
+using Tss.Core.Models;
+using System.Net;
 
 namespace Tss.Web.Controllers
 {
@@ -25,120 +25,104 @@ namespace Tss.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> GetItems()
         {
-            var dbItem = await _service.GetItems();
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Shopping cart was successfully retrieved."
-            };
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Shopping cart was successfully retrieved.",
+                await _service.GetItems()
+            );
             return Ok(response);
         }
 
         [HttpGet("Wishlist")]
         public async Task<IActionResult> GetSavedItems()
         {
-            var dbItem = await _service.GetSavedItems();
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Wishlist was successfully retrieved."
-            };
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Wishlist was successfully retrieved.",
+                await _service.GetSavedItems()
+            );
             return Ok(response);
         }
 
-        [HttpGet("TotalAmount")]
-        public async Task<IActionResult> GetTotalAmount()
+        [HttpGet("TotalCost")]
+        public async Task<IActionResult> GetTotalCost()
         {
-            var dbItem = await _service.GetTotalAmount();
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Total cost was successfully retrieved."
-            };
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Total cost was successfully retrieved.",
+                await _service.GetTotalCost()
+            );
             return Ok(response);
         }
 
+        [HttpGet("TotalQuantity")]
+        public async Task<IActionResult> GetTotalQuantity()
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Total quantity was successfully retrieved.",
+                await _service.GetTotalQuantity()
+            );
+            return Ok(response);
+        }
+
+
+        [AllowAnonymous]
         [HttpPost]
-        public async Task<IActionResult> AddItem([FromBody] ShoppingCartAdd input)
+        public async Task<IActionResult> AddItem([FromBody] ShoppingCartItemAddRequest input)
         {
-            var dbItem = await _service.AddItem(input);
-            var status = StatusCodes.Status201Created;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Item was successfully added to cart.",
-            };
-            return CreatedAtAction("GetProduct", new { id = dbItem.ItemId }, response);
+            Response response = new Response
+            (
+                HttpStatusCode.Created,
+                "Item was successfully added to cart.",
+                await _service.AddItem(input)
+            );
+            return CreatedAtAction(nameof(GetItems), response);
         }
 
         [HttpPut("{itemId}")]
-        public async Task<IActionResult> UpdateItem([FromRoute] int itemId, [FromBody] ShoppingCartUpdate input)
+        public async Task<IActionResult> UpdateItem([FromRoute] int itemId, [FromBody] ShoppingCartItemUpdateRequest input)
         {
-            var dbItem = await _service.UpdateItem(itemId, input);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Item was successfully updated."
-            };
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Item was successfully updated.",
+                await _service.UpdateItem(itemId, input)
+            );
             return Ok(response);
         }
 
         [HttpPut("SaveItemForLater/{itemId}")]
         public async Task<IActionResult> SaveItemForLater([FromRoute] int itemId)
         {
-            var dbItem = await _service.SaveItemForLater(itemId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Item was successfully saved to wishlist."
-            };
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Item was successfully saved to wishlist.",
+                await _service.SaveItemForLater(itemId)
+            );
             return Ok(response);
         }
 
         [HttpPut("MoveItemToCart/{itemId}")]
         public async Task<IActionResult> MoveItemToCart([FromRoute] int itemId)
         {
-            var dbItem = await _service.MoveItemToCart(itemId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Item was successfully moved to cart."
-            };
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Item was successfully moved to cart.",
+                await _service.MoveItemToCart(itemId)
+            );
             return Ok(response);
         }
-        
+
         [HttpDelete("{itemId}")]
         public async Task<IActionResult> RemoveItem([FromRoute] int itemId)
         {
-            var dbItem = await _service.RemoveItem(itemId);
-            var status = StatusCodes.Status200OK;
-            var response = new Response
-            {
-                Content = dbItem,
-                Status = status,
-                Type = URL.GetErrorType(status),
-                Title = "Item was successfully removed from cart."
-            };
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Item was successfully removed from cart.",
+                await _service.RemoveItem(itemId)
+            );
             return Ok(response);
         }
 
