@@ -52,6 +52,11 @@ namespace Tss.Infrastructure.Generics
                 query = query.GroupBy(specification.GroupBy).SelectMany(x => x);
             }
 
+            if (specification.CustomQuery != null)
+            {
+                // query = specification.CustomQuery(query);
+            }
+
             if (typeof(TOut) == typeof(T))
             {
                 return (IQueryable<TOut>)query;

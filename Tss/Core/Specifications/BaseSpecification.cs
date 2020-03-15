@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using Tss.Core.Interfaces;
+using System.Linq;
 
 namespace Tss.Core.Specifications
 {
@@ -26,6 +27,7 @@ namespace Tss.Core.Specifications
         public Expression<Func<T, object>> OrderBy { get; private set; }
         public Expression<Func<T, object>> OrderByDescending { get; private set; }
         public Expression<Func<T, object>> GroupBy { get; private set; }
+        public IQueryable<T> CustomQuery { get; private set; }
 
         public bool IsNoTracking { get; private set; }
 
@@ -72,6 +74,11 @@ namespace Tss.Core.Specifications
         protected virtual void ApplyGroupBy(Expression<Func<T, object>> groupByExpression)
         {
             GroupBy = groupByExpression;
+        }
+
+        protected virtual void ApplyCustomQuery(IQueryable<T> customQueryExpression)
+        {
+            CustomQuery = customQueryExpression;
         }
     }
 }

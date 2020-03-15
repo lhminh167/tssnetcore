@@ -2,8 +2,6 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tss.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Tss.Core.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Tss.Core.Models;
 using System.Net;
@@ -29,6 +27,29 @@ namespace Tss.Web.Controllers
                 HttpStatusCode.OK,
                 "Shopping cart was successfully retrieved.",
                 await _service.GetItems()
+            );
+            return Ok(response);
+        }
+
+        [HttpGet("Recommendation")]
+        public async Task<IActionResult> GetRecommendation(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending
+        )
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Shopping cart was successfully retrieved.",
+                await _service.GetRecommendation(new PaginationRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending
+                ))
             );
             return Ok(response);
         }

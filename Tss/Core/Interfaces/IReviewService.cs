@@ -6,10 +6,10 @@ namespace Tss.Core.Interfaces
 {
     public interface IReviewService
     {
-        Task<PaginatedList<Review>> Get(int productId);
+        Task<ReviewGetResponse> Get(ReviewGetRequest input);
         Task<Review> GetOne(int reviewId);
         Task<Review> Create(ReviewCreateRequest input);
-        Task<Review> Update(Review input);
+        Task<Review> Update(ReviewUpdateRequest input);
         Task<Review> Delete(int reviewId);
     }
 }

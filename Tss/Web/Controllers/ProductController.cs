@@ -72,6 +72,59 @@ namespace Tss.Web.Controllers
         }
 
         [AllowAnonymous]
+        [HttpGet("{productId}/Recommendation")]
+        public async Task<IActionResult> GetRecommendation(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending,
+            [FromRoute] int productId
+        )
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Products were successfully retrieved.",
+                await _service.GetRecommendations(new ProductRecommedationRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending,
+                    productId
+                ))
+            );
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{productId}/Review")]
+        public async Task<IActionResult> GetReviews(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending,
+            [FromRoute] int productId
+        )
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Products were successfully retrieved.",
+                await _service.GetReviews(new ReviewGetRequest(
+                    productId,
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending
+                ))
+            );
+            return Ok(response);
+        }
+
+
+        [AllowAnonymous]
         [HttpGet("{productId}")]
         public async Task<IActionResult> GetOne([FromRoute] int productId)
         {

@@ -1,12 +1,16 @@
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel.DataAnnotations;
 
 namespace Tss.Core.Models
 {
     public class ShoppingCartItemAddRequest
-    {        
+    {
+        [Required, Range(1, int.MaxValue)]
         public int ProductId { get; set; }
+        [Required, Range(1, int.MaxValue)]
         public int Quantity { get; set; }
+        [Required]
         public string Attributes { get; set; }
+        [Required]
+        public bool BuyNow { get; set; }
     }
 }

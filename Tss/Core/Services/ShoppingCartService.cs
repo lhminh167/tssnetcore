@@ -17,24 +17,48 @@ namespace Tss.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<ShoppingCart> _shoppingCartRepo;
         private readonly IRepository<Product> _productRepo;
+        private readonly IRepository<OrderDetail> _orderDetailRepo;
         private readonly IAuthHelper _authHelper;
 
         public ShoppingCartService(
             IUnitOfWork unitOfWork,
             IRepository<ShoppingCart> shoppingCartRepo,
             IRepository<Product> productRepo,
+            IRepository<OrderDetail> orderDetailRepo,
             IAuthHelper authHelper
         )
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
             _shoppingCartRepo = shoppingCartRepo ?? throw new ArgumentNullException(nameof(shoppingCartRepo));
             _productRepo = productRepo ?? throw new ArgumentNullException(nameof(productRepo));
+            _orderDetailRepo = orderDetailRepo ?? throw new ArgumentNullException(nameof(orderDetailRepo));
             _authHelper = authHelper ?? throw new ArgumentNullException(nameof(authHelper));
         }
 
         public async Task<List<ShoppingCart>> GetItems()
         {
             return await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
+        }
+
+        public async Task<PaginatedList<Product>> GetRecommendation(
+            PaginationRequest input
+        )
+        {
+            List<Product> list = await _orderDetailRepo.Get(new GetShoppingCartRecommendationSpecification(
+                _authHelper
+            ));
+
+            list = list.GroupBy(e => e.ProductId).OrderByDescending(p => p.Count()).SelectMany(p => p).Distinct().ToList();
+
+            if (input.IsPagingEnabled) list = list.Skip(input.PageIndex * input.PageSize).Take(input.PageSize).ToList();
+
+            return new PaginatedList<Product>(
+                list,
+                list.Count(),
+                input.PageIndex,
+                input.PageSize,
+                input.IsPagingEnabled
+            );
         }
 
         public async Task<ShoppingCartItemAddResponse> AddItem(ShoppingCartItemAddRequest input)

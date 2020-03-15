@@ -2,12 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tss.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Tss.Core.Constants;
 using Tss.Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
-using Tss.Core.Entities;
 
 namespace Tss.Web.Controllers
 {
@@ -27,7 +24,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> GetCustomers()
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Users were successfully retrieved.",
                 await _service.Get()
@@ -39,7 +36,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> GetCustomer([FromRoute] int customerId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "User was successfully retrieved.",
                 await _service.Get(customerId)
@@ -53,7 +50,7 @@ namespace Tss.Web.Controllers
         {
             LoginResponse content = await _service.Create(input);
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.Created,
                 "User was created successfully.",
                 content
@@ -66,7 +63,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Login([FromBody] LoginRequest input)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Logged in successfully.",
                 await _service.Login(input)
@@ -78,7 +75,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> UpdateCustomer([FromBody] CustomerUpdateRequest input)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "User was updated successfully.",
                 await _service.Update(input)
@@ -91,7 +88,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> DeleteCustomer([FromRoute] int customerId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "User was successfully deleted.",
                 await _service.Delete(customerId)

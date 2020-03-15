@@ -16,7 +16,7 @@ namespace Tss.Core.Entities
             CartId = cartId;
             Attributes = input.Attributes;
             Quantity = input.Quantity;
-            BuyNow = true;
+            BuyNow = input.BuyNow;
             AddedOn = DateTime.Now;
         }
 
@@ -35,7 +35,7 @@ namespace Tss.Core.Entities
         public virtual Product Product { get; set; }
 
         public void UpdateItem(ShoppingCartItemUpdateRequest input)
-        {            
+        {
             Quantity = input.Quantity;
             AddedOn = DateTime.Now;
         }
@@ -61,6 +61,6 @@ namespace Tss.Core.Entities
         public void AssociateToCustomer(int customerId)
         {
             CartId = customerId.ToString();
-        }      
+        }
     }
 }

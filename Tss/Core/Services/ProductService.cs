@@ -6,8 +6,6 @@ using Tss.Core.Interfaces;
 using System.Threading.Tasks;
 using Tss.Core.Models;
 using Ardalis.GuardClauses;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System.Linq;
 
 namespace Tss.Core.Services
@@ -20,7 +18,8 @@ namespace Tss.Core.Services
         private readonly IRepository<Product> _productRepo;
         private readonly IRepository<ProductAttribute> _productAttributeRepo;
         private readonly IRepository<ProductCategory> _productCategoryRepo;
-        private readonly IRepository<ShoppingCart> _shoppingCartRepo;
+        private readonly IRepository<OrderDetail> _orderDetailRepo;
+        private readonly IRepository<Review> _reviewRepo;
         private readonly IAuthHelper _authHelper;
         private readonly IMediaHelper _mediaHelper;
 
@@ -31,7 +30,8 @@ namespace Tss.Core.Services
             IRepository<Product> productRepo,
             IRepository<ProductAttribute> productAttributeRepo,
             IRepository<ProductCategory> productCategoryRepo,
-            IRepository<ShoppingCart> shoppingCartRepo,
+            IRepository<OrderDetail> orderDetailRepo,
+            IRepository<Review> reviewRepo,
             IAuthHelper authHelper,
             IMediaHelper mediaHelper
         )
@@ -42,7 +42,8 @@ namespace Tss.Core.Services
             _productRepo = productRepo ?? throw new ArgumentNullException(nameof(productRepo));
             _productAttributeRepo = productAttributeRepo ?? throw new ArgumentNullException(nameof(productAttributeRepo));
             _productCategoryRepo = productCategoryRepo ?? throw new ArgumentNullException(nameof(productCategoryRepo));
-            _shoppingCartRepo = shoppingCartRepo ?? throw new ArgumentNullException(nameof(shoppingCartRepo));
+            _orderDetailRepo = orderDetailRepo ?? throw new ArgumentNullException(nameof(orderDetailRepo));
+            _reviewRepo = reviewRepo ?? throw new System.ArgumentNullException(nameof(reviewRepo));
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
             _mediaHelper = mediaHelper ?? throw new System.ArgumentNullException(nameof(mediaHelper));
         }
@@ -67,9 +68,42 @@ namespace Tss.Core.Services
             ));
         }
 
+        public async Task<ReviewGetResponse> GetReviews(ReviewGetRequest input)
+        {
+            PaginatedList<Review> items = await _reviewRepo.GetPaginated(new GetReviewByProductIdSpecification(input, _authHelper));
+            decimal averageRating = items.Count > 0 ? await _reviewRepo.GetAverage(r => r.Rating) : 0;
+            return new ReviewGetResponse(items, averageRating);
+        }
+
+        public async Task<PaginatedList<Product>> GetRecommendations(
+            ProductRecommedationRequest input
+        )
+        {
+            List<Product> list = await _orderDetailRepo.Get(new GetProductRecommendationSpecification(
+                input,
+                _authHelper
+            ));
+
+            list = list.GroupBy(e => e.ProductId).OrderByDescending(p => p.Count()).SelectMany(p => p).Distinct().ToList();
+
+            if (input.IsPagingEnabled) list = list.Skip(input.PageIndex * input.PageSize).Take(input.PageSize).ToList();
+
+            return new PaginatedList<Product>(
+                list,
+                list.Count(),
+                input.PageIndex,
+                input.PageSize,
+                input.IsPagingEnabled
+            );
+        }
+
         public async Task<ProductResponse> GetOne(int productId)
         {
-            return new ProductResponse(await _productRepo.GetOne(new GetProductByIdSpecification(productId, _authHelper)));
+            return new ProductResponse(
+                await _productRepo.GetOne(new GetProductByIdSpecification(productId, _authHelper)),
+                await GetReviews(new ReviewGetRequest(productId)),
+                await GetRecommendations(new ProductRecommedationRequest(productId))
+            );
         }
 
         public async Task<ProductResponse> Create(ProductCreateRequest input)
@@ -105,8 +139,6 @@ namespace Tss.Core.Services
 
             await product.Update(input, attributeValues, category, _mediaHelper);
             _productRepo.Put(product);
-            await _unitOfWork.SaveAsync();
-
             _productAttributeRepo.DeleteRange(product.ProductAttribute.ToList());
             _productCategoryRepo.DeleteRange(product.ProductCategory.ToList());
             await _unitOfWork.SaveAsync();
@@ -114,7 +146,7 @@ namespace Tss.Core.Services
             product.UpdateAttributes(input);
             await _unitOfWork.SaveAsync();
 
-            return new ProductResponse(product, true);
+            return new ProductResponse(product);
         }
 
         public async Task<ProductResponse> Delete(int productId)
@@ -123,9 +155,6 @@ namespace Tss.Core.Services
             Guard.Against.NotFound(product, nameof(Product));
 
             await product.Remove(_mediaHelper);
-            // _shoppingCartRepo.DeleteRange(product.ShoppingCart.ToList());
-            // await _unitOfWork.SaveAsync();
-
             _productRepo.Delete(product);
             await _unitOfWork.SaveAsync();
             return new ProductResponse(product);

@@ -1,11 +1,15 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using MySql.Data.MySqlClient;
 using Tss.Core.Entities;
+using Tss.Core.Models;
 
 namespace Tss.Infrastructure.Contexts
 {
     public partial class TssContext : DbContext
     {
+        public string ConnectionString { get; set; }
+
         public TssContext()
         {
         }
@@ -15,11 +19,14 @@ namespace Tss.Infrastructure.Contexts
         {
         }
 
-        public string ConnectionString { get; set; }
-
         public TssContext(string connectionString)
         {
             this.ConnectionString = connectionString;
+        }
+
+        public static void ConfigureService(IServiceCollection services, AppSettings appSettings)
+        {
+            services.AddDbContext<TssContext>(options => options.UseMySql(appSettings.DatabaseConnectionString));
         }
 
         private MySqlConnection GetConnection()

@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Tss.Core.Entities;
 using Tss.Core.Interfaces;
 using Tss.Core.Models;

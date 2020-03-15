@@ -20,6 +20,7 @@ namespace Tss.Core.Interfaces
         Task<TEntity> Get(int id);
         Task<TOut> GetMax<TOut>(Expression<Func<TEntity, TOut>> spec);
         Task<TOut> GetMin<TOut>(Expression<Func<TEntity, TOut>> spec);
+        Task<decimal> GetAverage(Expression<Func<TEntity, decimal>> spec);
         TEntity Put(TEntity entity);
         TEntity Post(TEntity entity);
         TEntity Delete(TEntity entity);

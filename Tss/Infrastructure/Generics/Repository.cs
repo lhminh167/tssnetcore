@@ -89,6 +89,13 @@ namespace Tss.Infrastructure.Generics
             return await _dbSet.MinAsync<TEntity, TOut>(spec);
         }
 
+        public virtual async Task<decimal> GetAverage(
+            Expression<Func<TEntity, decimal>> spec
+        )
+        {
+            return await _dbSet.AverageAsync(spec);
+        }
+
         public virtual TEntity Put(TEntity entity)
         {
             return _dbSet.Update(entity).Entity;

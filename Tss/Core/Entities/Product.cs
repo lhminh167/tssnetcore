@@ -164,21 +164,7 @@ namespace Tss.Core.Entities
             Guard.Against.Null(mediaHelper, nameof(mediaHelper));
 
             await DeleteImages(mediaHelper);
-            // RemoveProductAttributes();
-            // RemoveProductCategory();
-            // RemoveReviews();
-            // RemoveShoppingCarts();
         }
-
-        // private void RemoveReviews()
-        // {
-        //     Review.ToList().RemoveAll(pa => pa.ProductId == ProductId);
-        // }
-
-        // private void RemoveShoppingCarts()
-        // {
-        //     ShoppingCart.ToList().RemoveAll(pa => pa.ProductId == ProductId);
-        // }
 
         private string GetImageName(string productName)
         {

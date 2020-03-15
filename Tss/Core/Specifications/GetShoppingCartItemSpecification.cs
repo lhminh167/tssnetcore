@@ -7,9 +7,9 @@ namespace Tss.Core.Specifications
     {
         public GetShoppingCartItemSpecification(ShoppingCartItemAddRequest input, string cartId)
         : base(
-            cart 
+            cart
             => cart.CartId == cartId
-            && cart.BuyNow
+            && cart.BuyNow == input.BuyNow
             && cart.Attributes == input.Attributes
             && cart.ProductId == input.ProductId
             ,
