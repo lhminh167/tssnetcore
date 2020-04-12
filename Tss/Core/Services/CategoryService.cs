@@ -11,58 +11,73 @@ namespace Tss.Core.Services
     public partial class CategoryService : ICategoryService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly IRepository<Category> _CategoryRepo;
+        private readonly IRepository<Category> _categoryRepo;
         private readonly IAuthHelper _authHelper;
+        private readonly IProductHelper _productHelper;
 
         public CategoryService(
             IUnitOfWork unitOfWork,
-            IRepository<Category> CategoryRepo,
-            IAuthHelper authHelper
+            IRepository<Category> categoryRepo,
+            IAuthHelper authHelper,
+            IProductHelper productHelper
         )
         {
             _unitOfWork = unitOfWork ?? throw new System.ArgumentNullException(nameof(unitOfWork));
-            _CategoryRepo = CategoryRepo ?? throw new System.ArgumentNullException(nameof(CategoryRepo));
+            _categoryRepo = categoryRepo ?? throw new System.ArgumentNullException(nameof(categoryRepo));
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
+            _productHelper = productHelper ?? throw new System.ArgumentNullException(nameof(productHelper));
         }
 
         // public async Task<List<Category>> Get()
         // {
-        //     return await _CategoryRepo.Get(new GetCategorySpecification(_authHelper));
+        //     return await _categoryRepo.Get(new GetCategorySpecification(_authHelper));
         // }
 
-        public async Task<Category> Get(int categoryId)
+        public async Task<CategoryGetResponse> Get(int categoryId)
         {
-            return await _CategoryRepo.GetOne(new GetCategoryByIdSpecification(categoryId, _authHelper));
+            Category category = await _categoryRepo.GetOne(new GetCategoryByIdSpecification(categoryId, _authHelper));
+
+            ProductSearchRequest request = new ProductSearchRequest(
+                0, 8, true, null, true, null, null, null,
+                new List<string> { category.Name },
+                0, 0, 0
+            );
+            PaginatedList<Product> product = await _productHelper.Get(request);
+
+            return new CategoryGetResponse(
+                category,
+                product
+            );
         }
 
         // public async Task<Category> Create(CategoryCreateRequest input)
         // {
-        //     Category Category = await _CategoryRepo.GetOne(new GetCategoryByNameSpecification(input.Name, _authHelper));
+        //     Category Category = await _categoryRepo.GetOne(new GetCategoryByNameSpecification(input.Name, _authHelper));
         //     Guard.Against.AlreadyExist(Category, nameof(Category));
 
         //     Category = new Category(input.Name);
-        //     _CategoryRepo.Post(Category);
+        //     _categoryRepo.Post(Category);
         //     await _unitOfWork.SaveAsync();
         //     return Category;
         // }
 
         // public async Task<Category> Update(Category input)
         // {
-        //     Category Category = await _CategoryRepo.Get(input.CategoryId);
+        //     Category Category = await _categoryRepo.Get(input.CategoryId);
         //     Guard.Against.NotFound(Category, nameof(Category));
 
         //     Category.Update(input.Name);
-        //     _CategoryRepo.Put(Category);
+        //     _categoryRepo.Put(Category);
         //     await _unitOfWork.SaveAsync();
         //     return Category;
         // }
 
         // public async Task<Category> Delete(int CategoryId)
         // {
-        //     Category Category = await _CategoryRepo.Get(CategoryId);
+        //     Category Category = await _categoryRepo.Get(CategoryId);
         //     Guard.Against.NotFound(Category, nameof(Category));
 
-        //     _CategoryRepo.Delete(Category);
+        //     _categoryRepo.Delete(Category);
         //     await _unitOfWork.SaveAsync();
         //     return Category;
         // }

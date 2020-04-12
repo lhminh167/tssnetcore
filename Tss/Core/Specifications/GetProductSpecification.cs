@@ -111,6 +111,16 @@ namespace Tss.Core.Specifications
                     )
                 )
             )
+            &&
+            (
+                input.Display == 0
+                ||
+                (
+                    input.Display > 0
+                    &&
+                    p.Display == input.Display
+                )
+            )
             ,
             p => p
         )
@@ -142,7 +152,9 @@ namespace Tss.Core.Specifications
             "BestSelling" =>
                 p => p.OrderDetail.Count,
             "MostDiscounted" =>
-                p => p.DiscountedPrice / p.Price * 100.0,
+                p => p.DiscountedPrice > 0
+                    ? (p.Price - p.DiscountedPrice) / p.Price * 100.0
+                    : 0,
             "TopRated" =>
                 p => (decimal)p.Review.Average(r => (decimal)r.Rating),
             "Newest" =>

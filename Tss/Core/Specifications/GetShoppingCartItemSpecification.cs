@@ -17,7 +17,6 @@ namespace Tss.Core.Specifications
         )
         {
             SetIsNoTracking(true);
-            // AddInclude("ProductAttribute.AttributeValue.Attribute");
         }
     }
 }

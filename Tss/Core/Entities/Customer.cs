@@ -94,6 +94,7 @@ namespace Tss.Core.Entities
         {
             Guard.Against.Null(input, nameof(input));
             Guard.Against.NullOrWhiteSpace(input.Name, nameof(input.Name));
+            Guard.Against.NullOrWhiteSpace(input.Email, nameof(input.Email));
             Guard.Against.NullOrWhiteSpace(input.Address1, nameof(input.Address1));
             Guard.Against.NullOrWhiteSpace(input.Address2, nameof(input.Address2));
             Guard.Against.NullOrWhiteSpace(input.City, nameof(input.City));
@@ -106,6 +107,7 @@ namespace Tss.Core.Entities
             Guard.Against.NullOrWhiteSpace(input.MobPhone, nameof(input.MobPhone));
 
             Name = input.Name;
+            Email = input.Email;
             Address1 = input.Address1;
             Address2 = input.Address2;
             City = input.City;

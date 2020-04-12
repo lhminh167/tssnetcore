@@ -7,8 +7,6 @@ using Ardalis.GuardClauses;
 using Tss.Core.Specifications;
 using System.Linq;
 using Tss.Core.Models;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Tss.Core.Services
 {
@@ -35,12 +33,16 @@ namespace Tss.Core.Services
             _authHelper = authHelper ?? throw new ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<List<ShoppingCart>> GetItems()
+        public async Task<ShoppingCartGetResponse> GetItems(ShoppingCartGetRequest input)
         {
-            return await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
+            return new ShoppingCartGetResponse(
+                await _shoppingCartRepo.GetPaginated(new GetShoppingCartSpecification(input, _authHelper.GetShoppingCartId())),
+                await GetTotalCost(input.BuyNow.Value),
+                await GetTotalQuantity(input.BuyNow.Value)
+            );
         }
 
-        public async Task<PaginatedList<Product>> GetRecommendation(
+        public async Task<PaginatedList<Product>> GetRecommendations(
             PaginationRequest input
         )
         {
@@ -50,10 +52,10 @@ namespace Tss.Core.Services
 
             list = list.GroupBy(e => e.ProductId).OrderByDescending(p => p.Count()).SelectMany(p => p).Distinct().ToList();
 
-            if (input.IsPagingEnabled) list = list.Skip(input.PageIndex * input.PageSize).Take(input.PageSize).ToList();
+            List<Product> paginatedList = list.Skip(input.PageIndex * input.PageSize).Take(input.PageSize).ToList();
 
             return new PaginatedList<Product>(
-                list,
+                input.IsPagingEnabled ? paginatedList : list,
                 list.Count(),
                 input.PageIndex,
                 input.PageSize,
@@ -81,7 +83,7 @@ namespace Tss.Core.Services
             }
             await _unitOfWork.SaveAsync();
 
-            int totalQuantity = await GetTotalQuantityByShoppingCartId(authInfo.CartId);
+            int totalQuantity = await GetTotalQuantityByShoppingCartId(input.BuyNow, authInfo.CartId);
 
             return new ShoppingCartItemAddResponse(item, totalQuantity, authInfo.Token);
         }
@@ -138,14 +140,9 @@ namespace Tss.Core.Services
             return item;
         }
 
-        public async Task<List<ShoppingCart>> GetSavedItems()
+        public async Task<double> GetTotalCost(bool buyNow)
         {
-            return await _shoppingCartRepo.Get(new GetWishlistSpecification(_authHelper.GetShoppingCartId()));
-        }
-
-        public async Task<double> GetTotalCost()
-        {
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(buyNow), _authHelper.GetShoppingCartId()));
 
             return items.Sum(item =>
                 (
@@ -157,21 +154,21 @@ namespace Tss.Core.Services
             );
         }
 
-        public async Task<int> GetTotalQuantityByShoppingCartId(string shoppingCartId)
+        public async Task<int> GetTotalQuantityByShoppingCartId(bool buyNow, string shoppingCartId)
         {
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(shoppingCartId));
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(buyNow), shoppingCartId));
 
             return items.Sum(item => item.Quantity);
         }
 
-        public async Task<int> GetTotalQuantity()
+        public async Task<int> GetTotalQuantity(bool buyNow)
         {
-            return await GetTotalQuantityByShoppingCartId(_authHelper.GetShoppingCartId());
+            return await GetTotalQuantityByShoppingCartId(buyNow, _authHelper.GetShoppingCartId());
         }
 
         public async Task RemoveCart()
         {
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetShoppingCartId()));
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(null), _authHelper.GetShoppingCartId()));
             Guard.Against.NotFound(items, "Shopping Cart");
 
             _shoppingCartRepo.DeleteRange(items);

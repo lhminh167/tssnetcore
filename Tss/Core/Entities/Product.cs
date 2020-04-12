@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Newtonsoft.Json;
@@ -50,9 +51,6 @@ namespace Tss.Core.Entities
         public virtual ICollection<Review> Review { get; set; }
         public virtual ICollection<ShoppingCart> ShoppingCart { get; set; }
 
-        // public virtual IReadOnlyCollection<AttributeValueResponse> Attributes => ProductAttribute?.Select(pa => new AttributeValueResponse(pa?.AttributeValue))?.ToList();
-        // public virtual ProductFilterCategoryResponse Category => ProductCategory?.Select(pc => new ProductFilterCategoryResponse(pc?.Category))?.FirstOrDefault();
-
         public void CheckAttributes(string attributeList)
         {
             Guard.Against.NullOrEmpty(attributeList, nameof(attributeList));
@@ -87,6 +85,8 @@ namespace Tss.Core.Entities
 
         public void UpdateAttributes(ProductCreateRequest input)
         {
+            Guard.Against.Null(input, nameof(input));
+
             UpdateProductAttributes(input);
             UpdateProductCategory(input);
         }
@@ -168,7 +168,9 @@ namespace Tss.Core.Entities
 
         private string GetImageName(string productName)
         {
-            return productName.ToLower().Replace(' ', '-');
+            productName = new Regex("[*'\",_&#^@]").Replace(productName, string.Empty);
+            productName = new Regex(@"\s+").Replace(productName, "-");
+            return productName.ToLower();
         }
 
         private List<string> GetImagePrefixes()
@@ -206,9 +208,9 @@ namespace Tss.Core.Entities
         {
             List<string> images = GetImageNames(input.Name);
 
-            Image = images[0];
-            Image2 = images[1];
-            Thumbnail = images[2];
+            Thumbnail = images[0];
+            Image = images[1];
+            Image2 = images[2];
         }
     }
 }

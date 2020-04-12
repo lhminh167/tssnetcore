@@ -6,6 +6,7 @@ using Tss.Core.Constants;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Logging;
 using Tss.Core.Models;
+using Newtonsoft.Json.Serialization;
 
 namespace Tss.Web.Middlewares
 {
@@ -50,7 +51,17 @@ namespace Tss.Web.Middlewares
 
             _logger.LogError(exception, exception.Message);
 
-            await context.Response.WriteAsync(JsonConvert.SerializeObject(response));
+            JsonSerializerSettings serializerSettings = new JsonSerializerSettings
+            {
+                ContractResolver = new DefaultContractResolver
+                {
+                    NamingStrategy = new CamelCaseNamingStrategy()
+                }
+            };
+
+            string serializedResponse = JsonConvert.SerializeObject(response, serializerSettings);
+
+            await context.Response.WriteAsync(serializedResponse);
         }
     }
 }

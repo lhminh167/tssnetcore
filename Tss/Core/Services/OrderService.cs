@@ -71,7 +71,7 @@ namespace Tss.Core.Services
 
         public async Task<OrderCreateResponse> Create(OrderCreateRequest input)
         {
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(_authHelper.GetCustomerId().ToString()));
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(true), _authHelper.GetCustomerId().ToString()));
             Guard.Against.NotFound(items, nameof(ShoppingCart));
 
 

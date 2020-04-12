@@ -8,7 +8,7 @@ namespace Tss.Core.Interfaces
     public interface ICategoryService
     {
         // Task<List<Category>> Get();
-        Task<Category> Get(int CategoryId);
+        Task<CategoryGetResponse> Get(int categoryId);
         // Task<Category> Create(CategoryCreateRequest input);
         // Task<Category> Update(Category Category);
         // Task<Category> Delete(int CategoryId);

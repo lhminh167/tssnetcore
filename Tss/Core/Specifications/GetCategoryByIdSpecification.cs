@@ -7,14 +7,14 @@ namespace Tss.Core.Specifications
     {
         public GetCategoryByIdSpecification(int categoryId, IAuthHelper authHelper)
         : base(
-            a 
+            a
             => a.CategoryId == categoryId
             ,
             a => a
         )
         {
             SetIsNoTracking(true);
-            AddInclude("ProductCategory.Product");
+            // AddInclude("ProductCategory.Product");
         }
     }
 

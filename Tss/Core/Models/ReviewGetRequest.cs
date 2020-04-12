@@ -1,10 +1,17 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using Ardalis.GuardClauses;
 
 namespace Tss.Core.Models
 {
     public class ReviewGetRequest : PaginationRequest
     {
+        public ReviewGetRequest()
+        : base(0, 8, true, null, true)
+        {
+        }
+
+
         public ReviewGetRequest(
             int productId
         )
@@ -14,12 +21,12 @@ namespace Tss.Core.Models
         }
 
         public ReviewGetRequest(
-            int productId,
             int pageIndex,
             int pageSize,
             bool isPagingEnabled,
             string sortBy,
-            bool isDescending
+            bool isDescending,
+            int productId
         )
         : base(pageIndex, pageSize, isPagingEnabled, sortBy, isDescending)
         {
@@ -28,6 +35,7 @@ namespace Tss.Core.Models
             ProductId = productId;
         }
 
+        [Required, Range(0, int.MaxValue)]
         public int ProductId { get; private set; }
     }
 }

@@ -36,12 +36,12 @@ namespace Tss.Web.Controllers
                 HttpStatusCode.OK,
                 "Reviews were successfully retrieved.",
                 await _service.Get(new ReviewGetRequest(
-                    productId,
                     pageIndex,
                     pageSize,
                     isPagingEnabled,
                     sortBy,
-                    isDescending
+                    isDescending,
+                    productId
                 ))
             );
             return Ok(response);

@@ -54,8 +54,8 @@ namespace Tss.Core.Services
             string cartId = _authHelper.GetShoppingCartId();
             if (string.IsNullOrWhiteSpace(cartId)) return;
 
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(cartId));
-            Guard.Against.NotFound(items, nameof(ShoppingCart));
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(null), cartId));
+            if (items.Count == 0) return;
 
             items.ForEach(i => i.AssociateToCustomer(customerId));
             _shoppingCartRepo.PutRange(items);

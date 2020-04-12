@@ -8,8 +8,6 @@ using CloudinaryDotNet;
 using System.Collections.Generic;
 using System;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 
 namespace Microsoft.eShopWeb.Infrastructure.Helpers
 {
@@ -65,17 +63,6 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
             foreach (var entry in input.Content)
             {
                 RenameResult result = await _cloudinary.RenameAsync(_settings.CloudinaryFolderName + entry.OldName, _settings.CloudinaryFolderName + entry.NewName);
-
-                string json = JsonConvert.SerializeObject(result);
-                string jsonFormatted = JValue.Parse(json).ToString(Formatting.Indented);
-                Console.WriteLine(jsonFormatted);
-
-                // if (string.IsNullOrWhiteSpace(result.Error.Message))
-                //     Guard.Against.NotFound(true, "Image");
-
-                // if (string.IsNullOrWhiteSpace(result.Error.Message))
-                //     Guard.Against.BadRequest(true, "Image");
-
             }
         }
 
@@ -85,11 +72,7 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
             {
                 PublicIds = input.Content.Select(e => _settings.CloudinaryFolderName + e.Name).ToList()
             };
-            var hbh = await _cloudinary.DeleteResourcesAsync(deletionParams);
-
-            string json = JsonConvert.SerializeObject(hbh);
-            string jsonFormatted = JValue.Parse(json).ToString(Formatting.Indented);
-            Console.WriteLine(jsonFormatted);
+            await _cloudinary.DeleteResourcesAsync(deletionParams);
         }
     }
 }

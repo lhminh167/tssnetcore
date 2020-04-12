@@ -15,7 +15,8 @@ namespace Tss.Core.Models
             string size,
             List<string> category,
             double minPrice,
-            double maxPrice
+            double maxPrice,
+            int display
         )
         : base(pageIndex, pageSize, isPagingEnabled, sortBy, isDescending)
         {
@@ -27,6 +28,7 @@ namespace Tss.Core.Models
                 : category;
             MinPrice = minPrice;
             MaxPrice = maxPrice;
+            Display = display;
         }
 
         public string Keyword { get; private set; }
@@ -35,5 +37,6 @@ namespace Tss.Core.Models
         public string Size { get; private set; }
         public double MinPrice { get; private set; }
         public double MaxPrice { get; private set; }
+        public int Display { get; private set; }
     }
 }

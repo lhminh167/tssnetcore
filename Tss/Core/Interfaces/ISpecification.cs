@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using System;
-using System.Linq;
 
 namespace Tss.Core.Interfaces
 {
@@ -13,7 +12,6 @@ namespace Tss.Core.Interfaces
         Expression<Func<T, object>> OrderBy { get; }
         Expression<Func<T, object>> OrderByDescending { get; }
         Expression<Func<T, object>> GroupBy { get; }
-        IQueryable<T> CustomQuery { get; }
         Expression<Func<T, TOut>> Select { get; }
 
         bool IsNoTracking { get; }

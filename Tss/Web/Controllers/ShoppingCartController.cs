@@ -21,18 +21,32 @@ namespace Tss.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetItems()
+        public async Task<IActionResult> GetItems(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending,
+            [FromQuery] bool buyNow
+        )
         {
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Shopping cart was successfully retrieved.",
-                await _service.GetItems()
+                await _service.GetItems(new ShoppingCartGetRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending,
+                    buyNow
+                ))
             );
             return Ok(response);
         }
 
         [HttpGet("Recommendation")]
-        public async Task<IActionResult> GetRecommendation(
+        public async Task<IActionResult> GetRecommendations(
             [FromQuery] int pageSize,
             [FromQuery] int pageIndex,
             [FromQuery] bool isPagingEnabled,
@@ -43,7 +57,7 @@ namespace Tss.Web.Controllers
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Shopping cart was successfully retrieved.",
-                await _service.GetRecommendation(new PaginationRequest(
+                await _service.GetRecommendations(new PaginationRequest(
                     pageIndex,
                     pageSize,
                     isPagingEnabled,
@@ -54,39 +68,16 @@ namespace Tss.Web.Controllers
             return Ok(response);
         }
 
-        [HttpGet("Wishlist")]
-        public async Task<IActionResult> GetSavedItems()
-        {
-            Response response = new Response(
-                HttpStatusCode.OK,
-                "Wishlist was successfully retrieved.",
-                await _service.GetSavedItems()
-            );
-            return Ok(response);
-        }
-
-        [HttpGet("TotalCost")]
-        public async Task<IActionResult> GetTotalCost()
-        {
-            Response response = new Response(
-                HttpStatusCode.OK,
-                "Total cost was successfully retrieved.",
-                await _service.GetTotalCost()
-            );
-            return Ok(response);
-        }
-
         [HttpGet("TotalQuantity")]
-        public async Task<IActionResult> GetTotalQuantity()
+        public async Task<IActionResult> GetTotalQuantity([FromQuery] bool buyNow)
         {
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Total quantity was successfully retrieved.",
-                await _service.GetTotalQuantity()
+                await _service.GetTotalQuantity(buyNow)
             );
             return Ok(response);
         }
-
 
         [AllowAnonymous]
         [HttpPost]

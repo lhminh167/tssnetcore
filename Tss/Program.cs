@@ -15,6 +15,7 @@ namespace Tss
         public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
             WebHost
                 .CreateDefaultBuilder(args)
+                .UseSentry("https://32757548d1954aa1addbac3c657867dd@sentry.io/5189176")
                 .UseSerilog(LoggingConfig.Configure)
                 .UseStartup<Startup>();
     }
