@@ -6,6 +6,6 @@ namespace Tss.Core.Interfaces
 {
     public interface IProductHelper
     {
-        Task<PaginatedList<Product>> Get(ProductSearchRequest input);
+        Task<PaginatedList<Product>> Get(ProductGetRequest input);
     }
 }

@@ -90,12 +90,12 @@ namespace Tss.Core.Services
 
         public async Task<ShoppingCart> UpdateItem(int itemId, ShoppingCartItemUpdateRequest input)
         {
-            var item = await _shoppingCartRepo.Get(itemId);
+            var item = await _shoppingCartRepo.GetOne(new GetShoppingCartItemSpecification(itemId, _authHelper));
             Guard.Against.NotFound(item, "Item");
 
             if (input.Quantity > 0)
             {
-                item.UpdateItem(input);
+                item.Update(input);
                 _shoppingCartRepo.Put(item);
             }
             else
@@ -110,7 +110,7 @@ namespace Tss.Core.Services
 
         public async Task<ShoppingCart> RemoveItem(int itemId)
         {
-            ShoppingCart item = await _shoppingCartRepo.Get(itemId);
+            var item = await _shoppingCartRepo.GetOne(new GetShoppingCartItemSpecification(itemId, _authHelper));
             Guard.Against.NotFound(item, "Item");
 
             _shoppingCartRepo.Delete(item);
@@ -120,25 +120,46 @@ namespace Tss.Core.Services
 
         public async Task<ShoppingCart> SaveItemForLater(int itemId)
         {
-            ShoppingCart item = await _shoppingCartRepo.Get(itemId);
-            Guard.Against.NotFound(item, "Item");
-
-            item.SaveItemForLater();
-            _shoppingCartRepo.Put(item);
-            await _unitOfWork.SaveAsync();
-            return item;
+            return await ChangeBuyNow(itemId);
         }
 
         public async Task<ShoppingCart> MoveItemToCart(int itemId)
         {
-            ShoppingCart item = await _shoppingCartRepo.Get(itemId);
+            return await ChangeBuyNow(itemId);
+        }
+
+        private async Task<ShoppingCart> ChangeBuyNow(int itemId)
+        {
+            var item = await _shoppingCartRepo.GetOne(new GetShoppingCartItemSpecification(itemId, _authHelper));
             Guard.Against.NotFound(item, "Item");
 
-            item.MoveItemToCart();
-            _shoppingCartRepo.Put(item);
+            ShoppingCart sameItem = await _shoppingCartRepo.GetOne(new GetShoppingCartItemSpecification(
+                new ShoppingCartItemAddRequest(
+                    item.ProductId,
+                    item.Quantity,
+                    item.Attributes,
+                    !item.BuyNow
+                ),
+                _authHelper.GetShoppingCartId()
+            ));
+
+            if (sameItem == null)
+            {
+                item.ChangeBuyNow();
+                _shoppingCartRepo.Put(item);
+            }
+            else
+            {
+                sameItem.AddUpQuantity(item.Quantity);
+                _shoppingCartRepo.Put(sameItem);
+                _shoppingCartRepo.Delete(item);
+                item = sameItem;
+            }
+
             await _unitOfWork.SaveAsync();
             return item;
         }
+
 
         public async Task<double> GetTotalCost(bool buyNow)
         {

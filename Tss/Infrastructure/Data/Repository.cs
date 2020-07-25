@@ -3,12 +3,12 @@ using System.Linq;
 using System;
 using Microsoft.EntityFrameworkCore;
 using Tss.Core.Interfaces;
-using Tss.Infrastructure.Contexts;
+using Tss.Infrastructure.Data;
 using System.Collections.Generic;
 using Tss.Core.Models;
 using System.Linq.Expressions;
 
-namespace Tss.Infrastructure.Generics
+namespace Tss.Infrastructure.Data
 {
     public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     {

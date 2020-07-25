@@ -26,7 +26,7 @@ namespace Tss.Core.Helpers
         }
 
         public async Task<PaginatedList<Product>> Get(
-            ProductSearchRequest input
+            ProductGetRequest input
         )
         {
             return await _productRepo.GetPaginated(new GetProductSpecification(

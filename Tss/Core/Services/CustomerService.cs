@@ -6,7 +6,7 @@ using Tss.Core.Models;
 using System.Collections.Generic;
 using Tss.Core.Specifications;
 using Ardalis.GuardClauses;
-using Microsoft.Extensions.Options;
+using System.Linq;
 
 namespace Tss.Core.Services
 {
@@ -16,6 +16,7 @@ namespace Tss.Core.Services
         private readonly IRepository<Customer> _customerRepo;
         private readonly IRepository<AttributeValue> _attributeValueRepo;
         private readonly IRepository<ShoppingCart> _shoppingCartRepo;
+        private readonly IRepository<CustomerAttribute> _customerAttributeRepo;
         private readonly IEmailHelper _emailHelper;
         private readonly IAuthHelper _authHelper;
 
@@ -24,6 +25,7 @@ namespace Tss.Core.Services
             IRepository<Customer> customerRepo,
             IRepository<AttributeValue> attributeValueRepo,
             IRepository<ShoppingCart> shoppingCartRepo,
+            IRepository<CustomerAttribute> customerAttributeRepo,
             IEmailHelper emailHelper,
             IAuthHelper authHelper
         )
@@ -32,21 +34,23 @@ namespace Tss.Core.Services
             _customerRepo = customerRepo ?? throw new ArgumentNullException(nameof(customerRepo));
             _attributeValueRepo = attributeValueRepo ?? throw new ArgumentNullException(nameof(attributeValueRepo));
             _shoppingCartRepo = shoppingCartRepo ?? throw new ArgumentNullException(nameof(shoppingCartRepo));
+            _customerAttributeRepo = customerAttributeRepo ?? throw new ArgumentNullException(nameof(customerAttributeRepo));
             _emailHelper = emailHelper ?? throw new ArgumentNullException(nameof(emailHelper));
             _authHelper = authHelper ?? throw new ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<List<Customer>> Get()
+        public async Task<List<CustomerResponse>> Get()
         {
-            return await _customerRepo.Get();
+            List<Customer> list = await _customerRepo.Get();
+            return list.Select(e => new CustomerResponse(e)).ToList();
         }
 
-        public async Task<Customer> Get(int customerId)
+        public async Task<CustomerResponse> Get(int customerId)
         {
             Customer customer = await _customerRepo.GetOne(new GetCustomerByIdSpecification(customerId, _authHelper));
             Guard.Against.NotFound(customer, "User");
 
-            return customer;
+            return new CustomerResponse(customer);
         }
 
         public async Task AssociateShoppingCartToCustomer(int customerId)
@@ -77,7 +81,7 @@ namespace Tss.Core.Services
             Customer duplicateCustomer = await _customerRepo.GetOne(new GetCustomerByEmailSpecification(input.Email));
             Guard.Against.EmailAddressTaken(duplicateCustomer);
 
-            AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), input.Role, _authHelper));
+            AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), Role.Customer.Message, _authHelper));
             Guard.Against.NotFound(role, nameof(Role));
 
             Customer customer = new Customer(input);
@@ -91,9 +95,9 @@ namespace Tss.Core.Services
             return new LoginResponse(customer, _authHelper);
         }
 
-        public async Task<Customer> Update(CustomerUpdateRequest input)
+        public async Task<CustomerResponse> Update(CustomerUpdateRequest input)
         {
-            Customer customer = await _customerRepo.GetOne(new GetCustomerByIdSpecification(input.CustomerId, _authHelper));
+            Customer customer = await _customerRepo.Get(input.CustomerId);
             Guard.Against.NotFound(customer, "User");
 
             AttributeValue role = await _attributeValueRepo.GetOne(new GetAttributeValueByNameAndValueSpecification(nameof(Role), input.Role, _authHelper));
@@ -106,13 +110,46 @@ namespace Tss.Core.Services
             }
 
             customer.UpdateInfo(input);
-            customer.UpdateRole(role, _authHelper);
             _customerRepo.Put(customer);
             await _unitOfWork.SaveAsync();
-            return customer;
+
+            customer.AllowToAddRole(role, _authHelper);
+
+            CustomerAttribute roleCustomerAttribute =
+                await _customerAttributeRepo.GetOne(new GetCustomerAttributeSpecification(customer.CustomerId, "Role"));
+            _customerAttributeRepo.Delete(roleCustomerAttribute);
+            await _unitOfWork.SaveAsync();
+
+            roleCustomerAttribute = new CustomerAttribute(customer, role, true);
+            _customerAttributeRepo.Post(roleCustomerAttribute);
+            await _unitOfWork.SaveAsync();
+
+            return new CustomerResponse(customer, role);
         }
 
-        public async Task<Customer> Delete(int customerId)
+        public async Task<CustomerResponse> UpdatePassword(CustomerPasswordUpdateRequest input)
+        {
+            Customer customer = await _customerRepo.Get(input.CustomerId);
+            Guard.Against.NotFound(customer, "User");
+
+            customer.UpdatePassword(input, _authHelper);
+            _customerRepo.Put(customer);
+            await _unitOfWork.SaveAsync();
+            return new CustomerResponse(customer, true);
+        }
+
+        public async Task<CustomerResponse> ForgotPassword(CustomerPasswordForgotRequest input)
+        {
+            Customer customer = await _customerRepo.GetOne(new GetCustomerByEmailSpecification(input.Email));
+            Guard.Against.NotFound(customer, "User");
+
+            await customer.ForgotPassword(_emailHelper);
+            _customerRepo.Put(customer);
+            await _unitOfWork.SaveAsync();
+            return new CustomerResponse(customer, true);
+        }
+
+        public async Task<CustomerResponse> Delete(int customerId)
         {
             Customer customer = await _customerRepo.GetOne(new GetCustomerByIdSpecification(customerId, _authHelper));
             Guard.Against.NotFound(customer, "User");
@@ -120,7 +157,7 @@ namespace Tss.Core.Services
 
             _customerRepo.Delete(customer);
             await _unitOfWork.SaveAsync();
-            return customer;
+            return new CustomerResponse(customer);
         }
     }
 }

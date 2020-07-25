@@ -58,6 +58,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="3.1.0" />
   </ItemGroup>
 
+<ItemGroup> <Content Include="Infrastructure\Data\Migrations\**\*.sql" CopyToPublishDirectory="PreserveNewest" /><!-- CopyToPublishDirectory = { Always, PreserveNewest, Never } --></ItemGroup>
 
 
 </Project>

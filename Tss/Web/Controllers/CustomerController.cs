@@ -83,6 +83,18 @@ namespace Tss.Web.Controllers
             return Ok(response);
         }
 
+        [HttpPut("{customerId}/Password")]
+        public async Task<IActionResult> UpdatePassword([FromBody] CustomerPasswordUpdateRequest input)
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "User was updated successfully.",
+                await _service.UpdatePassword(input)
+            );
+            return Ok(response);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> DeleteCustomer([FromRoute] int customerId)

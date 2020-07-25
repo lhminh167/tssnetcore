@@ -5,6 +5,8 @@ using System.Text;
 using Ardalis.GuardClauses;
 using Tss.Core.Models;
 using Tss.Core.Interfaces;
+using System;
+using System.Threading.Tasks;
 
 namespace Tss.Core.Entities
 {
@@ -48,14 +50,37 @@ namespace Tss.Core.Entities
         public string DayPhone { get; set; }
         public string EvePhone { get; set; }
         public string MobPhone { get; set; }
+        public string ResetPasswordToken { get; set; }
+        public DateTime ResetPasswordExpiryDate { get; set; }
 
         public virtual ShippingRegion ShippingRegion { get; set; }
         public virtual ICollection<CustomerAttribute> CustomerAttribute { get; set; }
         public virtual ICollection<Orders> Orders { get; set; }
         public virtual ICollection<Review> Review { get; set; }
 
-        public virtual IReadOnlyCollection<AttributeValueResponse> Attributes =>
-            CustomerAttribute?.Select(pa => new AttributeValueResponse(pa?.AttributeValue))?.ToList();
+        public async Task ForgotPassword(IEmailHelper emailHelper)
+        {
+            Guard.Against.Null(emailHelper, nameof(emailHelper));
+
+            RNGCryptoServiceProvider provider = new RNGCryptoServiceProvider();
+            byte[] byteArray = new byte[20];
+            provider.GetBytes(byteArray);
+
+            ResetPasswordToken = BitConverter.ToString(byteArray, 0);
+            ResetPasswordExpiryDate = DateTime.Now.AddDays(1); //expires in one day
+
+            await emailHelper.SendResetPasswordNotification(this);
+        }
+
+        public void UpdatePassword(CustomerPasswordUpdateRequest input, IAuthHelper authHelper)
+        {
+            Guard.Against.Null(input, nameof(input));
+            Guard.Against.Unauthorized(CustomerId != authHelper.GetCustomerId());
+            Guard.Against.IncorrectCurrentPassword(input.CurrentPassword, this);
+            Guard.Against.BadRequest(input.CurrentPassword == input.NewPassword, "New password should be differrent from current password.");
+
+            SetPassword(input.NewPassword);
+        }
 
         private void SetPassword(string password)
         {
@@ -156,15 +181,8 @@ namespace Tss.Core.Entities
 
         private void UpdateCustomerAttribute(CustomerAttribute customerAttribute, AttributeValue attributeValue)
         {
-            CustomerAttribute?.Remove(customerAttribute);
+            CustomerAttribute = new List<CustomerAttribute>();
             AddCustomerAttribute(attributeValue);
-        }
-
-        private List<AttributeValueResponse> GetAttributes()
-        {
-            return CustomerAttribute?
-                .Select(ca => new AttributeValueResponse(ca.AttributeValue))
-                .ToList();
         }
 
         public string GetRole()
@@ -189,7 +207,7 @@ namespace Tss.Core.Entities
             AddCustomerAttribute(role);
         }
 
-        private void AllowToAddRole(AttributeValue role, IAuthHelper authHelper)
+        public void AllowToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
             AllowAdminToAddRole(role, authHelper);
             AllowCustomerToAddRole(role, authHelper);

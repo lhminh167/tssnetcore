@@ -21,7 +21,7 @@ namespace Tss.Core.Models
             Status = status;
             Detail = detail;
             Instance = Guid.NewGuid().ToString();
-            Title = title + $" Error Instance ID: {Instance}";
+            Title = title;
             Type = URL.GetErrorType(status);
         }
 

@@ -9,5 +9,6 @@ namespace Tss.Core.Interfaces
         Task SendCheckStockNotification(Orders order);
         Task SendShipGoodsNotification(Orders order);
         Task SendOrderFinalNotification(Orders order);
+        Task SendResetPasswordNotification(Customer order);
     }
 }

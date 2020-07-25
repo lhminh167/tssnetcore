@@ -12,10 +12,10 @@ namespace Tss.Core.Models
             Guard.Against.Null(customer, nameof(customer));
 
             LoginToken = authHelper.GetLoginToken(customer);
-            Customer = customer;
+            Customer = new CustomerResponse(customer);
         }
 
         public string LoginToken { get; private set; }
-        public Customer Customer { get; private set; }
+        public CustomerResponse Customer { get; private set; }
     }
 }

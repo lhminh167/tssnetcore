@@ -72,7 +72,7 @@ namespace Tss.Web.Controllers
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Products were successfully retrieved.",
-                await _helper.Get(new ProductSearchRequest(
+                await _helper.Get(new ProductGetRequest(
                     pageIndex,
                     pageSize,
                     isPagingEnabled,
