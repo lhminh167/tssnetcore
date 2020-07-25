@@ -11,7 +11,7 @@ namespace Tss.Core.Specifications
     {
         public GetProductSpecification(
             IAuthHelper authHelper,
-            ProductSearchRequest input
+            ProductGetRequest input
         )
         : base(
             p
@@ -130,7 +130,7 @@ namespace Tss.Core.Specifications
             Sort(input);
         }
 
-        private void Sort(ProductSearchRequest input)
+        private void Sort(ProductGetRequest input)
         {
             if (input.IsDescending)
             {
@@ -142,7 +142,7 @@ namespace Tss.Core.Specifications
             }
         }
 
-        private Expression<Func<Product, object>> GetSortFunc(ProductSearchRequest input)
+        private Expression<Func<Product, object>> GetSortFunc(ProductGetRequest input)
         => input.SortBy switch
         {
             "Name" =>

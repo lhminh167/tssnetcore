@@ -4,7 +4,7 @@ using MySql.Data.MySqlClient;
 using Tss.Core.Entities;
 using Tss.Core.Models;
 
-namespace Tss.Infrastructure.Contexts
+namespace Tss.Infrastructure.Data
 {
     public partial class TssContext : DbContext
     {
@@ -293,7 +293,17 @@ namespace Tss.Infrastructure.Contexts
                     .OnDelete(DeleteBehavior.Restrict)
                     .HasConstraintName("customer_fk");
 
-                entity.Ignore(e => e.Attributes);
+                entity.Property(e => e.ResetPasswordToken)
+                    .HasColumnName("reset_password_token")
+                    .HasColumnType("text")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
+
+                entity.Property(e => e.ResetPasswordExpiryDate)
+                    .HasColumnName("reset_password_expiry_date")
+                    .HasColumnType("datetime")
+                    .HasCharSet("latin1")
+                    .HasCollation("latin1_swedish_ci");
             });
 
             modelBuilder.Entity<CustomerAttribute>(entity =>
@@ -743,7 +753,9 @@ namespace Tss.Infrastructure.Contexts
                 entity.Property(e => e.BuyNow)
                     .IsRequired()
                     .HasColumnName("buy_now")
-                    .HasDefaultValueSql("'1'");
+                    .HasColumnType("boolean");
+                // .HasDefaultValueSql("true");
+
 
                 entity.Property(e => e.CartId)
                     .IsRequired()

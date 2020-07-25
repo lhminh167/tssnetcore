@@ -28,16 +28,16 @@ namespace Tss.Core.Services
             _productHelper = productHelper ?? throw new System.ArgumentNullException(nameof(productHelper));
         }
 
-        // public async Task<List<Category>> Get()
-        // {
-        //     return await _categoryRepo.Get(new GetCategorySpecification(_authHelper));
-        // }
+        public async Task<List<Category>> Get()
+        {
+            return await _categoryRepo.Get();
+        }
 
         public async Task<CategoryGetResponse> Get(int categoryId)
         {
             Category category = await _categoryRepo.GetOne(new GetCategoryByIdSpecification(categoryId, _authHelper));
 
-            ProductSearchRequest request = new ProductSearchRequest(
+            ProductGetRequest request = new ProductGetRequest(
                 0, 8, true, null, true, null, null, null,
                 new List<string> { category.Name },
                 0, 0, 0

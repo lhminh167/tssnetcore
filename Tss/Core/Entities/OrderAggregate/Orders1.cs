@@ -24,7 +24,7 @@ namespace Tss.Core.Entities
             Guard.Against.Null(tax, nameof(Tax));
             Guard.Against.Null(shippingRegion, nameof(ShippingRegion));
             Guard.Against.BadRequest(
-                shipping.ShippingRegionId == shippingRegion.ShippingRegionId,
+                shipping.ShippingRegionId != shippingRegion.ShippingRegionId,
                 "This shipping option is not available at your chosen region."
             );
 

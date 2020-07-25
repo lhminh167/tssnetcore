@@ -2,9 +2,9 @@ using System.Collections.Generic;
 
 namespace Tss.Core.Models
 {
-    public class ProductSearchRequest : PaginationRequest
+    public class ProductGetRequest : PaginationRequest
     {
-        public ProductSearchRequest(
+        public ProductGetRequest(
             int pageIndex,
             int pageSize,
             bool isPagingEnabled,

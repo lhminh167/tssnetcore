@@ -20,17 +20,18 @@ namespace Tss.Web.Controllers
             _service = service ?? throw new System.ArgumentNullException(nameof(service));
         }
 
-        // [HttpGet]
-        // public async Task<IActionResult> Get()
-        // {
-        //     Response response = new Response
-        //     (            
-        //         HttpStatusCode.OK,
-        //         "Categorys were successfully retrieved.",
-        //         await _service.Get()
-        //     );
-        //     return Ok(response);
-        // }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Categorys were successfully retrieved.",
+                await _service.Get()
+            );
+            return Ok(response);
+        }
 
         [AllowAnonymous]
         [HttpGet("{CategoryId}")]

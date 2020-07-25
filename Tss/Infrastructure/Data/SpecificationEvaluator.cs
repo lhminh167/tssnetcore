@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Tss.Core.Interfaces;
 using Tss.Core.Models;
 
-namespace Tss.Infrastructure.Generics
+namespace Tss.Infrastructure.Data
 {
     public class SpecificationEvaluator<T> where T : class
     {

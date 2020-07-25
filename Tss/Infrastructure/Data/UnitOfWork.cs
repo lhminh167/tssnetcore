@@ -2,10 +2,10 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using System;
 using Tss.Core.Interfaces;
-using Tss.Infrastructure.Contexts;
+using Tss.Infrastructure.Data;
 using System.Linq;
 
-namespace Tss.Infrastructure.Generics
+namespace Tss.Infrastructure.Data
 {
     public class UnitOfWork : IUnitOfWork
     {
@@ -27,10 +27,11 @@ namespace Tss.Infrastructure.Generics
 
         public Task<int> SaveAsync()
         {
-            try {
+            try
+            {
                 return _context.SaveChangesAsync();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 this.Rollback();
                 throw ex;

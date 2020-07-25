@@ -6,7 +6,7 @@ namespace Tss.Core.Entities
 {
     public partial class CustomerAttribute
     {
-        public CustomerAttribute(Customer customer, AttributeValue attributeValue)
+        public CustomerAttribute(Customer customer, AttributeValue attributeValue, bool withNoRelatedEntities = false)
         {
             Guard.Against.Null(customer, nameof(customer));
             Guard.Against.Null(attributeValue, nameof(attributeValue));
@@ -15,6 +15,7 @@ namespace Tss.Core.Entities
             CustomerId = customer.CustomerId;
             AttributeValueId = attributeValue.AttributeValueId;
 
+            if (withNoRelatedEntities) return;
             Customer = customer;
             AttributeValue = attributeValue;
         }

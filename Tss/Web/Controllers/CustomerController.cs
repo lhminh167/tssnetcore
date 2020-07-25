@@ -83,6 +83,65 @@ namespace Tss.Web.Controllers
             return Ok(response);
         }
 
+        [HttpPut("{customerId}/Password")]
+        public async Task<IActionResult> UpdatePassword([FromBody] CustomerPasswordUpdateRequest input)
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Password was updated successfully.",
+                await _service.UpdatePassword(input)
+            );
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPut("ForgotPassword")]
+        public async Task<IActionResult> ForgotPassword([FromBody] CustomerPasswordForgotRequest input)
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Your request was successfully processed. Please check your email inbox for reset password link.",
+                await _service.ForgotPassword(input)
+            );
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{customerId}/ResetPassword/{resetPasswordToken}")]
+        public async Task<IActionResult> ValidateResetPasswordToken(
+            [FromRoute] int customerId,
+            [FromRoute] string resetPasswordToken
+        )
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Success! You provided a valid reset password link.",
+                await _service.ValidateResetPasswordToken(
+                    new CustomerPasswordResetTokenValidationRequest(
+                        customerId,
+                        resetPasswordToken
+                    )
+                )
+            );
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpPut("{customerId}/ResetPassword/{resetPasswordToken}")]
+        public async Task<IActionResult> ResetForgottenPassword([FromBody] CustomerPasswordResetRequest input)
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Password was reset successfully. A confirmation email was sent to your email address.",
+                await _service.ResetForgottenPassword(input)
+            );
+            return Ok(response);
+        }
+
         [Authorize(Roles = "Admin")]
         [HttpDelete("{customerId}")]
         public async Task<IActionResult> DeleteCustomer([FromRoute] int customerId)

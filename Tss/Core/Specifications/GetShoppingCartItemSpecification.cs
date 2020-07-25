@@ -1,4 +1,5 @@
 using Tss.Core.Entities;
+using Tss.Core.Interfaces;
 using Tss.Core.Models;
 
 namespace Tss.Core.Specifications
@@ -18,5 +19,20 @@ namespace Tss.Core.Specifications
         {
             SetIsNoTracking(true);
         }
+
+        public GetShoppingCartItemSpecification(int itemId, IAuthHelper authHelper)
+        : base(
+            entry
+            => entry.ItemId == itemId
+            && (
+                entry.CartId == authHelper.GetShoppingCartId()
+                || authHelper.GetRole() == Role.Admin.Message
+            ),
+            entry => entry
+        )
+        {
+            SetIsNoTracking(true);
+        }
+
     }
 }

@@ -54,5 +54,15 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
         {
             await SendEmailAsync(new PsFinalNotificationEmail(order, _settings));
         }
+
+        public async Task SendResetPasswordEmail(Customer customer)
+        {
+            await SendEmailAsync(new ResetPasswordEmail(customer, _settings));
+        }
+
+        public async Task SendPasswordChangeConfirmationEmail(Customer customer)
+        {
+            await SendEmailAsync(new ResetPasswordEmail(customer, _settings));
+        }
     }
 }
