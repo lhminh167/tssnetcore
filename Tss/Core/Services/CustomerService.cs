@@ -113,6 +113,13 @@ namespace Tss.Core.Services
             _customerRepo.Put(customer);
             await _unitOfWork.SaveAsync();
 
+            await UpdateRole(customer, role);
+
+            return new CustomerResponse(customer, role);
+        }
+
+        private async Task UpdateRole(Customer customer, AttributeValue role)
+        {
             customer.AllowToAddRole(role, _authHelper);
 
             CustomerAttribute roleCustomerAttribute =
@@ -123,8 +130,6 @@ namespace Tss.Core.Services
             roleCustomerAttribute = new CustomerAttribute(customer, role, true);
             _customerAttributeRepo.Post(roleCustomerAttribute);
             await _unitOfWork.SaveAsync();
-
-            return new CustomerResponse(customer, role);
         }
 
         public async Task<CustomerResponse> UpdatePassword(CustomerPasswordUpdateRequest input)
