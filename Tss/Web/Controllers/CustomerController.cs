@@ -20,6 +20,7 @@ namespace Tss.Web.Controllers
             _service = service ?? throw new ArgumentNullException(nameof(service));
         }
 
+        [Authorize(Roles = "Admin")]
         [HttpGet]
         public async Task<IActionResult> GetCustomers()
         {
