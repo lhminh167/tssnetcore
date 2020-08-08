@@ -235,17 +235,25 @@ namespace Tss.Core.Entities
 
         private void AllowAdminToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            if (authHelper.GetRole() != "Admin")
-                return;
+            bool isAdmin =
+                authHelper.GetRole() == "Admin" &&
+                authHelper.GetCustomerId() > 0;
+
+            if (!isAdmin) return;
         }
 
         private void AllowCustomerToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            if (authHelper.GetRole() != "Customer")
-                return;
+            int customerId = authHelper.GetCustomerId();
+
+            bool IsCustomer =
+                authHelper.GetRole() == "Customer" &&
+                customerId > 0;
+
+            if (!IsCustomer) return;
 
             bool isAuthorized =
-                CustomerId == authHelper.GetCustomerId()
+                CustomerId == customerId
                 && role.Value == "Customer";
 
             Guard.Against.Unauthorized(!isAuthorized);
@@ -253,7 +261,13 @@ namespace Tss.Core.Entities
 
         private void AllowAnonymousUserToAddRole(AttributeValue role, IAuthHelper authHelper)
         {
-            if (authHelper.GetCustomerId() > 0) return;
+            int customerId = authHelper.GetCustomerId();
+
+            bool isAnonymousUser =
+                authHelper.GetRole() == "Customer" &&
+                customerId == 0;
+
+            if (!isAnonymousUser) return;
 
             bool isAuthorized =
                 role.Value == "Customer";
