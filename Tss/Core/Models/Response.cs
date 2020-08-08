@@ -6,9 +6,7 @@ using Tss.Core.Constants;
 namespace Tss.Core.Models
 {
     public class Response
-    //  : PaginationInfo
     {
-        // error
         public Response(
             HttpStatusCode status,
             string title,
@@ -25,7 +23,6 @@ namespace Tss.Core.Models
             Type = URL.GetErrorType(status);
         }
 
-        // non-pagination
         public Response(
             HttpStatusCode status,
             string title,
@@ -40,28 +37,6 @@ namespace Tss.Core.Models
             Title = title;
             Type = URL.GetErrorType(status);
         }
-
-        // // pagination
-        // public Response(
-        //     HttpStatusCode status,
-        //     string title,
-        //     PaginatedList<object> paginatedList
-        // )
-        // : base(
-        //     paginatedList.Count,
-        //     paginatedList.PageIndex,
-        //     paginatedList.PageSize,
-        //     paginatedList.IsPagingEnabled
-        // )
-        // {
-        //     Guard.Against.NullOrWhiteSpace(title, nameof(title));
-        //     Guard.Against.Null(paginatedList, nameof(paginatedList));
-
-        //     Content = paginatedList.Items;
-        //     Status = status;
-        //     Title = title;
-        //     Type = URL.GetErrorType(status);
-        // }
 
         public object Content { get; private set; }
         public string Detail { get; private set; }
