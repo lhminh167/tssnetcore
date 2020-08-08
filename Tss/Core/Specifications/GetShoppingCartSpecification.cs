@@ -9,7 +9,10 @@ namespace Tss.Core.Specifications
         : base(
             cart
             => cart.CartId == cartId
-            && cart.BuyNow == input.BuyNow
+            && (
+                !input.BuyNow.HasValue
+                || cart.BuyNow == input.BuyNow
+            )
             ,
             cart => cart
         )
