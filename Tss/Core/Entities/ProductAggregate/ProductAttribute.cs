@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Ardalis.GuardClauses;
+﻿using System.Collections.Generic;
 
 namespace Tss.Core.Entities
 {
@@ -9,15 +6,8 @@ namespace Tss.Core.Entities
     {
         public ProductAttribute(int productId, int attributeValueId)
         {
-            // Guard.Against.Null(product, nameof(product));
-            // Guard.Against.Null(attributeValue, nameof(attributeValue));
-            // Guard.Against.BadRequest(!AllowedValues.Contains(attributeValue.Attribute.Name), $"{attributeValue.Attribute.Name} is not a product's attribute.");
-
             ProductId = productId;
             AttributeValueId = attributeValueId;
-
-            // Product = product;
-            // AttributeValue = attributeValue;
         }
 
         public ProductAttribute()

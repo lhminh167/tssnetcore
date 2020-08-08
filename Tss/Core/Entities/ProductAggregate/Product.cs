@@ -1,18 +1,14 @@
-using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Tss.Core.Interfaces;
 using Tss.Core.Models;
 
 namespace Tss.Core.Entities
 {
-    public class Product
+    public class Product : IAggregateRoot
     {
         public Product(ProductCreateRequest input)
         {
