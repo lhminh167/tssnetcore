@@ -55,6 +55,16 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
             await SendEmailAsync(new PsFinalNotificationEmail(order, _settings));
         }
 
+        public async Task SendStockNotOkNotification(Orders order)
+        {
+            await SendEmailAsync(new PsStockNotOkNotificationEmail(order, _settings));
+        }
+
+        public async Task SendInsufficientFundNotification(Orders order)
+        {
+            await SendEmailAsync(new PsInsufficientFundNotificationEmail(order, _settings));
+        }
+
         public async Task SendResetPasswordEmail(Customer customer)
         {
             await SendEmailAsync(new ResetPasswordEmail(customer, _settings));

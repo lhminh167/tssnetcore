@@ -1,14 +1,27 @@
+using System.Net;
 using Ardalis.GuardClauses;
 
 namespace Tss.Core.Models
 {
-    public class PaymentCreateResponse
+    public class PaymentCreateResponse : Response
     {
-        public PaymentCreateResponse(string paymentId, string paymentStatus, string paymentSecret)
+        public PaymentCreateResponse(
+            string paymentId,
+            string paymentStatus,
+            string paymentSecret,
+            HttpStatusCode status,
+            string title,
+            string detail
+        )
+        : base(
+            status,
+            title,
+            detail
+        )
         {
-            Guard.Against.Null(paymentId, nameof(paymentId));
-            Guard.Against.Null(paymentStatus, nameof(paymentStatus));
-            Guard.Against.Null(paymentSecret, nameof(paymentSecret));
+            Guard.Against.NullOrWhiteSpace(paymentId, nameof(paymentId));
+            Guard.Against.NullOrWhiteSpace(paymentStatus, nameof(paymentStatus));
+            Guard.Against.NullOrWhiteSpace(paymentSecret, nameof(paymentSecret));
 
             PaymentId = paymentId;
             PaymentStatus = paymentStatus;

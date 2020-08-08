@@ -60,9 +60,9 @@ namespace Tss.Core.Services
             return order;
         }
 
-        public async Task<CreateOrderFormResponse> GetCreateOrderForm()
+        public async Task<OrderCreateFormResponse> GetCreateOrderForm()
         {
-            return new CreateOrderFormResponse(
+            return new OrderCreateFormResponse(
                 await _shippingRepo.Get(),
                 await _shippingRegionRepo.Get(),
                 await _taxRepo.Get()
@@ -93,12 +93,12 @@ namespace Tss.Core.Services
             Guard.Against.NotFound(tax, nameof(Tax));
 
 
-            Orders order = new Orders(items, customer, shipping, tax, shippingRegion);
+            Orders order = new Orders(items, customer, shipping, tax, shippingRegion, _paymentHelper, input.PaymentMethodId);
             _ordersRepo.Post(order);
             await _unitOfWork.SaveAsync();
 
 
-            OrderCreateResponse response = await order.PsInitialNotification(_emailHelper, _paymentHelper, input.PaymentMethodId);
+            OrderCreateResponse response = await order.PsInitialNotification(_emailHelper, _paymentHelper);
             _shoppingCartRepo.DeleteRange(items);
             await _unitOfWork.SaveAsync();
 
@@ -121,7 +121,8 @@ namespace Tss.Core.Services
             Orders order = await _ordersRepo.GetOne(new GetOrderByIdSpecification(orderId, _authHelper));
             Guard.Against.NotFound(order, nameof(order));
 
-            await order.PsStockNotOk(_emailHelper, _paymentHelper, comments);
+            List<ShoppingCart> cart = await order.PsStockNotOk(_emailHelper, _paymentHelper, comments);
+            _shoppingCartRepo.PostRange(cart);
             _ordersRepo.Put(order);
             await _unitOfWork.SaveAsync();
             return order;

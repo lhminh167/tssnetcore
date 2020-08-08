@@ -4,9 +4,9 @@ using Tss.Core.Entities;
 
 namespace Tss.Core.Models
 {
-    public class CreateOrderFormResponse
+    public class OrderCreateFormResponse
     {
-        public CreateOrderFormResponse(List<Shipping> shippings, List<ShippingRegion> shippingRegions, List<Tax> taxes)
+        public OrderCreateFormResponse(List<Shipping> shippings, List<ShippingRegion> shippingRegions, List<Tax> taxes)
         {
             Guard.Against.Null(shippings, nameof(shippings));
             Guard.Against.Null(shippingRegions, nameof(shippingRegions));

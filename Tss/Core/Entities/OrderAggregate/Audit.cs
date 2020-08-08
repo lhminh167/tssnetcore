@@ -18,7 +18,6 @@ namespace Tss.Core.Entities
         {
             Guard.Against.NullOrWhiteSpace(message, nameof(message));
             Guard.Against.OutOfRange(code, nameof(code), 1, int.MaxValue);
-            Guard.Against.OutOfRange(orderId, nameof(orderId), 1, int.MaxValue);
 
             OrderId = orderId;
             Code = code;
