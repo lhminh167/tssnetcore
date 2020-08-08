@@ -42,8 +42,8 @@ namespace Tss.Web.Middlewares
                 new Response
                 (
                     HttpStatusCode.InternalServerError,
-                    HttpMessage.InternalServerErrorTitle,
-                    exception.Message
+                    exception.Message,
+                    HttpMessage.InternalServerErrorTitle
                 );
 
             context.Response.StatusCode = (int)response.Status;
