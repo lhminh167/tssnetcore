@@ -12,7 +12,7 @@ namespace Tss.Core.Models
         {
             Guard.Against.NullOrWhiteSpace(oldName, nameof(OldName));
             Guard.Against.NullOrWhiteSpace(newName, nameof(NewName));
-            Guard.Against.BadRequest(newName == oldName, "oldName should be different than newName.");
+            Guard.Against.BadRequest(newName == oldName, "Image's new image should be different than image's old name.");
 
             OldName = oldName;
             NewName = newName;

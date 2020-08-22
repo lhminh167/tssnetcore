@@ -24,6 +24,16 @@ namespace Tss.Core.Models
             IsPagingEnabled = isPagingEnabled;
         }
 
+        public PaginationRequest(
+        )
+        {
+            SortBy = null;
+            IsDescending = true;
+            PageIndex = 0;
+            PageSize = 0;
+            IsPagingEnabled = false;
+        }
+
         public bool IsPagingEnabled { get; private set; }
         public int PageIndex { get; private set; }
         public int PageSize { get; private set; }

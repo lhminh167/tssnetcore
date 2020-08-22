@@ -1,4 +1,5 @@
 using Tss.Core.Entities;
+using Tss.Core.Interfaces;
 using Tss.Core.Models;
 
 namespace Tss.Core.Specifications
@@ -7,9 +8,9 @@ namespace Tss.Core.Specifications
     {
         public GetShoppingCartItemSpecification(ShoppingCartItemAddRequest input, string cartId)
         : base(
-            cart 
+            cart
             => cart.CartId == cartId
-            && cart.BuyNow
+            && cart.BuyNow == input.BuyNow
             && cart.Attributes == input.Attributes
             && cart.ProductId == input.ProductId
             ,
@@ -17,7 +18,21 @@ namespace Tss.Core.Specifications
         )
         {
             SetIsNoTracking(true);
-            // AddInclude("ProductAttribute.AttributeValue.Attribute");
         }
+
+        public GetShoppingCartItemSpecification(int itemId, IAuthHelper authHelper)
+        : base(
+            entry
+            => entry.ItemId == itemId
+            && (
+                entry.CartId == authHelper.GetShoppingCartId()
+                || authHelper.GetRole() == Role.Admin.Message
+            ),
+            entry => entry
+        )
+        {
+            SetIsNoTracking(true);
+        }
+
     }
 }

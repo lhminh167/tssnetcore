@@ -2,6 +2,7 @@ using System;
 using System.Linq.Expressions;
 using System.Collections.Generic;
 using Tss.Core.Interfaces;
+using System.Linq;
 
 namespace Tss.Core.Specifications
 {

@@ -63,7 +63,7 @@ namespace Tss.Web.Configs
         {
             config.WriteTo.File(
                 path: "./Log/.json",
-                // restrictedToMinimumLevel: LogEventLevel.Debug,
+                restrictedToMinimumLevel: LogEventLevel.Error,
                 formatter: new ElasticsearchJsonFormatter(),
                 flushToDiskInterval: TimeSpan.FromSeconds(2),
                 // fileSizeLimitBytes: 1_000_000,

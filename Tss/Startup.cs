@@ -68,6 +68,8 @@ namespace Tss
             HttpConfig.Configure(app);
 
             SwaggerConfig.Configure(app);
+
+            DatabaseConfig.Configure(app);
         }
     }
 }

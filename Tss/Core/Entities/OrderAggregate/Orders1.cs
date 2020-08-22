@@ -14,7 +14,9 @@ namespace Tss.Core.Entities
             Customer customer,
             Shipping shipping,
             Tax tax,
-            ShippingRegion shippingRegion
+            ShippingRegion shippingRegion,
+            IPaymentHelper paymentHelper,
+            string paymentMethodId
         )
         {
             Guard.Against.Null(shoppingCart, nameof(ShoppingCart));
@@ -24,12 +26,14 @@ namespace Tss.Core.Entities
             Guard.Against.Null(tax, nameof(Tax));
             Guard.Against.Null(shippingRegion, nameof(ShippingRegion));
             Guard.Against.BadRequest(
-                shipping.ShippingRegionId == shippingRegion.ShippingRegionId,
+                shipping.ShippingRegionId != shippingRegion.ShippingRegionId,
                 "This shipping option is not available at your chosen region."
             );
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+            Guard.Against.NullOrWhiteSpace(paymentMethodId, nameof(paymentMethodId));
 
             CreatedOn = DateTime.Now;
-            Status = OrderStatus.OrderPlacedNotifyingCustomer.Id;
+            Status = OrderStatus.AwaitingConfirmationOfFunds.Id;
             ShippingId = shipping.ShippingId;
             CustomerId = customer.CustomerId;
             TaxId = tax.TaxId;
@@ -45,6 +49,8 @@ namespace Tss.Core.Entities
                 item.Quantity
             )).ToList();
             SetTotalAmount();
+
+            PsCheckFunds(paymentHelper, paymentMethodId).Wait();
         }
 
         public Orders()
@@ -85,12 +91,12 @@ namespace Tss.Core.Entities
             ShippedOn = DateTime.Now;
         }
 
-        private void CreateAudit(OrderAudit entry)
+        private void CreateAudit(OrderAudit entry, string comments = null)
         {
             Guard.Against.Null(entry, nameof(entry));
 
             Audit audit = new Audit(
-                entry.Message,
+                entry.Message + comments,
                 entry.Id,
                 OrderId
             );

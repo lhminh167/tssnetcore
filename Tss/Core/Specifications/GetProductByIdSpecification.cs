@@ -16,7 +16,6 @@ namespace Tss.Core.Specifications
             SetIsNoTracking(false);
             AddInclude("ProductCategory.Category");
             AddInclude("ProductAttribute.AttributeValue.Attribute");
-            AddInclude("Review.Customer");
         }
     }
 }

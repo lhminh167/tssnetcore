@@ -22,13 +22,27 @@ namespace Tss.Web.Controllers
 
         [AllowAnonymous]
         [HttpGet]
-        public async Task<IActionResult> Get([FromQuery] int productId)
+        public async Task<IActionResult> Get(
+            [FromQuery] int productId,
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending
+        )
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Reviews were successfully retrieved.",
-                await _service.Get(productId)
+                await _service.Get(new ReviewGetRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending,
+                    productId
+                ))
             );
             return Ok(response);
         }
@@ -38,7 +52,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> GetOne([FromRoute] int reviewId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Review was successfully retrieved.",
                 await _service.GetOne(reviewId)
@@ -51,7 +65,7 @@ namespace Tss.Web.Controllers
         {
             Review content = await _service.Create(input);
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.Created,
                 "Review was created successfully.",
                 content
@@ -60,10 +74,10 @@ namespace Tss.Web.Controllers
         }
 
         [HttpPut("{reviewId}")]
-        public async Task<IActionResult> Update([FromBody] Review input)
+        public async Task<IActionResult> Update([FromBody] ReviewUpdateRequest input)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Review was updated successfully.",
                 await _service.Update(input)
@@ -75,7 +89,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Delete([FromRoute] int reviewId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Review was successfully deleted.",
                 await _service.Delete(reviewId)

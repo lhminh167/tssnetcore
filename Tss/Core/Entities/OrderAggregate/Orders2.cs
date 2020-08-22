@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Ardalis.GuardClauses;
 using Tss.Core.Interfaces;
@@ -8,29 +11,40 @@ namespace Tss.Core.Entities
 {
     public partial class Orders
     {
-        public async Task<OrderCreateResponse> PsInitialNotification(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string paymentMethodId)
+        private async Task PsCheckFunds(IPaymentHelper paymentHelper, string paymentMethodId)
         {
-            if (Status != OrderStatus.OrderPlacedNotifyingCustomer.Id) StatusChangeException(OrderStatus.AwaitingConfirmationOfFunds);
+            if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.OrderPlacedNotifyingCustomer);
             CreateAudit(OrderAudit.OrderProcessorStarted);
-            CreateAudit(OrderAudit.PsInitialNotificationStarted);
-            await emailHelper.SendOrderInitialNotification(this);
-            CreateAudit(OrderAudit.PsInitialNotificationEmailSent);
-            SetOrderStatus(OrderStatus.AwaitingConfirmationOfFunds);
-            CreateAudit(OrderAudit.PsInitialNotificationFinished);
-            return await PsCheckFunds(emailHelper, paymentHelper, paymentMethodId);
-        }
-
-        private async Task<OrderCreateResponse> PsCheckFunds(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string paymentMethodId)
-        {
-            if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.NotifyingSupplierStockCheck);
             CreateAudit(OrderAudit.PsCheckFundsStarted);
+            PaymentCreateResponse response = await paymentHelper.CreatePayment(
+                paymentMethodId,
+                "usd",
+                TotalAmount
+            );
+            GuardAgainstUnsuccessfulPayment(OrderAudit.PsCheckFundsCreatePaymentFailed, response);
             Customer.CreditCard = paymentMethodId;
-            PaymentCreateResponse response = await paymentHelper.CreatePayment(this);
             Reference = response.PaymentId;
             AuthCode = response.PaymentSecret;
             CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);
-            SetOrderStatus(OrderStatus.NotifyingSupplierStockCheck);
+            SetOrderStatus(OrderStatus.OrderPlacedNotifyingCustomer);
             CreateAudit(OrderAudit.PsCheckFundsFinished);
+        }
+
+        public async Task<OrderCreateResponse> PsInitialNotification(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
+        {
+            if (Status != OrderStatus.OrderPlacedNotifyingCustomer.Id) StatusChangeException(OrderStatus.NotifyingSupplierStockCheck);
+            Guard.Against.Null(emailHelper, nameof(emailHelper));
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
+            CreateAudit(OrderAudit.PsInitialNotificationStarted);
+            var metadata = new Dictionary<string, string>();
+            metadata.Add(nameof(OrderId), OrderId.ToString());
+            PaymentCreateResponse response = await paymentHelper.UpdatePayment(Reference, metadata);
+            GuardAgainstUnsuccessfulPayment(OrderAudit.PsInitialNotificationUpdatePaymentFailed, response);
+            await emailHelper.SendOrderInitialNotification(this);
+            CreateAudit(OrderAudit.PsInitialNotificationEmailSent);
+            SetOrderStatus(OrderStatus.NotifyingSupplierStockCheck);
+            CreateAudit(OrderAudit.PsInitialNotificationFinished);
             await PsCheckStock(emailHelper, paymentHelper);
             return new OrderCreateResponse(this, response);
         }
@@ -48,6 +62,9 @@ namespace Tss.Core.Entities
         public async Task PsStockOk(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.AwaitingStockConfirmation.Id) StatusChangeException(OrderStatus.AwaitingCreditCardPayment);
+            Guard.Against.Null(emailHelper, nameof(emailHelper));
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
             CreateAudit(OrderAudit.PsStockOkStarted);
             CreateAudit(OrderAudit.PsStockOkStockConfirmedBySupplier);
             SetOrderStatus(OrderStatus.AwaitingCreditCardPayment);
@@ -59,7 +76,8 @@ namespace Tss.Core.Entities
         {
             if (Status != OrderStatus.AwaitingCreditCardPayment.Id) StatusChangeException(OrderStatus.NotifyingSupplierShipping);
             CreateAudit(OrderAudit.PsTakePaymentStarted);
-            await paymentHelper.CompletePayment(this.Reference);
+            var response = await paymentHelper.CompletePayment(Reference);
+            GuardAgainstUnsuccessfulPayment(OrderAudit.PsTakePaymentFundsDeductFailed, response);
             CreateAudit(OrderAudit.PsTakePaymentFundsDeducted);
             SetOrderStatus(OrderStatus.NotifyingSupplierShipping);
             CreateAudit(OrderAudit.PsTakePaymentFinished);
@@ -79,6 +97,9 @@ namespace Tss.Core.Entities
         public async Task PsShipOk(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.AwaitingShipmentConfirmation.Id) StatusChangeException(OrderStatus.SendingFinalNotification);
+            Guard.Against.Null(emailHelper, nameof(emailHelper));
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
             CreateAudit(OrderAudit.PsShipOkStarted);
             SetDateShipped();
             CreateAudit(OrderAudit.PsShipOkOrderDispatched);
@@ -98,34 +119,61 @@ namespace Tss.Core.Entities
             CreateAudit(OrderAudit.OrderProcessorFinished);
         }
 
-        public async Task PsStockNotOk(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string comments)
+        public async Task<List<ShoppingCart>> PsStockNotOk(IEmailHelper emailHelper, IPaymentHelper paymentHelper, string comments)
         {
             if (Status != OrderStatus.AwaitingStockConfirmation.Id) StatusChangeException(OrderStatus.AwaitingCreditCardPayment);
+            Guard.Against.Null(emailHelper, nameof(emailHelper));
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
             CreateAudit(OrderAudit.PsStockNotOkStarted);
-            await emailHelper.SendOrderFinalNotification(this);
+            Comments = comments;
+            await emailHelper.SendStockNotOkNotification(this);
             CreateAudit(OrderAudit.PsStockNotOkEmailSent);
             SetOrderStatus(OrderStatus.OutOfStock);
+            List<ShoppingCart> cart = ConvertOrderItemsToShoppingCartItems() ?? new List<ShoppingCart>();
+            CreateAudit(OrderAudit.PsOrderRevertedToShoppingCart);
             CreateAudit(OrderAudit.PsStockNotOkFinished);
             CreateAudit(OrderAudit.OrderProcessorFinished);
+            return cart;
         }
 
-        // public async Task SetOrderCanceledStatus(
-        //     IEmailHelper emailHelper, 
-        //     IPaymentHelper paymentHelper,
-        //     OrderAudit sectionEndingAudit,
-        //     OrderAudit cancellationAudit
-        // )
-        // {
-        // Guard.Against.Null(emailHelper, nameof(emailHelper), paymentHelper);
-        // Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+        private List<ShoppingCart> ConvertOrderItemsToShoppingCartItems()
+        {
+            return OrderDetail.Select(item => ConvertOrderItemToShoppingCartItem(item)).ToList();
+        }
 
-        //     CreateAudit(sectionEndingAudit);
-        //     CreateAudit(OrderAudit.PsCheckFundsStarted);
-        //     // await emailHelper.SendOrderCancellationNotification(this);
-        //     CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);
-        //     // SetOrderStatus(cancellationAudit);
-        //     // CreateAudit(OrderAudit.PsCancelOrderFinished);
+        private ShoppingCart ConvertOrderItemToShoppingCartItem(OrderDetail input)
+        {
+            return new ShoppingCart(
+                ConvertOrderItemToShoppingCartItemAddRequest(input),
+                CustomerId.ToString()
+            );
+        }
+
+        private ShoppingCartItemAddRequest ConvertOrderItemToShoppingCartItemAddRequest(OrderDetail input)
+        {
+            return new ShoppingCartItemAddRequest(
+                input.ProductId,
+                input.Quantity,
+                input.Attributes,
+                true
+            );
+        }
+
+        private void GuardAgainstUnsuccessfulPayment(OrderAudit audit, PaymentCreateResponse payment)
+        {
+            if (payment.Status == HttpStatusCode.OK) return;
+            CreateAudit(audit, payment.Title);
+            Guard.Against.UnsuccessfulPayment(payment);
+        }
+
+        // private void GuardAgainstUnsuccesfulEmailSending(OrderAudit audit, PaymentCreateResponse payment)
+        // {
+        //     if (payment.Status == HttpStatusCode.OK) return;
+        //     CreateAudit(audit, payment.Title);
+        //     Guard.Against.UnsuccessfulPayment(payment);
         // }
+
 
         private void StatusChangeException(OrderStatus orderStatusToChange)
         {

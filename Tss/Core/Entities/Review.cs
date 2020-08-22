@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using Ardalis.GuardClauses;
 using Tss.Core.Interfaces;
 using Tss.Core.Models;
@@ -7,16 +8,22 @@ namespace Tss.Core.Entities
 {
     public class Review
     {
-        public Review(ReviewCreateRequest input, IAuthHelper authHelper)
+        public Review(ReviewCreateRequest input, Product product, Customer customer, IAuthHelper authHelper)
         {
+            Guard.Against.Null(input, nameof(input));
+            Guard.Against.Null(product, nameof(product));
+            Guard.Against.Null(customer, nameof(customer));
             Guard.Against.Null(authHelper, nameof(authHelper));
-            Guard.Against.OutOfRange(input.CustomerId, nameof(CustomerId), 1, int.MaxValue);
-            Guard.Against.OutOfRange(input.ProductId, nameof(ProductId), 1, int.MaxValue);
+            // Guard.Against.BadRequest(
+            //     customer.Review.Any(r => r.ProductId == product.ProductId),
+            //     "You already reviewed this product."
+            // );
             Guard.Against.NullOrWhiteSpace(input.Review1, "Review content");
+            Guard.Against.OutOfRange(input.Review1.Length, "Review content", 50, int.MaxValue);
             Guard.Against.OutOfRange(input.Rating, nameof(Rating), 1, 5);
 
-            CustomerId = input.CustomerId;
-            ProductId = input.ProductId;
+            CustomerId = customer.CustomerId;
+            ProductId = product.ProductId;
             Review1 = input.Review1;
             Rating = input.Rating;
             CreatedOn = DateTime.Now;
@@ -36,15 +43,33 @@ namespace Tss.Core.Entities
         public virtual Customer Customer { get; private set; }
         public virtual Product Product { get; private set; }
 
-        public void Update(Review input, IAuthHelper authHelper)
+        public void Update(ReviewUpdateRequest input, IAuthHelper authHelper)
         {
             Guard.Against.Unauthorized(authHelper.GetCustomerId() != CustomerId);
             Guard.Against.NullOrWhiteSpace(input.Review1, "Review content");
+            Guard.Against.OutOfRange(input.Review1.Length, "Review content", 50, int.MaxValue);
             Guard.Against.OutOfRange(input.Rating, nameof(Rating), 1, 5);
 
             Review1 = input.Review1;
             Rating = input.Rating;
             CreatedOn = DateTime.Now;
         }
+
+        public void Delete(IAuthHelper authHelper)
+        {
+            bool isAuthorized =
+                authHelper.GetCustomerId() == CustomerId
+                || authHelper.GetRole() == "Admin";
+
+            Guard.Against.Unauthorized(!isAuthorized);
+        }
+
+        public void SetCustomer(Customer customer)
+        {
+            Guard.Against.Null(customer, nameof(customer));
+
+            Customer = customer;
+        }
+
     }
 }

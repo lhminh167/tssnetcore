@@ -18,9 +18,9 @@ namespace Tss.Core.Models
             Guard.Against.Null(categories, nameof(categories));
             Guard.Against.OutOfRange(attributes.Count, nameof(attributes.Count), 1, int.MaxValue);
             Guard.Against.OutOfRange(categories.Count, nameof(categories.Count), 1, int.MaxValue);
-            Guard.Against.BadRequest(maxPrice < 0.0, "Max Price should be greater than zero.");
-            Guard.Against.BadRequest(maxPrice < 0.0, "Min Price should be greater than zero.");
-            Guard.Against.BadRequest(minPrice > maxPrice, "Max Price should be greater than Min Price.");
+            Guard.Against.BadRequest(maxPrice < 0.0, "Max price should be greater than zero.");
+            Guard.Against.BadRequest(maxPrice < 0.0, "Min price should be greater than zero.");
+            Guard.Against.BadRequest(minPrice > maxPrice, "Max price should be greater than min price.");
 
             Attributes = attributes.Select(av => new AttributeValueResponse(av)).ToList();
             Categories = categories;

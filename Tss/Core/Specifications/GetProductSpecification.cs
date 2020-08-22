@@ -1,10 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using Microsoft.EntityFrameworkCore;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Tss.Core.Entities;
 using Tss.Core.Interfaces;
 using Tss.Core.Models;
@@ -15,7 +11,7 @@ namespace Tss.Core.Specifications
     {
         public GetProductSpecification(
             IAuthHelper authHelper,
-            ProductSearchRequest input
+            ProductGetRequest input
         )
         : base(
             p
@@ -115,6 +111,16 @@ namespace Tss.Core.Specifications
                     )
                 )
             )
+            &&
+            (
+                input.Display == 0
+                ||
+                (
+                    input.Display > 0
+                    &&
+                    p.Display == input.Display
+                )
+            )
             ,
             p => p
         )
@@ -124,7 +130,7 @@ namespace Tss.Core.Specifications
             Sort(input);
         }
 
-        private void Sort(ProductSearchRequest input)
+        private void Sort(ProductGetRequest input)
         {
             if (input.IsDescending)
             {
@@ -136,7 +142,7 @@ namespace Tss.Core.Specifications
             }
         }
 
-        private Expression<Func<Product, object>> GetSortFunc(ProductSearchRequest input)
+        private Expression<Func<Product, object>> GetSortFunc(ProductGetRequest input)
         => input.SortBy switch
         {
             "Name" =>
@@ -146,7 +152,9 @@ namespace Tss.Core.Specifications
             "BestSelling" =>
                 p => p.OrderDetail.Count,
             "MostDiscounted" =>
-                p => p.DiscountedPrice / p.Price * 100.0,
+                p => p.DiscountedPrice > 0
+                    ? (p.Price - p.DiscountedPrice) / p.Price * 100.0
+                    : 0,
             "TopRated" =>
                 p => (decimal)p.Review.Average(r => (decimal)r.Rating),
             "Newest" =>

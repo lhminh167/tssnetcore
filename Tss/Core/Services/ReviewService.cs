@@ -30,9 +30,11 @@ namespace Tss.Core.Services
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<PaginatedList<Review>> Get(int productId)
+        public async Task<ReviewGetResponse> Get(ReviewGetRequest input)
         {
-            return await _reviewRepo.GetPaginated(new GetReviewByProductIdSpecification(productId, _authHelper));
+            PaginatedList<Review> items = await _reviewRepo.GetPaginated(new GetReviewByProductIdSpecification(input, _authHelper));
+            decimal averageRating = items.Count > 0 ? await _reviewRepo.GetAverage(r => r.Rating) : 0;
+            return new ReviewGetResponse(items, averageRating);
         }
 
         public async Task<Review> GetOne(int reviewId)
@@ -42,21 +44,22 @@ namespace Tss.Core.Services
 
         public async Task<Review> Create(ReviewCreateRequest input)
         {
+            Customer customer = await _customerRepo.GetOne(new GetCustomerByIdWithReviewsSpecification(_authHelper));
+            Guard.Against.NotFound(customer, nameof(Customer));
+
             Product product = await _productRepo.Get(input.ProductId);
             Guard.Against.NotFound(product, nameof(Product));
 
-            Customer customer = await _customerRepo.Get(input.CustomerId);
-            Guard.Against.NotFound(customer, nameof(Customer));
-
-            Review review = new Review(input, _authHelper);
+            Review review = new Review(input, product, customer, _authHelper);
             _reviewRepo.Post(review);
             await _unitOfWork.SaveAsync();
+            review.SetCustomer(customer);
             return review;
         }
 
-        public async Task<Review> Update(Review input)
+        public async Task<Review> Update(ReviewUpdateRequest input)
         {
-            Review review = await _reviewRepo.GetOne(new GetReviewByIdSpecification(input.ReviewId, _authHelper));
+            Review review = await _reviewRepo.Get(input.ReviewId);
             Guard.Against.NotFound(review, nameof(Review));
 
             review.Update(input, _authHelper);
@@ -70,11 +73,7 @@ namespace Tss.Core.Services
             Review review = await _reviewRepo.GetOne(new GetReviewByIdSpecification(reviewId, _authHelper));
             Guard.Against.NotFound(review, nameof(Review));
 
-            bool isAuthorized =
-                _authHelper.GetCustomerId() == review.CustomerId
-                || _authHelper.GetRole() == "Admin";
-            Guard.Against.Unauthorized(!isAuthorized);
-
+            review.Delete(_authHelper);
             _reviewRepo.Delete(review);
             await _unitOfWork.SaveAsync();
             return review;

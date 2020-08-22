@@ -1,7 +1,3 @@
-using System;
-using Ardalis.GuardClauses;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using Tss.Core.Models;
 
 namespace Tss.Core.Entities
@@ -24,7 +20,6 @@ namespace Tss.Core.Entities
         public BaseOrderAudit(string message, int id)
         : base(id, message)
         {
-            // Guard.Against.OutOfRange(id, nameof(id), 10000, 20702);
         }
     }
 
@@ -55,6 +50,21 @@ namespace Tss.Core.Entities
             20002
         );
 
+        public static OrderAudit PsInitialNotificationSendEmailFailed = new OrderAudit(
+            "Failed to send notification email to customer.",
+            20003
+        );
+
+        public static OrderAudit PsInitialNotificationPaymentUpdated = new OrderAudit(
+            "Payment Metadata Updated.",
+            20003
+        );
+
+        public static OrderAudit PsInitialNotificationUpdatePaymentFailed = new OrderAudit(
+            "Failed to update payment.",
+            20003
+        );
+
         public static OrderAudit PsCheckFundsStarted = new OrderAudit(
             "PsCheckFunds started.",
             20100
@@ -68,6 +78,11 @@ namespace Tss.Core.Entities
         public static OrderAudit PsCheckFundsFundsAvailable = new OrderAudit(
             "Funds available for purchase.",
             20102
+        );
+
+        public static OrderAudit PsCheckFundsCreatePaymentFailed = new OrderAudit(
+            "Failed to creat payment.",
+            20103
         );
 
         public static OrderAudit PsCheckStockStarted = new OrderAudit(
@@ -113,6 +128,11 @@ namespace Tss.Core.Entities
         public static OrderAudit PsTakePaymentFundsDeducted = new OrderAudit(
             "Funds deducted from customer credit card account.",
             20402
+        );
+
+        public static OrderAudit PsTakePaymentFundsDeductFailed = new OrderAudit(
+            "Failed to deduct funds from customer credit card account.",
+            20403
         );
 
         public static OrderAudit PsShipGoodsStarted = new OrderAudit(
@@ -173,6 +193,16 @@ namespace Tss.Core.Entities
         public static OrderAudit PsStockNotOkEmailSent = new OrderAudit(
             "Out-of-stock email sent to customer.",
             20802
+        );
+
+        public static OrderAudit PsOrderRevertedToShoppingCart = new OrderAudit(
+            "Order items was put back into customer's shopping cart.",
+            20803
+        );
+
+        public static OrderAudit PsInsufficientFundEmailSent = new OrderAudit(
+            "Insufficient fund email sent to customer.",
+            20902
         );
 
         OrderAudit(string message, int id)

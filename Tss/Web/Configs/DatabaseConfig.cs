@@ -1,11 +1,8 @@
-using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-using Microsoft.EntityFrameworkCore;
-using Tss.Infrastructure.Contexts;
+using Tss.Infrastructure.Data;
 using Tss.Core.Models;
-
+using Microsoft.EntityFrameworkCore;
 namespace Tss.Web.Configs
 {
     /// <summary>
@@ -19,7 +16,7 @@ namespace Tss.Web.Configs
         /// <param name="services">The services.</param>
         public static void ConfigureService(IServiceCollection services, AppSettings appSettings)
         {
-            services.AddDbContext<TssContext>(options => options.UseMySql(appSettings.DatabaseConnectionString));
+            TssContext.ConfigureService(services, appSettings);
         }
 
         /// <summary>
@@ -28,6 +25,12 @@ namespace Tss.Web.Configs
         /// <param name="app">The application.</param>
         public static void Configure(IApplicationBuilder app)
         {
+            using (var serviceScope = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>().CreateScope())
+            {
+                var context = serviceScope.ServiceProvider.GetService<TssContext>();
+                context.Database.Migrate();
+            }
+
         }
     }
 }

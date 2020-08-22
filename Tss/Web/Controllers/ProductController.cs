@@ -15,13 +15,30 @@ namespace Tss.Web.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
+        private readonly IProductHelper _helper;
 
         public ProductController(
-            IProductService service
+            IProductService service,
+            IProductHelper helper
         )
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
+            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
         }
+
+        [AllowAnonymous]
+        [HttpGet("Homepage")]
+        public async Task<IActionResult> GetHomePageProducts()
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Filters were successfully retrieved.",
+                await _service.GetHomePageProducts()
+            );
+            return Ok(response);
+        }
+
+
 
         [AllowAnonymous]
         [HttpGet("Filter")]
@@ -48,13 +65,14 @@ namespace Tss.Web.Controllers
             [FromQuery] string size,
             [FromQuery] List<string> category,
             [FromQuery] double minPrice,
-            [FromQuery] double maxPrice
+            [FromQuery] double maxPrice,
+            [FromQuery] int display
         )
         {
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Products were successfully retrieved.",
-                await _service.Get(new ProductSearchRequest(
+                await _helper.Get(new ProductGetRequest(
                     pageIndex,
                     pageSize,
                     isPagingEnabled,
@@ -65,11 +83,65 @@ namespace Tss.Web.Controllers
                     size,
                     category,
                     minPrice,
-                    maxPrice
+                    maxPrice,
+                    display
                 ))
             );
             return Ok(response);
         }
+
+        [AllowAnonymous]
+        [HttpGet("{productId}/Recommendation")]
+        public async Task<IActionResult> GetRecommendations(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending,
+            [FromRoute] int productId
+        )
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Products were successfully retrieved.",
+                await _service.GetRecommendations(new ProductRecommedationRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending,
+                    productId
+                ))
+            );
+            return Ok(response);
+        }
+
+        [AllowAnonymous]
+        [HttpGet("{productId}/Review")]
+        public async Task<IActionResult> GetReviews(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending,
+            [FromRoute] int productId
+        )
+        {
+            Response response = new Response(
+                HttpStatusCode.OK,
+                "Products were successfully retrieved.",
+                await _service.GetReviews(new ReviewGetRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending,
+                    productId
+                ))
+            );
+            return Ok(response);
+        }
+
 
         [AllowAnonymous]
         [HttpGet("{productId}")]

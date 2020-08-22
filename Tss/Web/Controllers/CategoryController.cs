@@ -1,10 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tss.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Tss.Core.Constants;
 using Tss.Core.Models;
-using Tss.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
@@ -23,24 +20,25 @@ namespace Tss.Web.Controllers
             _service = service ?? throw new System.ArgumentNullException(nameof(service));
         }
 
-        // [HttpGet]
-        // public async Task<IActionResult> Get()
-        // {
-        //     Response response = new Response
-        //     (            
-        //         HttpStatusCode.OK,
-        //         "Categorys were successfully retrieved.",
-        //         await _service.Get()
-        //     );
-        //     return Ok(response);
-        // }
+        [AllowAnonymous]
+        [HttpGet]
+        public async Task<IActionResult> Get()
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Categorys were successfully retrieved.",
+                await _service.Get()
+            );
+            return Ok(response);
+        }
 
         [AllowAnonymous]
         [HttpGet("{CategoryId}")]
         public async Task<IActionResult> GetCategory([FromRoute] int CategoryId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Category was successfully retrieved.",
                 await _service.Get(CategoryId)

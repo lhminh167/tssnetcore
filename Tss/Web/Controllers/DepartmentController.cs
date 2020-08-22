@@ -1,10 +1,7 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Tss.Core.Interfaces;
-using Microsoft.AspNetCore.Http;
-using Tss.Core.Constants;
 using Tss.Core.Models;
-using Tss.Core.Entities;
 using Microsoft.AspNetCore.Authorization;
 using System.Net;
 
@@ -28,7 +25,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Get()
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Departments were successfully retrieved.",
                 await _service.Get()
