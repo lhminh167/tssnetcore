@@ -7,7 +7,7 @@ namespace Tss.Core.Interfaces
 {
     public interface IOrderService
     {
-        Task<List<Orders>> Get();
+        Task<PaginatedList<Orders>> Get(PaginationRequest input);
         Task<Orders> Get(int orderId);
         Task<OrderCreateFormResponse> GetCreateOrderForm();
         Task<OrderCreateResponse> Create(OrderCreateRequest input);

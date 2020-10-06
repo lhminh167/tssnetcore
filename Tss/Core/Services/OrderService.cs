@@ -47,9 +47,9 @@ namespace Tss.Core.Services
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<List<Orders>> Get()
+        public async Task<PaginatedList<Orders>> Get(PaginationRequest input)
         {
-            return await _ordersRepo.Get(new GetOrderSpecification(_authHelper));
+            return await _ordersRepo.GetPaginated(new GetOrderSpecification(_authHelper, input));
         }
 
         public async Task<Orders> Get(int orderId)

@@ -22,13 +22,25 @@ namespace Tss.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending
+        )
         {
             Response response = new Response
             (
                 HttpStatusCode.OK,
                 "Orders were successfully retrieved.",
-                await _service.Get()
+                await _service.Get(new PaginationRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending
+                ))
             );
             return Ok(response);
         }
