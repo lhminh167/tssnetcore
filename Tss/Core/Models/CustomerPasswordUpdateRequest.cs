@@ -8,7 +8,7 @@ namespace Tss.Core.Models
         public int CustomerId { get; set; }
 
         [Required]
-        public string CurrentPassword { get; set; }
+        public string Password { get; set; }
 
         [Required]
         public string NewPassword { get; set; }

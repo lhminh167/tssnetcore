@@ -95,8 +95,8 @@ namespace Tss.Core.Entities
         {
             Guard.Against.Null(input, nameof(input));
             Guard.Against.Unauthorized(CustomerId != authHelper.GetCustomerId());
-            Guard.Against.IncorrectCurrentPassword(input.CurrentPassword, this);
-            Guard.Against.BadRequest(input.CurrentPassword == input.NewPassword, "New password should be differrent from current password.");
+            Guard.Against.IncorrectCurrentPassword(input.Password, this);
+            Guard.Against.BadRequest(input.Password == input.NewPassword, "New password should be differrent from current password.");
 
             SetPassword(input.NewPassword);
         }
