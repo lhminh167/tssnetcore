@@ -10,6 +10,7 @@ namespace Tss.Core.Interfaces
         Task<PaginatedList<Orders>> Get(PaginationRequest input);
         Task<Orders> Get(int orderId);
         Task<OrderCreateFormResponse> GetCreateForm();
+        Task<OrderCreateResponse> CreatePayment(OrderCreateRequest input);
         Task<OrderCreateResponse> Create(OrderCreateRequest input);
         Task<Orders> StockOk(int orderId);
         Task<Orders> StockNotOk(int orderId, string comments);

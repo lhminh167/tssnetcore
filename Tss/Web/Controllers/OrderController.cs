@@ -69,6 +69,19 @@ namespace Tss.Web.Controllers
             return Ok(response);
         }
 
+        [HttpPost("Payment")]
+        public async Task<IActionResult> CreatePayment([FromBody] OrderCreateRequest input)
+        {
+            OrderCreateResponse content = await _service.CreatePayment(input);
+            Response response = new Response
+            (
+                HttpStatusCode.Created,
+                "Payment was created successfully.",
+                content
+            );
+            return CreatedAtAction(nameof(GetOne), new { orderId = content.Order.OrderId }, response);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] OrderCreateRequest input)
         {

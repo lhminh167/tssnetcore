@@ -9,14 +9,18 @@ namespace Tss.Core.Entities
     public partial class Orders : IAggregateRoot
     {
 
-        public Orders(
+        private Orders(
             List<ShoppingCart> shoppingCart,
             Customer customer,
             Shipping shipping,
             Tax tax,
-            ShippingRegion shippingRegion,
-            IPaymentHelper paymentHelper,
-            string paymentMethodId
+            ShippingRegion shippingRegion
+        // ,
+        // IEmailHelper emailHelper,
+        // IPaymentHelper paymentHelper,
+        // string paymentMethodId,
+        // string paymentId,
+        // string paymentSecret
         )
         {
             Guard.Against.Null(shoppingCart, nameof(ShoppingCart));
@@ -29,8 +33,6 @@ namespace Tss.Core.Entities
                 shipping.ShippingRegionId != shippingRegion.ShippingRegionId,
                 "This shipping option is not available at your chosen region."
             );
-            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
-            Guard.Against.NullOrWhiteSpace(paymentMethodId, nameof(paymentMethodId));
 
             CreatedOn = DateTime.Now;
             Status = OrderStatus.AwaitingConfirmationOfFunds.Id;
@@ -49,8 +51,6 @@ namespace Tss.Core.Entities
                 item.Quantity
             )).ToList();
             SetTotalAmount();
-
-            PsCheckFunds(paymentHelper, paymentMethodId).Wait();
         }
 
         public Orders()
