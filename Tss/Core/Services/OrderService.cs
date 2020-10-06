@@ -60,7 +60,7 @@ namespace Tss.Core.Services
             return order;
         }
 
-        public async Task<OrderCreateFormResponse> GetCreateOrderForm()
+        public async Task<OrderCreateFormResponse> GetCreateForm()
         {
             return new OrderCreateFormResponse(
                 await _shippingRepo.Get(),

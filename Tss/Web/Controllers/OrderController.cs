@@ -58,13 +58,13 @@ namespace Tss.Web.Controllers
         }
 
         [HttpGet("New")]
-        public async Task<IActionResult> GetGetCreateOrderForm()
+        public async Task<IActionResult> GetCreateForm()
         {
             Response response = new Response
             (
                 HttpStatusCode.OK,
                 "Checkout form was successfully retrieved.",
-                await _service.GetCreateOrderForm()
+                await _service.GetCreateForm()
             );
             return Ok(response);
         }
