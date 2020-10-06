@@ -110,8 +110,11 @@ namespace Tss.Core.Services
 
         public async Task<ProductResponse> GetOne(int productId)
         {
+            Product product = await _productRepo.GetOne(new GetProductByIdSpecification(productId, _authHelper));
+            Guard.Against.NotFound(product, nameof(Product));
+
             return new ProductResponse(
-                await _productRepo.GetOne(new GetProductByIdSpecification(productId, _authHelper)),
+                product,
                 await GetReviews(new ReviewGetRequest(productId)),
                 await GetRecommendations(new ProductRecommedationRequest(productId))
             );
