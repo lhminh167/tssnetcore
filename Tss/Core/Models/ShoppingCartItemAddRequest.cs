@@ -12,13 +12,13 @@ namespace Tss.Core.Models
         [Required]
         public string Attributes { get; set; }
         [Required]
-        public bool BuyNow { get; set; }
+        public bool? BuyNow { get; set; }
 
         public ShoppingCartItemAddRequest(
             int productId,
             int quantity,
             string attributes,
-            bool buyNow
+            bool? buyNow
         )
         {
             Guard.Against.OutOfRange(productId, nameof(productId), 1, int.MaxValue);
