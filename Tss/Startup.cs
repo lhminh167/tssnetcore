@@ -53,8 +53,6 @@ namespace Tss
 
             CachingConfig.ConfigureService(services);
 
-            AutomapperConfig.ConfigureService(services);
-
             SwaggerConfig.ConfigureService(services);
 
             DebuggingConfig.ConfigureService(services);
