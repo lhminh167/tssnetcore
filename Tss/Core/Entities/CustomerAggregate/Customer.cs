@@ -88,6 +88,8 @@ namespace Tss.Core.Entities
             ValidateResetPasswordToken(input);
 
             SetPassword(input.NewPassword);
+            ResetPasswordToken = null;
+            ResetPasswordExpiryDate = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified);
             await emailHelper.SendPasswordChangeConfirmationEmail(this);
         }
 

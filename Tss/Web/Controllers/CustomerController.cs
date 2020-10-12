@@ -130,6 +130,20 @@ namespace Tss.Web.Controllers
             return Ok(response);
         }
 
+        [HttpGet("{customerId}/ResetPassword")]
+        public async Task<IActionResult> GetResetPasswordToken(
+            [FromRoute] int customerId
+        )
+        {
+            Response response = new Response
+            (
+                HttpStatusCode.OK,
+                "Reset password token was successfully retrieved.",
+                await _service.GetResetPasswordToken(customerId)
+            );
+            return Ok(response);
+        }
+
         [AllowAnonymous]
         [HttpPut("{customerId}/ResetPassword/{resetPasswordToken}")]
         public async Task<IActionResult> ResetForgottenPassword([FromBody] CustomerPasswordResetRequest input)

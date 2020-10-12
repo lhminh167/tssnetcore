@@ -179,6 +179,14 @@ namespace Tss.Core.Services
             return new CustomerResponse(customer, true);
         }
 
+        public async Task<CustomerPasswordResetTokenGetResponse> GetResetPasswordToken(int customerId)
+        {
+            Customer customer = await _customerRepo.Get(customerId);
+            Guard.Against.NotFound(customer, "User");
+
+            return new CustomerPasswordResetTokenGetResponse(customer);
+        }
+
         public async Task<CustomerResponse> ResetForgottenPassword(CustomerPasswordResetRequest input)
         {
             Customer customer = await _customerRepo.Get(input.CustomerId);

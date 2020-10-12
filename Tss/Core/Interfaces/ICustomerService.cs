@@ -14,6 +14,7 @@ namespace Tss.Core.Interfaces
         Task<CustomerResponse> UpdatePassword(CustomerPasswordUpdateRequest input);
         Task<CustomerResponse> ForgotPassword(CustomerPasswordForgotRequest input);
         Task<CustomerResponse> ValidateResetPasswordToken(CustomerPasswordResetTokenValidationRequest input);
+        Task<CustomerPasswordResetTokenGetResponse> GetResetPasswordToken(int customerId);
         Task<CustomerResponse> ResetForgottenPassword(CustomerPasswordResetRequest input);
         Task<CustomerResponse> Delete(int customerId);
     }
