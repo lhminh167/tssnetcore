@@ -11,26 +11,96 @@ namespace Tss.Core.Entities
 {
     public partial class Orders
     {
-        private async Task PsCheckFunds(IPaymentHelper paymentHelper, string paymentMethodId)
+        public static async Task<OrderCreateResponse> CreatePayment(
+            List<ShoppingCart> shoppingCart,
+            Customer customer,
+            Shipping shipping,
+            Tax tax,
+            ShippingRegion shippingRegion,
+            IPaymentHelper paymentHelper,
+            string paymentMethodId,
+            string paymentId,
+            string paymentSecret
+        )
+        {
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
+            var order = new Orders(
+                shoppingCart,
+                customer,
+                shipping,
+                tax,
+                shippingRegion
+            );
+
+
+            PaymentCreateResponse response = await paymentHelper.CreatePayment(
+                paymentMethodId,
+                "usd",
+                order.TotalAmount
+            );
+            order.GuardAgainstUnsuccessfulPayment(OrderAudit.PsCheckFundsCreatePaymentFailed, response);
+
+
+            return new OrderCreateResponse(order, response);
+        }
+
+        public static async Task<OrderCreateResponse> Create(
+            List<ShoppingCart> shoppingCart,
+            Customer customer,
+            Shipping shipping,
+            Tax tax,
+            ShippingRegion shippingRegion,
+            IEmailHelper emailHelper,
+            IPaymentHelper paymentHelper,
+            string paymentMethodId,
+            string paymentId,
+            string paymentSecret
+        )
+        {
+            Guard.Against.Null(emailHelper, nameof(emailHelper));
+            Guard.Against.Null(paymentHelper, nameof(paymentHelper));
+
+            var order = new Orders(
+                shoppingCart,
+                customer,
+                shipping,
+                tax,
+                shippingRegion
+            );
+
+            var response = await order.PsCheckFunds(
+                emailHelper,
+                paymentHelper,
+                paymentMethodId,
+                paymentId,
+                paymentSecret
+            );
+
+            return response;
+        }
+
+        private async Task<OrderCreateResponse> PsCheckFunds(
+            IEmailHelper emailHelper,
+            IPaymentHelper paymentHelper,
+            string paymentMethodId,
+            string paymentId,
+            string paymentSecret
+        )
         {
             if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.OrderPlacedNotifyingCustomer);
             CreateAudit(OrderAudit.OrderProcessorStarted);
             CreateAudit(OrderAudit.PsCheckFundsStarted);
-            PaymentCreateResponse response = await paymentHelper.CreatePayment(
-                paymentMethodId,
-                "usd",
-                TotalAmount
-            );
-            GuardAgainstUnsuccessfulPayment(OrderAudit.PsCheckFundsCreatePaymentFailed, response);
             Customer.CreditCard = paymentMethodId;
-            Reference = response.PaymentId;
-            AuthCode = response.PaymentSecret;
+            Reference = paymentId;
+            AuthCode = paymentSecret;
             CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);
             SetOrderStatus(OrderStatus.OrderPlacedNotifyingCustomer);
             CreateAudit(OrderAudit.PsCheckFundsFinished);
+            return await PsInitialNotification(emailHelper, paymentHelper);
         }
 
-        public async Task<OrderCreateResponse> PsInitialNotification(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
+        private async Task<OrderCreateResponse> PsInitialNotification(IEmailHelper emailHelper, IPaymentHelper paymentHelper)
         {
             if (Status != OrderStatus.OrderPlacedNotifyingCustomer.Id) StatusChangeException(OrderStatus.NotifyingSupplierStockCheck);
             Guard.Against.Null(emailHelper, nameof(emailHelper));

@@ -5,7 +5,7 @@ namespace Tss.Core.Specifications
 {
     public class GetShoppingCartSpecification : BaseSpecification<ShoppingCart, ShoppingCart>
     {
-        public GetShoppingCartSpecification(ShoppingCartGetRequest input, string cartId)
+        public GetShoppingCartSpecification(ShoppingCartGetRequest input, string cartId, bool includeProduct = true)
         : base(
             cart
             => cart.CartId == cartId
@@ -18,7 +18,7 @@ namespace Tss.Core.Specifications
         )
         {
             SetIsNoTracking(true);
-            AddInclude(c => c.Product);
+            if (includeProduct) AddInclude(c => c.Product);
             ApplyPaging(input.PageIndex, input.PageSize, input.IsPagingEnabled);
         }
     }

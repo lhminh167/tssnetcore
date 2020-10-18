@@ -22,13 +22,25 @@ namespace Tss.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(
+            [FromQuery] int pageSize,
+            [FromQuery] int pageIndex,
+            [FromQuery] bool isPagingEnabled,
+            [FromQuery] string sortBy,
+            [FromQuery] bool isDescending
+        )
         {
             Response response = new Response
             (
                 HttpStatusCode.OK,
                 "Orders were successfully retrieved.",
-                await _service.Get()
+                await _service.Get(new PaginationRequest(
+                    pageIndex,
+                    pageSize,
+                    isPagingEnabled,
+                    sortBy,
+                    isDescending
+                ))
             );
             return Ok(response);
         }
@@ -46,15 +58,28 @@ namespace Tss.Web.Controllers
         }
 
         [HttpGet("New")]
-        public async Task<IActionResult> GetGetCreateOrderForm()
+        public async Task<IActionResult> GetCreateForm()
         {
             Response response = new Response
             (
                 HttpStatusCode.OK,
                 "Checkout form was successfully retrieved.",
-                await _service.GetCreateOrderForm()
+                await _service.GetCreateForm()
             );
             return Ok(response);
+        }
+
+        [HttpPost("Payment")]
+        public async Task<IActionResult> CreatePayment([FromBody] OrderCreateRequest input)
+        {
+            OrderCreateResponse content = await _service.CreatePayment(input);
+            Response response = new Response
+            (
+                HttpStatusCode.Created,
+                "Payment was created successfully.",
+                content
+            );
+            return CreatedAtAction(nameof(GetOne), new { orderId = content.Order.OrderId }, response);
         }
 
         [HttpPost]

@@ -16,7 +16,7 @@ namespace Tss.Core.Entities
             CartId = cartId;
             Attributes = input.Attributes;
             Quantity = input.Quantity;
-            BuyNow = input.BuyNow;
+            BuyNow = input.BuyNow.Value;
             AddedOn = DateTime.Now;
         }
 

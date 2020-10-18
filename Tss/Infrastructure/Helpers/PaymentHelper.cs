@@ -42,6 +42,10 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
                     Currency = currency,
                     CaptureMethod = "manual",
                     Amount = (long)(amount * 100),
+                    Metadata = new Dictionary<string, string>
+                    {
+                        { "integration_check", "accept_a_payment" },
+                    },
                 };
                 PaymentIntent response = await _paymentIntentService.CreateAsync(options);
                 PaymentIntent confirmResponse = await _paymentIntentService.ConfirmAsync(response.Id);

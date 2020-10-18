@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Tss.Core.Specifications;
 using Ardalis.GuardClauses;
 using System.Linq;
+using Tss.Infrastructure.Data;
 
 namespace Tss.Core.Services
 {
@@ -53,16 +54,31 @@ namespace Tss.Core.Services
             return new CustomerResponse(customer);
         }
 
-        public async Task AssociateShoppingCartToCustomer(int customerId)
+        private async Task AssociateShoppingCartToCustomer(int customerId)
         {
             string cartId = _authHelper.GetShoppingCartId();
             if (string.IsNullOrWhiteSpace(cartId)) return;
 
-            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(null), cartId));
-            if (items.Count == 0) return;
+            List<ShoppingCart> anonymousItems = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(null), cartId, false));
+            if (anonymousItems.Count == 0) return;
 
-            items.ForEach(i => i.AssociateToCustomer(customerId));
-            _shoppingCartRepo.PutRange(items);
+            List<ShoppingCart> customerItems = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(null), customerId.ToString(), false));
+            customerItems.ForEach(customerItem =>
+            {
+                var sameItem = anonymousItems.FirstOrDefault(anonymousItem =>
+                    anonymousItem.BuyNow == customerItem.BuyNow
+                    && anonymousItem.Attributes == customerItem.Attributes
+                    && anonymousItem.ProductId == customerItem.ProductId
+                );
+
+                if (sameItem is null) return;
+                anonymousItems.Remove(sameItem);
+                _shoppingCartRepo.Delete(sameItem);
+                customerItem.AddUpQuantity(sameItem.Quantity);
+            });
+            anonymousItems.ForEach(anonymousItem => anonymousItem.AssociateToCustomer(customerId));
+            _shoppingCartRepo.PutRange(anonymousItems);
+            _shoppingCartRepo.PutRange(customerItems);
         }
 
         public async Task<LoginResponse> Login(LoginRequest input)
@@ -161,6 +177,14 @@ namespace Tss.Core.Services
 
             customer.ValidateResetPasswordToken(input);
             return new CustomerResponse(customer, true);
+        }
+
+        public async Task<CustomerPasswordResetTokenGetResponse> GetResetPasswordToken(int customerId)
+        {
+            Customer customer = await _customerRepo.Get(customerId);
+            Guard.Against.NotFound(customer, "User");
+
+            return new CustomerPasswordResetTokenGetResponse(customer);
         }
 
         public async Task<CustomerResponse> ResetForgottenPassword(CustomerPasswordResetRequest input)

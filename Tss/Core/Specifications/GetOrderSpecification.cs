@@ -1,11 +1,12 @@
 using Tss.Core.Entities;
 using Tss.Core.Interfaces;
+using Tss.Core.Models;
 
 namespace Tss.Core.Specifications
 {
     public class GetOrderSpecification : BaseSpecification<Orders, Orders>
     {
-        public GetOrderSpecification(IAuthHelper authHelper)
+        public GetOrderSpecification(IAuthHelper authHelper, PaginationRequest input)
         : base(
             o => o.CustomerId == authHelper.GetCustomerId() || authHelper.GetRole() == "Admin"
             ,
@@ -13,12 +14,9 @@ namespace Tss.Core.Specifications
         )
         {
             SetIsNoTracking(true);
-            // AddInclude(o => o.Tax);
-            // AddInclude(o => o.Shipping);
             AddInclude(o => o.Customer);
-            // AddInclude(o => o.OrderDetail);
-            // AddInclude(o => o.Audit);
             ApplyOrderByDescending(o => o.CreatedOn);
+            ApplyPaging(input.PageIndex, input.PageSize, input.IsPagingEnabled);
         }
     }
 

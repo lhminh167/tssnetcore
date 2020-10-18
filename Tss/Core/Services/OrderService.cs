@@ -47,9 +47,9 @@ namespace Tss.Core.Services
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<List<Orders>> Get()
+        public async Task<PaginatedList<Orders>> Get(PaginationRequest input)
         {
-            return await _ordersRepo.Get(new GetOrderSpecification(_authHelper));
+            return await _ordersRepo.GetPaginated(new GetOrderSpecification(_authHelper, input));
         }
 
         public async Task<Orders> Get(int orderId)
@@ -60,7 +60,7 @@ namespace Tss.Core.Services
             return order;
         }
 
-        public async Task<OrderCreateFormResponse> GetCreateOrderForm()
+        public async Task<OrderCreateFormResponse> GetCreateForm()
         {
             return new OrderCreateFormResponse(
                 await _shippingRepo.Get(),
@@ -68,6 +68,48 @@ namespace Tss.Core.Services
                 await _taxRepo.Get()
             );
         }
+
+        public async Task<OrderCreateResponse> CreatePayment(OrderCreateRequest input)
+        {
+            List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(true), _authHelper.GetCustomerId().ToString()));
+            Guard.Against.NotFound(items, nameof(ShoppingCart));
+
+
+            ShippingRegion shippingRegion = await _shippingRegionRepo.Get(input.ShippingRegionId);
+            Guard.Against.NotFound(shippingRegion, nameof(ShippingRegion));
+
+
+            Shipping shipping = await _shippingRepo.Get(input.ShippingId);
+            Guard.Against.NotFound(shipping, nameof(Shipping));
+
+
+            Customer customer = await _customerRepo.Get(_authHelper.GetCustomerId());
+            Guard.Against.NotFound(customer, nameof(Customer));
+            customer.UpdateInfoOnCheckout(input);
+
+
+            int taxId = Tax.GetTaxId(shipping);
+            Tax tax = await _taxRepo.Get(taxId);
+            Guard.Against.NotFound(tax, nameof(Tax));
+
+
+            var response = await Orders.CreatePayment(
+                items,
+                customer,
+                shipping,
+                tax,
+                shippingRegion,
+                _paymentHelper,
+                input.PaymentMethodId,
+                input.PaymentId,
+                input.PaymentSecret
+            );
+
+
+
+            return response;
+        }
+
 
         public async Task<OrderCreateResponse> Create(OrderCreateRequest input)
         {
@@ -93,12 +135,18 @@ namespace Tss.Core.Services
             Guard.Against.NotFound(tax, nameof(Tax));
 
 
-            Orders order = new Orders(items, customer, shipping, tax, shippingRegion, _paymentHelper, input.PaymentMethodId);
-            _ordersRepo.Post(order);
-            await _unitOfWork.SaveAsync();
-
-
-            OrderCreateResponse response = await order.PsInitialNotification(_emailHelper, _paymentHelper);
+            var response = await Orders.Create(
+                items,
+                customer,
+                shipping,
+                tax, shippingRegion,
+                _emailHelper,
+                _paymentHelper,
+                input.PaymentMethodId,
+                input.PaymentId,
+                input.PaymentSecret
+            );
+            _ordersRepo.Post(response.Order);
             _shoppingCartRepo.DeleteRange(items);
             await _unitOfWork.SaveAsync();
 

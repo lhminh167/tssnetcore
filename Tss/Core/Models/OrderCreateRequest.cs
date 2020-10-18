@@ -19,5 +19,7 @@ namespace Tss.Core.Models
         public string EvePhone { get; set; }
         public string MobPhone { get; set; }
         public string PaymentMethodId { get; set; }
+        public string PaymentId { get; set; }
+        public string PaymentSecret { get; set; }
     }
 }

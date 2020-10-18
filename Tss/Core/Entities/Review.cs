@@ -45,7 +45,7 @@ namespace Tss.Core.Entities
 
         public void Update(ReviewUpdateRequest input, IAuthHelper authHelper)
         {
-            Guard.Against.Unauthorized(authHelper.GetCustomerId() != CustomerId);
+            Allow(authHelper);
             Guard.Against.NullOrWhiteSpace(input.Review1, "Review content");
             Guard.Against.OutOfRange(input.Review1.Length, "Review content", 50, int.MaxValue);
             Guard.Against.OutOfRange(input.Rating, nameof(Rating), 1, 5);
@@ -57,11 +57,7 @@ namespace Tss.Core.Entities
 
         public void Delete(IAuthHelper authHelper)
         {
-            bool isAuthorized =
-                authHelper.GetCustomerId() == CustomerId
-                || authHelper.GetRole() == "Admin";
-
-            Guard.Against.Unauthorized(!isAuthorized);
+            Allow(authHelper);
         }
 
         public void SetCustomer(Customer customer)
@@ -71,5 +67,13 @@ namespace Tss.Core.Entities
             Customer = customer;
         }
 
+        private void Allow(IAuthHelper authHelper)
+        {
+            bool isAuthorized =
+                authHelper.GetCustomerId() == CustomerId
+                || authHelper.GetRole() == Role.Admin.Message;
+
+            Guard.Against.Unauthorized(!isAuthorized);
+        }
     }
 }

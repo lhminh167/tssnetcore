@@ -83,7 +83,7 @@ namespace Tss.Core.Services
             }
             await _unitOfWork.SaveAsync();
 
-            int totalQuantity = await GetTotalQuantityByShoppingCartId(input.BuyNow, authInfo.CartId);
+            int totalQuantity = await GetTotalQuantityByShoppingCartId(input.BuyNow.Value, authInfo.CartId);
 
             return new ShoppingCartItemAddResponse(item, totalQuantity, authInfo.Token);
         }
