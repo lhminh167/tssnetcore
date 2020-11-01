@@ -129,7 +129,7 @@ namespace Tss.Web.Controllers
         {
             Response response = new Response(
                 HttpStatusCode.OK,
-                "Products were successfully retrieved.",
+                "Reviews were successfully retrieved.",
                 await _service.GetReviews(new ReviewGetRequest(
                     pageIndex,
                     pageSize,
