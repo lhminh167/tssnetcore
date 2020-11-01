@@ -90,10 +90,11 @@ namespace Tss.Infrastructure.Data
         }
 
         public virtual async Task<decimal> GetAverage(
-            Expression<Func<TEntity, decimal>> spec
+            ISpecification<TEntity, TEntity> entitySpec,
+            Expression<Func<TEntity, decimal>> averageSpec
         )
         {
-            return await _dbSet.AverageAsync(spec);
+            return await ApplySpecification(entitySpec).AverageAsync(averageSpec);
         }
 
         public virtual TEntity Put(TEntity entity)

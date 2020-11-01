@@ -81,8 +81,9 @@ namespace Tss.Core.Services
 
         public async Task<ReviewGetResponse> GetReviews(ReviewGetRequest input)
         {
-            PaginatedList<Review> items = await _reviewRepo.GetPaginated(new GetReviewByProductIdSpecification(input, _authHelper));
-            decimal averageRating = items.Count > 0 ? await _reviewRepo.GetAverage(r => r.Rating) : 0;
+            GetReviewByProductIdSpecification spec = new GetReviewByProductIdSpecification(input, _authHelper);
+            PaginatedList<Review> items = await _reviewRepo.GetPaginated(spec);
+            decimal averageRating = items.Count > 0 ? await _reviewRepo.GetAverage(spec, r => r.Rating) : 0;
             return new ReviewGetResponse(items, averageRating);
         }
 

@@ -6,7 +6,6 @@ namespace Tss.Core.Interfaces
 {
     public interface IReviewService
     {
-        Task<ReviewGetResponse> Get(ReviewGetRequest input);
         Task<Review> GetOne(int reviewId);
         Task<Review> Create(ReviewCreateRequest input);
         Task<Review> Update(ReviewUpdateRequest input);

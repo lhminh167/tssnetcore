@@ -21,33 +21,6 @@ namespace Tss.Web.Controllers
         }
 
         [AllowAnonymous]
-        [HttpGet]
-        public async Task<IActionResult> Get(
-            [FromQuery] int productId,
-            [FromQuery] int pageSize,
-            [FromQuery] int pageIndex,
-            [FromQuery] bool isPagingEnabled,
-            [FromQuery] string sortBy,
-            [FromQuery] bool isDescending
-        )
-        {
-            Response response = new Response
-            (
-                HttpStatusCode.OK,
-                "Reviews were successfully retrieved.",
-                await _service.Get(new ReviewGetRequest(
-                    pageIndex,
-                    pageSize,
-                    isPagingEnabled,
-                    sortBy,
-                    isDescending,
-                    productId
-                ))
-            );
-            return Ok(response);
-        }
-
-        [AllowAnonymous]
         [HttpGet("{reviewId}")]
         public async Task<IActionResult> GetOne([FromRoute] int reviewId)
         {

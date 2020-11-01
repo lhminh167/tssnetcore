@@ -30,13 +30,6 @@ namespace Tss.Core.Services
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
         }
 
-        public async Task<ReviewGetResponse> Get(ReviewGetRequest input)
-        {
-            PaginatedList<Review> items = await _reviewRepo.GetPaginated(new GetReviewByProductIdSpecification(input, _authHelper));
-            decimal averageRating = items.Count > 0 ? await _reviewRepo.GetAverage(r => r.Rating) : 0;
-            return new ReviewGetResponse(items, averageRating);
-        }
-
         public async Task<Review> GetOne(int reviewId)
         {
             return await _reviewRepo.GetOne(new GetReviewByIdSpecification(reviewId, _authHelper));
