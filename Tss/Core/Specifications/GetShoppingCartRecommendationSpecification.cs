@@ -16,9 +16,13 @@ namespace Tss.Core.Specifications
             od.Order.OrderDetail.Any(od1 =>
                 // the products in the shopping cart.
                 od1.Product.ShoppingCart.Any(c => c.CartId == authHelper.GetShoppingCartId())
-                &&
-                od1.Product.ProductId != od.ProductId
             )
+            &&
+            // Must not include products that already exist
+            // in the visitor's cart
+            !od.Product.ShoppingCart.Any(c => c.CartId == authHelper.GetShoppingCartId())
+            // within the last month
+            && od.Order.CreatedOn > DateTime.Now.AddMonths(-1)
             ,
             od => od.Product
         )
