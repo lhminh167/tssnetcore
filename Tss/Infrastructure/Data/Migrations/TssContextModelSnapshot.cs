@@ -355,7 +355,7 @@ namespace Tss.Infrastructure.Data.Migrations
 
                     b.Property<string>("AuthCode")
                         .HasColumnName("auth_code")
-                        .HasColumnType("varchar(50)")
+                        .HasColumnType("text")
                         .HasAnnotation("MySql:CharSet", "latin1")
                         .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
 

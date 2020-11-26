@@ -441,7 +441,7 @@ namespace Tss.Infrastructure.Data
 
                 entity.Property(e => e.AuthCode)
                     .HasColumnName("auth_code")
-                    .HasColumnType("varchar(50)")
+                    .HasColumnType("text")
                     .HasCharSet("latin1")
                     .HasCollation("latin1_swedish_ci");
 
