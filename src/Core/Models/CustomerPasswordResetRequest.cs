@@ -5,6 +5,6 @@ namespace Tss.Core.Models
     public class CustomerPasswordResetRequest : CustomerPasswordResetTokenValidationRequest
     {
         [Required]
-        public string NewPassword { get; set; }
+        public string NewPassword { get; private set; }
     }
 }

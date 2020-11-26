@@ -6,13 +6,13 @@ namespace Tss.Core.Models
     public class ShoppingCartItemAddRequest
     {
         [Required, Range(1, int.MaxValue)]
-        public int ProductId { get; set; }
+        public int ProductId { get; private set; }
         [Required, Range(1, int.MaxValue)]
-        public int Quantity { get; set; }
+        public int Quantity { get; private set; }
         [Required]
-        public string Attributes { get; set; }
+        public string Attributes { get; private set; }
         [Required]
-        public bool? BuyNow { get; set; }
+        public bool? BuyNow { get; private set; }
 
         public ShoppingCartItemAddRequest(
             int productId,

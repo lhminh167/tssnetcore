@@ -24,15 +24,15 @@ namespace Tss.Core.Entities
         {
         }
 
-        public int ItemId { get; set; }
-        public string CartId { get; set; }
-        public int ProductId { get; set; }
-        public string Attributes { get; set; }
-        public int Quantity { get; set; }
-        public bool BuyNow { get; set; }
-        public DateTime AddedOn { get; set; }
+        public int ItemId { get; private set; }
+        public string CartId { get; private set; }
+        public int ProductId { get; private set; }
+        public string Attributes { get; private set; }
+        public int Quantity { get; private set; }
+        public bool BuyNow { get; private set; }
+        public DateTime AddedOn { get; private set; }
 
-        public virtual Product Product { get; set; }
+        public virtual Product Product { get; private set; }
 
         public void Update(ShoppingCartItemUpdateRequest input)
         {

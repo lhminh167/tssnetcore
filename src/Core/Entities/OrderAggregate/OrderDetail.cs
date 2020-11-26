@@ -30,15 +30,15 @@ namespace Tss.Core.Entities
         {
         }
 
-        public int ItemId { get; set; }
-        public int OrderId { get; set; }
-        public int ProductId { get; set; }
-        public string Attributes { get; set; }
-        public string ProductName { get; set; }
-        public int Quantity { get; set; }
-        public double UnitCost { get; set; }
+        public int ItemId { get; private set; }
+        public int OrderId { get; private set; }
+        public int ProductId { get; private set; }
+        public string Attributes { get; private set; }
+        public string ProductName { get; private set; }
+        public int Quantity { get; private set; }
+        public double UnitCost { get; private set; }
 
-        public virtual Orders Order { get; set; }
-        public virtual Product Product { get; set; }
+        public virtual Orders Order { get; private set; }
+        public virtual Product Product { get; private set; }
     }
 }

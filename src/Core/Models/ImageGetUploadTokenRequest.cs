@@ -14,7 +14,7 @@ namespace Tss.Core.Models
             Settings = settings;
         }
 
-        public string Settings { get; set; }
-        public string Name { get; set; }
+        public string Settings { get; private set; }
+        public string Name { get; private set; }
     }
 }

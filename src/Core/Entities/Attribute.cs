@@ -19,10 +19,10 @@ namespace Tss.Core.Entities
             AttributeValue = new HashSet<AttributeValue>();
         }
 
-        public int AttributeId { get; set; }
-        public string Name { get; set; }
+        public int AttributeId { get; private set; }
+        public string Name { get; private set; }
 
-        public virtual ICollection<AttributeValue> AttributeValue { get; set; }
+        public virtual ICollection<AttributeValue> AttributeValue { get; private set; }
 
         public void Update(string name)
         {

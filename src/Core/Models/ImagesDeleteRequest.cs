@@ -13,6 +13,6 @@ namespace Tss.Core.Models
             Content = input;
         }
 
-        public List<ImageDeleteRequest> Content { get; set; }
+        public List<ImageDeleteRequest> Content { get; private set; }
     }
 }

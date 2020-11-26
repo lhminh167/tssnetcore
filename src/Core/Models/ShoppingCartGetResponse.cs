@@ -22,7 +22,7 @@ namespace Tss.Core.Models
             TotalCost = totalCost;
         }
 
-        public int TotalQuantity { get; set; }
-        public double TotalCost { get; set; }
+        public int TotalQuantity { get; private set; }
+        public double TotalCost { get; private set; }
     }
 }

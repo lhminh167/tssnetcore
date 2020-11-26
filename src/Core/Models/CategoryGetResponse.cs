@@ -22,12 +22,12 @@ namespace Tss.Core.Models
             Product = product;
         }
 
-        public int CategoryId { get; set; }
+        public int CategoryId { get; private set; }
         [DefaultValue(1)]
-        public int DepartmentId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public int DepartmentId { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
 
-        public virtual PaginatedList<Product> Product { get; set; }
+        public virtual PaginatedList<Product> Product { get; private set; }
     }
 }

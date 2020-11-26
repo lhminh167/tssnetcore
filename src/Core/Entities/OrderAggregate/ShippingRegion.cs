@@ -10,10 +10,10 @@ namespace Tss.Core.Entities
             Shipping = new HashSet<Shipping>();
         }
 
-        public int ShippingRegionId { get; set; }
-        public string ShippingRegion1 { get; set; }
+        public int ShippingRegionId { get; private set; }
+        public string ShippingRegion1 { get; private set; }
 
-        public virtual ICollection<Customer> Customer { get; set; }
-        public virtual ICollection<Shipping> Shipping { get; set; }
+        public virtual ICollection<Customer> Customer { get; private set; }
+        public virtual ICollection<Shipping> Shipping { get; private set; }
     }
 }

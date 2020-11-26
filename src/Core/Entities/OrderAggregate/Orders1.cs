@@ -59,23 +59,23 @@ namespace Tss.Core.Entities
             OrderDetail = new HashSet<OrderDetail>();
         }
 
-        public int OrderId { get; set; }
-        public double TotalAmount { get; set; }
-        public DateTime CreatedOn { get; set; }
-        public DateTime? ShippedOn { get; set; }
-        public int Status { get; set; }
-        public string Comments { get; set; }
-        public int CustomerId { get; set; }
-        public string AuthCode { get; set; }
-        public string Reference { get; set; }
-        public int ShippingId { get; set; }
-        public int TaxId { get; set; }
+        public int OrderId { get; private set; }
+        public double TotalAmount { get; private set; }
+        public DateTime CreatedOn { get; private set; }
+        public DateTime? ShippedOn { get; private set; }
+        public int Status { get; private set; }
+        public string Comments { get; private set; }
+        public int CustomerId { get; private set; }
+        public string AuthCode { get; private set; }
+        public string Reference { get; private set; }
+        public int ShippingId { get; private set; }
+        public int TaxId { get; private set; }
 
-        public virtual Customer Customer { get; set; }
-        public virtual Shipping Shipping { get; set; }
-        public virtual Tax Tax { get; set; }
-        public virtual ICollection<Audit> Audit { get; set; }
-        public virtual ICollection<OrderDetail> OrderDetail { get; set; }
+        public virtual Customer Customer { get; private set; }
+        public virtual Shipping Shipping { get; private set; }
+        public virtual Tax Tax { get; private set; }
+        public virtual ICollection<Audit> Audit { get; private set; }
+        public virtual ICollection<OrderDetail> OrderDetail { get; private set; }
 
         public virtual OrderStatus OrderStatus => OrderStatus.FromValue<OrderStatus>(Status);
 

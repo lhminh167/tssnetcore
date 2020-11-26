@@ -5,12 +5,12 @@ namespace Tss.Core.Models
     public class ReviewCreateRequest
     {
         [Required, Range(0, int.MaxValue)]
-        public int ProductId { get; set; }
+        public int ProductId { get; private set; }
 
         [Required, MinLength(50)]
-        public string Review1 { get; set; }
+        public string Review1 { get; private set; }
 
         [Required, Range(1, 5)]
-        public short Rating { get; set; }
+        public short Rating { get; private set; }
     }
 }

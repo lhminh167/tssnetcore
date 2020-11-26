@@ -15,9 +15,9 @@ namespace Tss.Core.Models
             Role = role;
         }
 
-        public bool Shipping { get; set; }
-        public bool ShippingRegion { get; set; }
-        public bool Tax { get; set; }
-        public bool Role { get; set; }
+        public bool Shipping { get; private set; }
+        public bool ShippingRegion { get; private set; }
+        public bool Tax { get; private set; }
+        public bool Role { get; private set; }
     }
 }

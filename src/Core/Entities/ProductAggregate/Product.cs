@@ -31,21 +31,21 @@ namespace Tss.Core.Entities
             ShoppingCart = new HashSet<ShoppingCart>();
         }
 
-        public int ProductId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public double Price { get; set; }
-        public double DiscountedPrice { get; set; }
-        public string Image { get; set; }
-        public string Image2 { get; set; }
-        public string Thumbnail { get; set; }
-        public short Display { get; set; }
+        public int ProductId { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public double Price { get; private set; }
+        public double DiscountedPrice { get; private set; }
+        public string Image { get; private set; }
+        public string Image2 { get; private set; }
+        public string Thumbnail { get; private set; }
+        public short Display { get; private set; }
 
-        public virtual ICollection<OrderDetail> OrderDetail { get; set; }
-        public virtual ICollection<ProductAttribute> ProductAttribute { get; set; }
-        public virtual ICollection<ProductCategory> ProductCategory { get; set; }
-        public virtual ICollection<Review> Review { get; set; }
-        public virtual ICollection<ShoppingCart> ShoppingCart { get; set; }
+        public virtual ICollection<OrderDetail> OrderDetail { get; private set; }
+        public virtual ICollection<ProductAttribute> ProductAttribute { get; private set; }
+        public virtual ICollection<ProductCategory> ProductCategory { get; private set; }
+        public virtual ICollection<Review> Review { get; private set; }
+        public virtual ICollection<ShoppingCart> ShoppingCart { get; private set; }
 
         public void CheckAttributes(string attributeList)
         {

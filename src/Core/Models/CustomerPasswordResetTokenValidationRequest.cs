@@ -23,8 +23,8 @@ namespace Tss.Core.Models
         }
 
         [Required, Range(0, int.MaxValue)]
-        public int CustomerId { get; set; }
+        public int CustomerId { get; private set; }
         [Required]
-        public string ResetPasswordToken { get; set; }
+        public string ResetPasswordToken { get; private set; }
     }
 }

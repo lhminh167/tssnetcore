@@ -5,15 +5,15 @@ namespace Tss.Core.Models
 {
     public class ProductCreateRequest
     {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public double Price { get; set; }
-        public double DiscountedPrice { get; set; }
-        public string Image { get; set; }
-        public string Image2 { get; set; }
-        public string Thumbnail { get; set; }
-        public short Display { get; set; }
-        public int CategoryId { get; set; }
-        public List<int> Attributes { get; set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
+        public double Price { get; private set; }
+        public double DiscountedPrice { get; private set; }
+        public string Image { get; private set; }
+        public string Image2 { get; private set; }
+        public string Thumbnail { get; private set; }
+        public short Display { get; private set; }
+        public int CategoryId { get; private set; }
+        public List<int> Attributes { get; private set; }
     }
 }

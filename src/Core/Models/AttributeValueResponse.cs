@@ -20,9 +20,9 @@ namespace Tss.Core.Models
         {
         }
 
-        public int AttributeValueId { get; set; }
-        public int AttributeId { get; set; }
-        public string Value { get; set; }
-        public string Name { get; set; }
+        public int AttributeValueId { get; private set; }
+        public int AttributeId { get; private set; }
+        public string Value { get; private set; }
+        public string Name { get; private set; }
     }
 }

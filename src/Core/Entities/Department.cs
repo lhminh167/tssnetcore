@@ -9,10 +9,10 @@ namespace Tss.Core.Entities
             Category = new HashSet<Category>();
         }
 
-        public int DepartmentId { get; set; }
-        public string Name { get; set; }
-        public string Description { get; set; }
+        public int DepartmentId { get; private set; }
+        public string Name { get; private set; }
+        public string Description { get; private set; }
 
-        public virtual ICollection<Category> Category { get; set; }
+        public virtual ICollection<Category> Category { get; private set; }
     }
 }
