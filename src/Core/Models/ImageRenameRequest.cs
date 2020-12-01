@@ -18,7 +18,7 @@ namespace Tss.Core.Models
             NewName = newName;
         }
 
-        public string OldName { get; private set; }
-        public string NewName { get; private set; }
+        public string OldName { get; set; }
+        public string NewName { get; set; }
     }
 }

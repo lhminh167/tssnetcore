@@ -31,12 +31,12 @@ namespace Tss.Core.Models
             Display = display;
         }
 
-        public string Keyword { get; private set; }
-        public List<string> Category { get; private set; }
-        public string Color { get; private set; }
-        public string Size { get; private set; }
-        public double MinPrice { get; private set; }
-        public double MaxPrice { get; private set; }
-        public int Display { get; private set; }
+        public string Keyword { get; set; }
+        public List<string> Category { get; set; }
+        public string Color { get; set; }
+        public string Size { get; set; }
+        public double MinPrice { get; set; }
+        public double MaxPrice { get; set; }
+        public int Display { get; set; }
     }
 }

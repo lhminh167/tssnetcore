@@ -23,6 +23,6 @@ namespace Tss.Core.Models
             ProductId = productId;
         }
 
-        public int ProductId { get; private set; }
+        public int ProductId { get; set; }
     }
 }

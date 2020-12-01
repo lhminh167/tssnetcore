@@ -34,10 +34,10 @@ namespace Tss.Core.Models
             IsPagingEnabled = false;
         }
 
-        public bool IsPagingEnabled { get; private set; }
-        public int PageIndex { get; private set; }
-        public int PageSize { get; private set; }
-        public string SortBy { get; private set; }
-        public bool IsDescending { get; private set; }
+        public bool IsPagingEnabled { get; set; }
+        public int PageIndex { get; set; }
+        public int PageSize { get; set; }
+        public string SortBy { get; set; }
+        public bool IsDescending { get; set; }
     }
 }

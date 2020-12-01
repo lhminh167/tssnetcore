@@ -12,6 +12,6 @@ namespace Tss.Core.Models
             Content = input;
         }
 
-        public List<ImageRenameRequest> Content { get; private set; }
+        public List<ImageRenameRequest> Content { get; set; }
     }
 }

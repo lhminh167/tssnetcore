@@ -29,6 +29,6 @@ namespace Tss.Core.Models
             BuyNow = buyNow;
         }
 
-        public bool? BuyNow { get; private set; }
+        public bool? BuyNow { get; set; }
     }
 }

@@ -36,6 +36,6 @@ namespace Tss.Core.Models
         }
 
         [Required, Range(0, int.MaxValue)]
-        public int ProductId { get; private set; }
+        public int ProductId { get; set; }
     }
 }
