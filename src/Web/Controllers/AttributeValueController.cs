@@ -27,7 +27,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Get([FromQuery] string name)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Attribute values were successfully retrieved.",
                 await _service.Get(name)
@@ -39,7 +39,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> GetOne([FromRoute] int attributeValueId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Attribute value was successfully retrieved.",
                 await _service.GetOne(attributeValueId)
@@ -52,7 +52,7 @@ namespace Tss.Web.Controllers
         {
             AttributeValue content = await _service.Create(input);
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.Created,
                 "Attribute value was created successfully.",
                 content
@@ -61,10 +61,10 @@ namespace Tss.Web.Controllers
         }
 
         [HttpPut("{attributeValueId}")]
-        public async Task<IActionResult> Update([FromBody] AttributeValue input)
+        public async Task<IActionResult> Update([FromBody] AttributeValueUpdateRequest input)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Attribute value was updated successfully.",
                 await _service.Update(input)
@@ -76,7 +76,7 @@ namespace Tss.Web.Controllers
         public async Task<IActionResult> Delete([FromRoute] int attributeValueId)
         {
             Response response = new Response
-            (            
+            (
                 HttpStatusCode.OK,
                 "Attribute value was successfully deleted.",
                 await _service.Delete(attributeValueId)
