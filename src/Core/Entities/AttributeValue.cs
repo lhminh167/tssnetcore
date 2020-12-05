@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Ardalis.GuardClauses;
+using Tss.Core.Models;
 
 namespace Tss.Core.Entities
 {
@@ -31,10 +32,10 @@ namespace Tss.Core.Entities
 
         public string Name => Attribute?.Name;
 
-        public void Update(AttributeValue attributeValue)
+        public void Update(AttributeValueUpdateRequest attributeValue)
         {
             Guard.Against.Null(attributeValue, nameof(attributeValue));
-            
+
             Value = attributeValue.Value;
         }
 
@@ -59,7 +60,7 @@ namespace Tss.Core.Entities
         }
 
         public static string Encode(List<AttributeValue> attributeList)
-        {            
+        {
             Guard.Against.Null(attributeList, nameof(attributeList));
 
             string attributes = string.Join("/", attributeList.Select(av => av.Attribute.Name));

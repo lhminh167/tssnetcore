@@ -10,7 +10,7 @@ namespace Tss.Core.Interfaces
         Task<List<AttributeValue>> Get(string name);
         Task<AttributeValue> GetOne(int attributeValueId);
         Task<AttributeValue> Create(AttributeValueCreateRequest input);
-        Task<AttributeValue> Update(AttributeValue attributeValue);
+        Task<AttributeValue> Update(AttributeValueUpdateRequest attributeValue);
         Task<AttributeValue> Delete(int attributeValueId);
     }
 }

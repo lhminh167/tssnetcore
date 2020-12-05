@@ -42,19 +42,19 @@ namespace Tss.Core.Services
         {
             AttributeValue dbAttributeValue = null;
             Guard.Against.NotFound(dbAttributeValue, nameof(AttributeValue));
-            
+
             dbAttributeValue = null;
             _attributeValueRepo.Post(dbAttributeValue);
             await _unitOfWork.SaveAsync();
             return dbAttributeValue;
         }
 
-        public async Task<AttributeValue> Update(AttributeValue attributeValue)
+        public async Task<AttributeValue> Update(AttributeValueUpdateRequest input)
         {
-            AttributeValue dbAttributeValue = await _attributeValueRepo.Get(attributeValue.AttributeValueId);
+            AttributeValue dbAttributeValue = await _attributeValueRepo.Get(input.AttributeValueId);
             Guard.Against.NotFound(dbAttributeValue, nameof(AttributeValue));
 
-            dbAttributeValue.Update(attributeValue);
+            dbAttributeValue.Update(input);
             _attributeValueRepo.Put(dbAttributeValue);
             await _unitOfWork.SaveAsync();
             return dbAttributeValue;
