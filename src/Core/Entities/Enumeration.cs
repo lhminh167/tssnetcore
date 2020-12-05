@@ -4,7 +4,7 @@ using System.Linq;
 using System.Reflection;
 using Ardalis.GuardClauses;
 
-namespace Tss.Core.Models
+namespace Tss.Core.Entities
 {
     public abstract class Enumeration : IComparable
     {

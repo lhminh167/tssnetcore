@@ -1,7 +1,7 @@
 using Ardalis.GuardClauses;
 using Tss.Core.Models;
 
-namespace Tss.Core.Models
+namespace Tss.Core.Entities
 {
     public abstract class BaseProductSortBy : Enumeration
     {
