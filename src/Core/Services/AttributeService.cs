@@ -46,7 +46,7 @@ namespace Tss.Core.Services
             return attribute;
         }
 
-        public async Task<Attribute> Update(Attribute input)
+        public async Task<Attribute> Update(AttributeUpdateRequest input)
         {
             Attribute attribute = await _attributeRepo.Get(input.AttributeId);
             Guard.Against.NotFound(attribute, nameof(Attribute));
