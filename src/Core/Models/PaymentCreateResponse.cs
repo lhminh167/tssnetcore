@@ -28,9 +28,9 @@ namespace Tss.Core.Models
             PaymentSecret = paymentSecret;
         }
 
-        public string PaymentId { get; private set; }
-        public string PaymentStatus { get; private set; }
-        public string PaymentSecret { get; private set; }
+        public string PaymentId { get; set; }
+        public string PaymentStatus { get; set; }
+        public string PaymentSecret { get; set; }
 
     }
 }

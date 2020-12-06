@@ -13,7 +13,7 @@ namespace Tss.Core.Models
             Token = token;
         }
 
-        public string CartId { get; private set; }           
-        public string Token { get; private set; }
+        public string CartId { get; set; }
+        public string Token { get; set; }
     }
 }

@@ -5,14 +5,14 @@ using Tss.Core.Entities;
 
 namespace Tss.Core.Models
 {
-    public class ReviewGetResponse : PaginatedList<Review>
+    public class ReviewGetResponse : PaginatedList<ReviewResponse>
     {
         public ReviewGetResponse(
             PaginatedList<Review> list,
             decimal averageRating
         )
         : base(
-            list.Items.ToList(),
+            list.Items.Select(e => new ReviewResponse(e)).ToList(),
             list.Count,
             list.PageIndex,
             list.PageSize,
@@ -24,6 +24,6 @@ namespace Tss.Core.Models
             AverageRating = averageRating;
         }
 
-        public decimal AverageRating { get; private set; }
+        public decimal AverageRating { get; set; }
     }
 }

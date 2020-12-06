@@ -17,7 +17,7 @@ namespace Tss.Core.Models
             CreationTime = creationTime;
         }
 
-        public string UploadToken { get; private set; }
-        public double CreationTime { get; private set; }
+        public string UploadToken { get; set; }
+        public double CreationTime { get; set; }
     }
 }

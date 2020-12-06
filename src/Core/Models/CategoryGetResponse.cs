@@ -17,17 +17,19 @@ namespace Tss.Core.Models
             Guard.Against.Null(product, nameof(product));
 
             CategoryId = category.CategoryId;
+            DepartmentId = category.DepartmentId;
             Name = category.Name;
             Description = category.Description;
-            Product = product;
+
+            Product = product.Select(e => new ProductResponse(e));
         }
 
-        public int CategoryId { get; private set; }
+        public int CategoryId { get; set; }
         [DefaultValue(1)]
-        public int DepartmentId { get; private set; }
-        public string Name { get; private set; }
-        public string Description { get; private set; }
+        public int DepartmentId { get; set; }
+        public string Name { get; set; }
+        public string Description { get; set; }
 
-        public virtual PaginatedList<Product> Product { get; private set; }
+        public virtual PaginatedList<ProductResponse> Product { get; set; }
     }
 }

@@ -5,8 +5,13 @@ using Tss.Core.Constants;
 
 namespace Tss.Core.Models
 {
-    public class Response
+    public class Response<T>
     {
+        private Response()
+        {
+
+        }
+
         public Response(
             HttpStatusCode status,
             string title,
@@ -26,7 +31,7 @@ namespace Tss.Core.Models
         public Response(
             HttpStatusCode status,
             string title,
-            object content
+            T content
         )
         {
             Guard.Against.NullOrWhiteSpace(title, nameof(title));
@@ -38,11 +43,31 @@ namespace Tss.Core.Models
             Type = URL.GetErrorType(status);
         }
 
-        public object Content { get; private set; }
-        public string Detail { get; private set; }
-        public string Instance { get; private set; }
-        public HttpStatusCode Status { get; private set; }
-        public string Title { get; private set; }
-        public string Type { get; private set; }
+        public T Content { get; set; }
+        public string Detail { get; set; }
+        public string Instance { get; set; }
+        public HttpStatusCode Status { get; set; }
+        public string Title { get; set; }
+        public string Type { get; set; }
     }
+
+    public class Response : Response<object>
+    {
+        public Response(
+            HttpStatusCode status,
+            string title,
+            string detail
+        ) : base(status, title, detail)
+        {
+        }
+
+        public Response(
+            HttpStatusCode status,
+            string title,
+            object content
+        ) : base(status, title, content)
+        {
+        }
+    }
+
 }

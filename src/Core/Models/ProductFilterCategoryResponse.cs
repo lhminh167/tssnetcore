@@ -13,8 +13,8 @@ namespace Tss.Core.Models
             Name = category.Name;
         }
 
-        public int CategoryId { get; private set; }
-        public string Name { get; private set; }
+        public int CategoryId { get; set; }
+        public string Name { get; set; }
     }
 
 }

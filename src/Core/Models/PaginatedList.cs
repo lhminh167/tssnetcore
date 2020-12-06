@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Ardalis.GuardClauses;
 
 namespace Tss.Core.Models
@@ -26,13 +27,25 @@ namespace Tss.Core.Models
             IsPagingEnabled = isPagingEnabled;
         }
 
-        public IReadOnlyCollection<T> Items { get; private set; }
-        public bool IsPagingEnabled { get; private set; }
-        public int PageIndex { get; private set; }
-        public int PageSize { get; private set; }
-        public int TotalPages { get; private set; }
-        public int Count { get; private set; }
+        public IReadOnlyList<T> Items { get; set; }
+        public bool IsPagingEnabled { get; set; }
+        public int PageIndex { get; set; }
+        public int PageSize { get; set; }
+        public int TotalPages { get; set; }
+        public int Count { get; set; }
         public bool HasPreviousPage => (PageIndex > 0);
         public bool HasNextPage => (PageIndex < TotalPages - 1);
+
+        public PaginatedList<TOut> Select<TOut>(Func<T, TOut> converter)
+        {
+            return new PaginatedList<TOut>(
+                Items.Select(converter).ToList(),
+                Count,
+                PageIndex,
+                PageSize,
+                IsPagingEnabled
+            );
+        }
+
     }
 }

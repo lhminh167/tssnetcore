@@ -3,7 +3,7 @@ using Tss.Core.Entities;
 
 namespace Tss.Core.Models
 {
-    public class ShoppingCartGetResponse : PaginatedList<ShoppingCart>
+    public class ShoppingCartGetResponse : PaginatedList<ShoppingCartResponse>
     {
         public ShoppingCartGetResponse(
             PaginatedList<ShoppingCart> list,
@@ -11,7 +11,7 @@ namespace Tss.Core.Models
             int totalQuantity
         )
         : base(
-            list.Items.ToList(),
+            list.Items.Select(e => new ShoppingCartResponse(e)).ToList(),
             list.Count,
             list.PageIndex,
             list.PageSize,
@@ -22,7 +22,7 @@ namespace Tss.Core.Models
             TotalCost = totalCost;
         }
 
-        public int TotalQuantity { get; private set; }
-        public double TotalCost { get; private set; }
+        public int TotalQuantity { get; set; }
+        public double TotalCost { get; set; }
     }
 }

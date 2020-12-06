@@ -19,10 +19,10 @@ namespace Tss.Core.Models
             Newest = newest;
         }
 
-        public PaginatedList<Product> TopPanel { get; private set; }
-        public PaginatedList<Product> MostDiscounted { get; private set; }
-        public PaginatedList<Product> BestSelling { get; private set; }
-        public PaginatedList<Product> TopRated { get; private set; }
-        public PaginatedList<Product> Newest { get; private set; }
+        public PaginatedList<Product> TopPanel { get; set; }
+        public PaginatedList<Product> MostDiscounted { get; set; }
+        public PaginatedList<Product> BestSelling { get; set; }
+        public PaginatedList<Product> TopRated { get; set; }
+        public PaginatedList<Product> Newest { get; set; }
     }
 }

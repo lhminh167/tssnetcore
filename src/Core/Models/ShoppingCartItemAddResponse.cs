@@ -12,13 +12,13 @@ namespace Tss.Core.Models
             Guard.Against.NullOrWhiteSpace(loginToken, nameof(LoginToken));
             Guard.Against.OutOfRange(totalQuantity, nameof(TotalQuantity), 1, int.MaxValue);
 
-            Item = item;
+            Item = new ShoppingCartResponse(item);
             LoginToken = loginToken;
             TotalQuantity = totalQuantity;
         }
 
-        public ShoppingCart Item { get; private set; }           
-        public int TotalQuantity { get; private set; }
-        public string LoginToken { get; private set; }
+        public ShoppingCartResponse Item { get; set; }
+        public int TotalQuantity { get; set; }
+        public string LoginToken { get; set; }
     }
 }

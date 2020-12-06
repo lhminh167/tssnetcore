@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Ardalis.GuardClauses;
 using Tss.Core.Entities;
 
@@ -12,13 +13,13 @@ namespace Tss.Core.Models
             Guard.Against.Null(shippingRegions, nameof(shippingRegions));
             Guard.Against.Null(taxes, nameof(taxes));
 
-            Shippings = shippings;
-            ShippingRegions = shippingRegions;
-            Taxes = taxes;
+            Shippings = shippings.Select(e => new ShippingResponse(e)).ToList();
+            ShippingRegions = shippingRegions.Select(e => new ShippingRegionResponse(e)).ToList();
+            Taxes = taxes.Select(e => new TaxResponse(e)).ToList();
         }
 
-        public List<Shipping> Shippings { get; private set; }
-        public List<ShippingRegion> ShippingRegions { get; private set; }
-        public List<Tax> Taxes { get; private set; }
+        public List<ShippingResponse> Shippings { get; set; }
+        public List<ShippingRegionResponse> ShippingRegions { get; set; }
+        public List<TaxResponse> Taxes { get; set; }
     }
 }

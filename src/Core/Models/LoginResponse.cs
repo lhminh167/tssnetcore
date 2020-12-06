@@ -6,6 +6,10 @@ namespace Tss.Core.Models
 {
     public class LoginResponse
     {
+        public LoginResponse()
+        {
+        }
+
         public LoginResponse(Customer customer, IAuthHelper authHelper)
         {
             Guard.Against.Null(authHelper, nameof(authHelper));
@@ -15,7 +19,7 @@ namespace Tss.Core.Models
             Customer = new CustomerResponse(customer);
         }
 
-        public string LoginToken { get; private set; }
-        public CustomerResponse Customer { get; private set; }
+        public string LoginToken { get; set; }
+        public CustomerResponse Customer { get; set; }
     }
 }

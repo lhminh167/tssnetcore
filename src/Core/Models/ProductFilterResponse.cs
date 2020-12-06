@@ -28,9 +28,9 @@ namespace Tss.Core.Models
             MinPrice = minPrice;
         }
 
-        public List<AttributeValueResponse> Attributes { get; private set; }
-        public List<ProductFilterCategoryResponse> Categories { get; private set; }
-        public double MaxPrice { get; private set; }
-        public double MinPrice { get; private set; }
+        public List<AttributeValueResponse> Attributes { get; set; }
+        public List<ProductFilterCategoryResponse> Categories { get; set; }
+        public double MaxPrice { get; set; }
+        public double MinPrice { get; set; }
     }
 }

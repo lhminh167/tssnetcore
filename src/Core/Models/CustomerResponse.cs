@@ -1,6 +1,12 @@
+﻿using System.Linq;
 using System.Collections.Generic;
-using System.Linq;
+using System.Security.Cryptography;
+using System.Text;
 using Ardalis.GuardClauses;
+using Tss.Core.Models;
+using Tss.Core.Interfaces;
+using System;
+using System.Threading.Tasks;
 using Tss.Core.Entities;
 
 namespace Tss.Core.Models
@@ -24,7 +30,7 @@ namespace Tss.Core.Models
             Region = input.Region;
             PostalCode = input.PostalCode;
             Country = input.Country;
-            ShippingRegion = input.ShippingRegion;
+            ShippingRegion = new ShippingRegionResponse(input.ShippingRegion);
             DayPhone = input.DayPhone;
             EvePhone = input.EvePhone;
             MobPhone = input.MobPhone;
@@ -51,27 +57,33 @@ namespace Tss.Core.Models
             Region = input.Region;
             PostalCode = input.PostalCode;
             Country = input.Country;
-            ShippingRegion = input.ShippingRegion;
+            ShippingRegion = new ShippingRegionResponse(input.ShippingRegion);
             DayPhone = input.DayPhone;
             EvePhone = input.EvePhone;
             MobPhone = input.MobPhone;
             Role = role.Value;
         }
 
-        public int CustomerId { get; private set; }
-        public string Name { get; private set; }
-        public string Email { get; private set; }
-        public string CreditCard { get; private set; }
-        public string Address1 { get; private set; }
-        public string Address2 { get; private set; }
-        public string City { get; private set; }
-        public string Region { get; private set; }
-        public string PostalCode { get; private set; }
-        public string Country { get; private set; }
-        public ShippingRegion ShippingRegion { get; private set; }
-        public string DayPhone { get; private set; }
-        public string EvePhone { get; private set; }
-        public string MobPhone { get; private set; }
-        public string Role { get; private set; }
+        public CustomerResponse()
+        {
+        }
+
+        public int CustomerId { get; set; }
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string CreditCard { get; set; }
+        public string Address1 { get; set; }
+        public string Address2 { get; set; }
+        public string City { get; set; }
+        public string Region { get; set; }
+        public string PostalCode { get; set; }
+        public string Country { get; set; }
+        public int ShippingRegionId { get; set; }
+        public string DayPhone { get; set; }
+        public string EvePhone { get; set; }
+        public string MobPhone { get; set; }
+        public string Role { get; set; }
+
+        public virtual ShippingRegionResponse ShippingRegion { get; set; }
     }
 }
