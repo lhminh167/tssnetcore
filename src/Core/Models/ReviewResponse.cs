@@ -20,7 +20,7 @@ namespace Tss.Core.Models
             Rating = input.Rating;
             CreatedOn = input.CreatedOn;
 
-            Customer = new CustomerResponse(input.Customer);
+            Customer = new CustomerResponse(input.Customer, true);
             Product = new ProductResponse(input.Product);
         }
 
