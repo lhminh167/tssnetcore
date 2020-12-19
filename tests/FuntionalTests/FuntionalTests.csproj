@@ -21,7 +21,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>
 
-    <ProjectReference Include="..\..\Tss\Tss.csproj" />
+    <ProjectReference Include="..\..\src\Tss.csproj" />
 
   </ItemGroup>
 
