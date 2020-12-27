@@ -13,19 +13,19 @@ namespace Tss.Core.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IRepository<Category> _categoryRepo;
         private readonly IAuthHelper _authHelper;
-        private readonly IProductHelper _productHelper;
+        private readonly IRepository<Product> _productRepo;
 
         public CategoryService(
             IUnitOfWork unitOfWork,
             IRepository<Category> categoryRepo,
             IAuthHelper authHelper,
-            IProductHelper productHelper
+            IRepository<Product> productRepo
         )
         {
             _unitOfWork = unitOfWork ?? throw new System.ArgumentNullException(nameof(unitOfWork));
             _categoryRepo = categoryRepo ?? throw new System.ArgumentNullException(nameof(categoryRepo));
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
-            _productHelper = productHelper ?? throw new System.ArgumentNullException(nameof(productHelper));
+            _productRepo = productRepo ?? throw new System.ArgumentNullException(nameof(productRepo));
         }
 
         public async Task<List<Category>> Get()
@@ -42,7 +42,10 @@ namespace Tss.Core.Services
                 new List<string> { category.Name },
                 0, 0, 0
             );
-            PaginatedList<Product> product = await _productHelper.Get(request);
+            PaginatedList<Product> product = await _productRepo.GetPaginated(new GetProductSpecification(
+                _authHelper,
+                request
+            ));
 
             return new CategoryGetResponse(
                 category,

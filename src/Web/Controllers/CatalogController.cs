@@ -11,13 +11,13 @@ namespace Tss.Web.Controllers
     [Route("api/[controller]")]
     public class CatalogController : ControllerBase
     {
-        private readonly ICatalogHelper _helper;
+        private readonly ICatalogService _service;
 
         public CatalogController(
-            ICatalogHelper helper
+            ICatalogService service
         )
         {
-            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
+            _service = service ?? throw new ArgumentNullException(nameof(service));
         }
 
         [AllowAnonymous]
@@ -32,7 +32,7 @@ namespace Tss.Web.Controllers
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Catalog were successfully retrieved.",
-                await _helper.Get(new CatalogGetRequest(
+                await _service.Get(new CatalogGetRequest(
                     shipping,
                     shippingRegion,
                     tax,

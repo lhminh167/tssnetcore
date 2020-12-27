@@ -22,7 +22,6 @@ namespace Tss.Core.Services
         private readonly IRepository<Review> _reviewRepo;
         private readonly IAuthHelper _authHelper;
         private readonly IMediaHelper _mediaHelper;
-        private readonly IProductHelper _productHelper;
 
         public ProductService(
             IUnitOfWork unitOfWork,
@@ -34,8 +33,7 @@ namespace Tss.Core.Services
             IRepository<OrderDetail> orderDetailRepo,
             IRepository<Review> reviewRepo,
             IAuthHelper authHelper,
-            IMediaHelper mediaHelper,
-            IProductHelper productHelper
+            IMediaHelper mediaHelper
         )
         {
             _unitOfWork = unitOfWork ?? throw new System.ArgumentNullException(nameof(unitOfWork));
@@ -48,16 +46,15 @@ namespace Tss.Core.Services
             _reviewRepo = reviewRepo ?? throw new System.ArgumentNullException(nameof(reviewRepo));
             _authHelper = authHelper ?? throw new System.ArgumentNullException(nameof(authHelper));
             _mediaHelper = mediaHelper ?? throw new System.ArgumentNullException(nameof(mediaHelper));
-            _productHelper = productHelper ?? throw new System.ArgumentNullException(nameof(productHelper));
         }
 
         public async Task<ProductsHomepage> GetHomePageProducts()
         {
-            PaginatedList<Product> topPanel = await _productHelper.Get(new ProductGetRequest(0, 8, true, null, true, null, null, null, new List<string>(), 0, 0, ProductDisplay.HomepageTopPanel.Id));
-            PaginatedList<Product> mostDiscounted = await _productHelper.Get(new ProductGetRequest(0, 4, true, ProductSortBy.MostDiscounted.Message, true, null, null, null, new List<string>(), 0, 0, 0));
-            PaginatedList<Product> bestSelling = await _productHelper.Get(new ProductGetRequest(0, 4, true, ProductSortBy.BestSelling.Message, true, null, null, null, new List<string>(), 0, 0, 0));
-            PaginatedList<Product> topRated = await _productHelper.Get(new ProductGetRequest(0, 4, true, ProductSortBy.TopRated.Message, true, null, null, null, new List<string>(), 0, 0, 0));
-            PaginatedList<Product> newest = await _productHelper.Get(new ProductGetRequest(0, 8, true, ProductSortBy.Newest.Message, true, null, null, null, new List<string>(), 0, 0, 0));
+            PaginatedList<Product> topPanel = await Get(new ProductGetRequest(0, 8, true, null, true, null, null, null, new List<string>(), 0, 0, ProductDisplay.HomepageTopPanel.Id));
+            PaginatedList<Product> mostDiscounted = await Get(new ProductGetRequest(0, 4, true, ProductSortBy.MostDiscounted.Message, true, null, null, null, new List<string>(), 0, 0, 0));
+            PaginatedList<Product> bestSelling = await Get(new ProductGetRequest(0, 4, true, ProductSortBy.BestSelling.Message, true, null, null, null, new List<string>(), 0, 0, 0));
+            PaginatedList<Product> topRated = await Get(new ProductGetRequest(0, 4, true, ProductSortBy.TopRated.Message, true, null, null, null, new List<string>(), 0, 0, 0));
+            PaginatedList<Product> newest = await Get(new ProductGetRequest(0, 8, true, ProductSortBy.Newest.Message, true, null, null, null, new List<string>(), 0, 0, 0));
 
             return new ProductsHomepage(
                 topPanel,
@@ -107,6 +104,16 @@ namespace Tss.Core.Services
                 input.PageSize,
                 input.IsPagingEnabled
             );
+        }
+
+        public async Task<PaginatedList<Product>> Get(
+            ProductGetRequest input
+        )
+        {
+            return await _productRepo.GetPaginated(new GetProductSpecification(
+                _authHelper,
+                input
+            ));
         }
 
         public async Task<ProductResponse> GetOne(int productId)

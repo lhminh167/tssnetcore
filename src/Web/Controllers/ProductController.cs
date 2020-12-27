@@ -15,15 +15,12 @@ namespace Tss.Web.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
-        private readonly IProductHelper _helper;
 
         public ProductController(
-            IProductService service,
-            IProductHelper helper
+            IProductService service
         )
         {
             _service = service ?? throw new ArgumentNullException(nameof(service));
-            _helper = helper ?? throw new ArgumentNullException(nameof(helper));
         }
 
         [AllowAnonymous]
@@ -72,7 +69,7 @@ namespace Tss.Web.Controllers
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Products were successfully retrieved.",
-                await _helper.Get(new ProductGetRequest(
+                await _service.Get(new ProductGetRequest(
                     pageIndex,
                     pageSize,
                     isPagingEnabled,

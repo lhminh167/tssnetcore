@@ -9,6 +9,7 @@ namespace Tss.Core.Interfaces
         Task<ProductFilterResponse> GetFilters();
         Task<PaginatedList<Product>> GetRecommendations(ProductRecommedationRequest input);
         Task<ReviewGetResponse> GetReviews(ReviewGetRequest input);
+        Task<PaginatedList<Product>> Get(ProductGetRequest input);
         Task<ProductResponse> GetOne(int productId);
         Task<ProductResponse> Create(ProductCreateRequest input);
         Task<ProductResponse> Update(ProductUpdateRequest input);

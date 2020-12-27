@@ -5,9 +5,9 @@ using Tss.Core.Interfaces;
 using System.Threading.Tasks;
 using Tss.Core.Models;
 
-namespace Tss.Core.Helpers
+namespace Tss.Core.Services
 {
-    public class CatalogHelper : ICatalogHelper
+    public class CatalogService : ICatalogService
     {
         private readonly IRepository<Shipping> _shippingRepo;
         private readonly IRepository<ShippingRegion> _shippingRegionRepo;
@@ -15,7 +15,7 @@ namespace Tss.Core.Helpers
         private readonly IRepository<AttributeValue> _attributeValueRepo;
         private readonly IAuthHelper _authHelper;
 
-        public CatalogHelper(
+        public CatalogService(
             IRepository<Shipping> shippingRepo,
             IRepository<ShippingRegion> shippingRegionRepo,
             IRepository<Tax> taxRepo,

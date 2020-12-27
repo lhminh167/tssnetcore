@@ -3,7 +3,7 @@ using Tss.Core.Models;
 
 namespace Tss.Core.Interfaces
 {
-    public interface ICatalogHelper
+    public interface ICatalogService
     {
         Task<CatalogGetResponse> Get(CatalogGetRequest input);
     }
