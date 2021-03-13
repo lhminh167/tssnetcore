@@ -16,13 +16,13 @@ namespace Tss.Core.Models
         )
         {
             Items = items;
+            Count = count;
 
             if (!isPagingEnabled) return;
             Guard.Against.OutOfRange(pageSize, nameof(pageSize), 0, int.MaxValue);
 
             TotalPages = (int)Math.Ceiling(count / (double)pageSize);
             PageIndex = pageIndex;
-            Count = count;
             PageSize = pageSize;
             IsPagingEnabled = isPagingEnabled;
         }
