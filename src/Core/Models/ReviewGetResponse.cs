@@ -19,6 +19,7 @@ namespace Tss.Core.Models
             list.IsPagingEnabled
         )
         {
+            Guard.Against.Null(list, nameof(list));
             Guard.Against.BadRequest(averageRating < 0 || averageRating > 5, nameof(averageRating));
 
             AverageRating = averageRating;

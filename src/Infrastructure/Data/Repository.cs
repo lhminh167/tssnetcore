@@ -38,13 +38,15 @@ namespace Tss.Infrastructure.Data
             ISpecification<TEntity, TOut> spec
         )
         {
+            var applySpec = ApplySpecification(spec);
+
             List<TOut> list = spec.IsPagingEnabled
-                ? await ApplySpecification(spec).Skip(spec.PageIndex * spec.PageSize).Take(spec.PageSize).ToListAsync()
-                : await ApplySpecification(spec).ToListAsync();
+                ? await applySpec.Skip(spec.PageIndex * spec.PageSize).Take(spec.PageSize).ToListAsync()
+                : await applySpec.ToListAsync();
 
             return new PaginatedList<TOut>(
                 list,
-                await ApplySpecification(spec).CountAsync(),
+                await applySpec.CountAsync(),
                 spec.PageIndex,
                 spec.PageSize,
                 spec.IsPagingEnabled
