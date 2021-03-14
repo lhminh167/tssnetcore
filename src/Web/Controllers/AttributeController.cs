@@ -61,7 +61,7 @@ namespace Tss.Web.Controllers
         }
 
         [HttpPut("{attributeId}")]
-        public async Task<IActionResult> Update([FromBody] Attribute input)
+        public async Task<IActionResult> Update([FromBody] AttributeUpdateRequest input)
         {
             Response response = new Response
             (            
