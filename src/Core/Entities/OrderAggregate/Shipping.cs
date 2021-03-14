@@ -9,12 +9,12 @@ namespace Tss.Core.Entities
             Orders = new HashSet<Orders>();
         }
 
-        public int ShippingId { get; set; }
-        public string ShippingType { get; set; }
-        public double ShippingCost { get; set; }
-        public int ShippingRegionId { get; set; }
+        public int ShippingId { get; private set; }
+        public string ShippingType { get; private set; }
+        public double ShippingCost { get; private set; }
+        public int ShippingRegionId { get; private set; }
 
-        public virtual ShippingRegion ShippingRegion { get; set; }
-        public virtual ICollection<Orders> Orders { get; set; }
+        public virtual ShippingRegion ShippingRegion { get; private set; }
+        public virtual ICollection<Orders> Orders { get; private set; }
     }
 }

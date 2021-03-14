@@ -34,29 +34,29 @@ namespace Tss.Core.Entities
             Review = new HashSet<Review>();
         }
 
-        public int CustomerId { get; set; }
-        public string Name { get; set; }
-        public string Email { get; set; }
-        public byte[] PasswordHash { get; set; }
-        public byte[] PasswordSalt { get; set; }
-        public string CreditCard { get; set; }
-        public string Address1 { get; set; }
-        public string Address2 { get; set; }
-        public string City { get; set; }
-        public string Region { get; set; }
-        public string PostalCode { get; set; }
-        public string Country { get; set; }
-        public int ShippingRegionId { get; set; }
-        public string DayPhone { get; set; }
-        public string EvePhone { get; set; }
-        public string MobPhone { get; set; }
-        public string ResetPasswordToken { get; set; }
-        public DateTime ResetPasswordExpiryDate { get; set; }
+        public int CustomerId { get; private set; }
+        public string Name { get; private set; }
+        public string Email { get; private set; }
+        public byte[] PasswordHash { get; private set; }
+        public byte[] PasswordSalt { get; private set; }
+        public string CreditCard { get; private set; }
+        public string Address1 { get; private set; }
+        public string Address2 { get; private set; }
+        public string City { get; private set; }
+        public string Region { get; private set; }
+        public string PostalCode { get; private set; }
+        public string Country { get; private set; }
+        public int ShippingRegionId { get; private set; }
+        public string DayPhone { get; private set; }
+        public string EvePhone { get; private set; }
+        public string MobPhone { get; private set; }
+        public string ResetPasswordToken { get; private set; }
+        public DateTime ResetPasswordExpiryDate { get; private set; }
 
-        public virtual ShippingRegion ShippingRegion { get; set; }
-        public virtual ICollection<CustomerAttribute> CustomerAttribute { get; set; }
-        public virtual ICollection<Orders> Orders { get; set; }
-        public virtual ICollection<Review> Review { get; set; }
+        public virtual ShippingRegion ShippingRegion { get; private set; }
+        public virtual ICollection<CustomerAttribute> CustomerAttribute { get; private set; }
+        public virtual ICollection<Orders> Orders { get; private set; }
+        public virtual ICollection<Review> Review { get; private set; }
 
         public async Task ForgotPassword(IEmailHelper emailHelper)
         {
@@ -275,6 +275,12 @@ namespace Tss.Core.Entities
                 role.Value == "Customer";
 
             Guard.Against.Unauthorized(!isAuthorized);
+        }
+
+        public void SetCreditCard(string input)
+        {
+            Guard.Against.NullOrWhiteSpace(input, nameof(input));
+            CreditCard = input;
         }
     }
 }

@@ -24,11 +24,11 @@ namespace Tss.Core.Entities
         {
         }
 
-        public int CustomerId { get; set; }
-        public int AttributeValueId { get; set; }
+        public int CustomerId { get; private set; }
+        public int AttributeValueId { get; private set; }
 
-        public virtual AttributeValue AttributeValue { get; set; }
-        public virtual Customer Customer { get; set; }
+        public virtual AttributeValue AttributeValue { get; private set; }
+        public virtual Customer Customer { get; private set; }
 
         public static IReadOnlyList<string> AllowedValues => new List<string> { "Role" };
     }

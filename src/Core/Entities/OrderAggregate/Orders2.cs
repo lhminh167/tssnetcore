@@ -91,7 +91,7 @@ namespace Tss.Core.Entities
             if (Status != OrderStatus.AwaitingConfirmationOfFunds.Id) StatusChangeException(OrderStatus.OrderPlacedNotifyingCustomer);
             CreateAudit(OrderAudit.OrderProcessorStarted);
             CreateAudit(OrderAudit.PsCheckFundsStarted);
-            Customer.CreditCard = paymentMethodId;
+            Customer.SetCreditCard(paymentMethodId);
             Reference = paymentId;
             AuthCode = paymentSecret;
             CreateAudit(OrderAudit.PsCheckFundsFundsAvailable);

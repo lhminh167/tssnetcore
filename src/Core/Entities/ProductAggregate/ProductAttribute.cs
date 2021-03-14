@@ -14,11 +14,11 @@ namespace Tss.Core.Entities
         {
         }
 
-        public int ProductId { get; set; }
-        public int AttributeValueId { get; set; }
+        public int ProductId { get; private set; }
+        public int AttributeValueId { get; private set; }
 
-        public virtual AttributeValue AttributeValue { get; set; }
-        public virtual Product Product { get; set; }
+        public virtual AttributeValue AttributeValue { get; private set; }
+        public virtual Product Product { get; private set; }
 
         public static IReadOnlyList<string> AllowedValues => new List<string> { "Color", "Size" };
     }

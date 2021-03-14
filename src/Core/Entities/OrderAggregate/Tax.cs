@@ -9,11 +9,11 @@ namespace Tss.Core.Entities
             Orders = new HashSet<Orders>();
         }
 
-        public int TaxId { get; set; }
-        public string TaxType { get; set; }
-        public double TaxPercentage { get; set; }
+        public int TaxId { get; private set; }
+        public string TaxType { get; private set; }
+        public double TaxPercentage { get; private set; }
 
-        public virtual ICollection<Orders> Orders { get; set; }
+        public virtual ICollection<Orders> Orders { get; private set; }
 
         public static int GetTaxId(Shipping shipping)
         {

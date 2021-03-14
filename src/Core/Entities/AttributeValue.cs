@@ -21,11 +21,11 @@ namespace Tss.Core.Entities
             ProductAttribute = new HashSet<ProductAttribute>();
         }
 
-        public int AttributeValueId { get; set; }
-        public int AttributeId { get; set; }
-        public string Value { get; set; }
+        public int AttributeValueId { get; private set; }
+        public int AttributeId { get; private set; }
+        public string Value { get; private set; }
 
-        public virtual Attribute Attribute { get; set; }
+        public virtual Attribute Attribute { get; private set; }
         private ICollection<CustomerAttribute> CustomerAttribute { get; set; }
         private ICollection<ProductAttribute> ProductAttribute { get; set; }
 

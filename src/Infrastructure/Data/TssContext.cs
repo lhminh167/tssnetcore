@@ -8,7 +8,7 @@ namespace Tss.Infrastructure.Data
 {
     public partial class TssContext : DbContext
     {
-        public string ConnectionString { get; set; }
+        public string ConnectionString { get; private set; }
 
         public TssContext()
         {
@@ -34,23 +34,23 @@ namespace Tss.Infrastructure.Data
             return new MySqlConnection(ConnectionString);
         }
 
-        public virtual DbSet<Attribute> Attribute { get; set; }
-        public virtual DbSet<AttributeValue> AttributeValue { get; set; }
-        public virtual DbSet<Audit> Audit { get; set; }
-        public virtual DbSet<Category> Category { get; set; }
-        public virtual DbSet<Customer> Customer { get; set; }
-        public virtual DbSet<CustomerAttribute> CustomerAttribute { get; set; }
-        public virtual DbSet<Department> Department { get; set; }
-        public virtual DbSet<OrderDetail> OrderDetail { get; set; }
-        public virtual DbSet<Orders> Orders { get; set; }
-        public virtual DbSet<Product> Product { get; set; }
-        public virtual DbSet<ProductAttribute> ProductAttribute { get; set; }
-        public virtual DbSet<ProductCategory> ProductCategory { get; set; }
-        public virtual DbSet<Review> Review { get; set; }
-        public virtual DbSet<Shipping> Shipping { get; set; }
-        public virtual DbSet<ShippingRegion> ShippingRegion { get; set; }
-        public virtual DbSet<ShoppingCart> ShoppingCart { get; set; }
-        public virtual DbSet<Tax> Tax { get; set; }
+        public virtual DbSet<Attribute> Attribute { get; private set; }
+        public virtual DbSet<AttributeValue> AttributeValue { get; private set; }
+        public virtual DbSet<Audit> Audit { get; private set; }
+        public virtual DbSet<Category> Category { get; private set; }
+        public virtual DbSet<Customer> Customer { get; private set; }
+        public virtual DbSet<CustomerAttribute> CustomerAttribute { get; private set; }
+        public virtual DbSet<Department> Department { get; private set; }
+        public virtual DbSet<OrderDetail> OrderDetail { get; private set; }
+        public virtual DbSet<Orders> Orders { get; private set; }
+        public virtual DbSet<Product> Product { get; private set; }
+        public virtual DbSet<ProductAttribute> ProductAttribute { get; private set; }
+        public virtual DbSet<ProductCategory> ProductCategory { get; private set; }
+        public virtual DbSet<Review> Review { get; private set; }
+        public virtual DbSet<Shipping> Shipping { get; private set; }
+        public virtual DbSet<ShippingRegion> ShippingRegion { get; private set; }
+        public virtual DbSet<ShoppingCart> ShoppingCart { get; private set; }
+        public virtual DbSet<Tax> Tax { get; private set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
