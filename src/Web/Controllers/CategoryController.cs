@@ -27,7 +27,7 @@ namespace Tss.Web.Controllers
             Response response = new Response
             (
                 HttpStatusCode.OK,
-                "Categorys were successfully retrieved.",
+                "Categories were successfully retrieved.",
                 await _service.Get()
             );
             return Ok(response);
