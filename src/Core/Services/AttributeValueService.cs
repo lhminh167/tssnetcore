@@ -35,18 +35,21 @@ namespace Tss.Core.Services
 
         public async Task<AttributeValue> GetOne(int attributeValueId)
         {
-            return await _attributeValueRepo.Get(attributeValueId);
+            AttributeValue attributeValue = await _attributeValueRepo.Get(attributeValueId);
+            Guard.Against.NotFound(attributeValue, nameof(AttributeValue));
+
+            return attributeValue;
         }
 
         public async Task<AttributeValue> Create(AttributeValueCreateRequest input)
         {
-            AttributeValue dbAttributeValue = null;
-            Guard.Against.NotFound(dbAttributeValue, nameof(AttributeValue));
+            Attribute attribute = await _attributeRepo.GetOne(new GetAttributeByNameSpecification(input.Name, _authHelper));
+            Guard.Against.NotFound(attribute, nameof(Attribute));
 
-            dbAttributeValue = null;
-            _attributeValueRepo.Post(dbAttributeValue);
+            AttributeValue attributeValue = new AttributeValue(attribute.AttributeId, input.Value);
+            _attributeValueRepo.Post(attributeValue);
             await _unitOfWork.SaveAsync();
-            return dbAttributeValue;
+            return attributeValue;
         }
 
         public async Task<AttributeValue> Update(AttributeValueUpdateRequest input)
