@@ -66,7 +66,8 @@ namespace Tss.Web.Controllers
             [FromQuery] List<string> category,
             [FromQuery] double minPrice,
             [FromQuery] double maxPrice,
-            [FromQuery] int display
+            [FromQuery] int display,
+            [FromQuery] bool includeDetails
         )
         {
             Response response = new Response(
@@ -84,7 +85,8 @@ namespace Tss.Web.Controllers
                     category,
                     minPrice,
                     maxPrice,
-                    display
+                    display,
+                    includeDetails
                 ))
             );
             return Ok(response);

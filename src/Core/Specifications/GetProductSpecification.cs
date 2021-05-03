@@ -128,6 +128,12 @@ namespace Tss.Core.Specifications
             SetIsNoTracking(true);
             ApplyPaging(input.PageIndex, input.PageSize, input.IsPagingEnabled);
             Sort(input);
+            if (!input.IncludeDetails) return;
+            AddInclude("ProductCategory.Category");
+            AddInclude("ProductAttribute.AttributeValue.Attribute");
+            AddInclude("OrderDetail");
+            AddInclude("ShoppingCart");
+            AddInclude("Review");
         }
 
         private void Sort(ProductGetRequest input)

@@ -16,7 +16,8 @@ namespace Tss.Core.Models
             List<string> category,
             double minPrice,
             double maxPrice,
-            int display
+            int display,
+            bool includeDetails = false
         )
         : base(pageIndex, pageSize, isPagingEnabled, sortBy, isDescending)
         {
@@ -29,14 +30,16 @@ namespace Tss.Core.Models
             MinPrice = minPrice;
             MaxPrice = maxPrice;
             Display = display;
+            IncludeDetails = includeDetails;
         }
 
-        public string Keyword { get; private set; }
-        public List<string> Category { get; private set; }
-        public string Color { get; private set; }
-        public string Size { get; private set; }
-        public double MinPrice { get; private set; }
-        public double MaxPrice { get; private set; }
-        public int Display { get; private set; }
+        public string Keyword { get; set; }
+        public List<string> Category { get; set; }
+        public string Color { get; set; }
+        public string Size { get; set; }
+        public double MinPrice { get; set; }
+        public double MaxPrice { get; set; }
+        public int Display { get; set; }
+        public bool IncludeDetails { get; set; }
     }
 }
