@@ -32,7 +32,10 @@ namespace Tss.Core.Services
 
         public async Task<Review> GetOne(int reviewId)
         {
-            return await _reviewRepo.GetOne(new GetReviewByIdSpecification(reviewId, _authHelper));
+            var review = await _reviewRepo.GetOne(new GetReviewByIdSpecification(reviewId, _authHelper));
+            Guard.Against.NotFound(review, nameof(Review));
+
+            return review;
         }
 
         public async Task<Review> Create(ReviewCreateRequest input)
