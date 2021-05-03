@@ -139,3 +139,9 @@ The `$HEROKU_API_KEY` is set in the Settings options of Travis CI.
 In Travis CI, to define variables in Repository Settings, make sure you’re logged in, navigate to the repository in question, choose “Settings” from the cog menu, and click on “Add new variable” in the “Environment Variables” section.
 
 ![settings-env-vars](https://docs.travis-ci.com/images/settings-env-vars.png)
+
+## Testing
+
+Use the following command `dotnet test --logger "console;verbosity=detailed" --filter "Priority=<priority>"` to run tests of specified priority. 
+
+Highest priority is 1, which covers critical business cases.
