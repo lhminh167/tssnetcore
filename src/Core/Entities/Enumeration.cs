@@ -8,9 +8,9 @@ namespace Tss.Core.Entities
 {
     public abstract class Enumeration : IComparable
     {
-        public string Message { get; private set; }
+        public string Message { get; set; }
 
-        public int Id { get; private set; }
+        public int Id { get; set; }
 
         protected Enumeration(int id, string message)
         {
