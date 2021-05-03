@@ -9,7 +9,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 
-namespace Microsoft.eShopWeb.Infrastructure.Helpers
+namespace Tss.Infrastructure.Helpers
 {
     public class MediaHelper : IMediaHelper
     {

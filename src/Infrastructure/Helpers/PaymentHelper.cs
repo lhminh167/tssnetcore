@@ -9,7 +9,7 @@ using Tss.Core.Entities;
 using System;
 using Newtonsoft.Json;
 
-namespace Microsoft.eShopWeb.Infrastructure.Helpers
+namespace Tss.Infrastructure.Helpers
 {
     public class PaymentHelper : IPaymentHelper
     {

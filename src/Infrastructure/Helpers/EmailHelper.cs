@@ -7,7 +7,7 @@ using Tss.Core.Models;
 using Ardalis.GuardClauses;
 using Tss.Core.Entities;
 
-namespace Microsoft.eShopWeb.Infrastructure.Helpers
+namespace Tss.Infrastructure.Helpers
 {
     public class EmailHelper : IEmailHelper
     {

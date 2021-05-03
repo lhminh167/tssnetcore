@@ -13,7 +13,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Tss.Core.Extensions;
 
-namespace Microsoft.eShopWeb.Infrastructure.Helpers
+namespace Tss.Infrastructure.Helpers
 {
     public class AuthHelper : IAuthHelper
     {
@@ -56,11 +56,11 @@ namespace Microsoft.eShopWeb.Infrastructure.Helpers
             Claim[] claims = new Claim[]
             {
                 new Claim(
-                    ClaimTypes.NameIdentifier, 
+                    ClaimTypes.NameIdentifier,
                     cartId
                 ),
                 new Claim(
-                    ClaimTypes.Name, 
+                    ClaimTypes.Name,
                     GetClaim(ClaimTypes.Name) ?? "Visitor"
                 ),
                 new Claim(
