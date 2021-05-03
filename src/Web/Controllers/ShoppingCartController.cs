@@ -56,7 +56,7 @@ namespace Tss.Web.Controllers
         {
             Response response = new Response(
                 HttpStatusCode.OK,
-                "Shopping cart was successfully retrieved.",
+                "Recommended products were successfully retrieved.",
                 await _service.GetRecommendations(new PaginationRequest(
                     pageIndex,
                     pageSize,
