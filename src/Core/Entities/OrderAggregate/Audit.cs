@@ -24,5 +24,9 @@ namespace Tss.Core.Entities
             Message = message;
             CreatedOn = DateTime.Now;
         }
+
+        private Audit()
+        {
+        }
     }
 }

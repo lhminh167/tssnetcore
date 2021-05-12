@@ -14,7 +14,7 @@ namespace Tss.Core.Entities
             Name = name;
         }
 
-        public Attribute()
+        private Attribute()
         {
             AttributeValue = new HashSet<AttributeValue>();
         }

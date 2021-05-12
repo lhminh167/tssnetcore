@@ -4,7 +4,7 @@ namespace Tss.Core.Entities
 {
     public class Department
     {
-        public Department()
+        private Department()
         {
             Category = new HashSet<Category>();
         }

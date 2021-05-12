@@ -26,7 +26,7 @@ namespace Tss.Core.Entities
             UnitCost = product.DiscountedPrice > 0 ? product.DiscountedPrice : product.Price;
         }
 
-        public OrderDetail()
+        private OrderDetail()
         {
         }
 

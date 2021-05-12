@@ -16,7 +16,7 @@ namespace Tss.Core.Entities
             Value = value;
         }
 
-        public AttributeValue()
+        private AttributeValue()
         {
             CustomerAttribute = new HashSet<CustomerAttribute>();
             ProductAttribute = new HashSet<ProductAttribute>();

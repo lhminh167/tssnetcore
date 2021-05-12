@@ -29,7 +29,7 @@ namespace Tss.Core.Entities
             CreatedOn = DateTime.Now;
         }
 
-        public Review()
+        private Review()
         {
         }
 
