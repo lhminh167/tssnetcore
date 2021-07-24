@@ -8,6 +8,8 @@ using CloudinaryDotNet;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Microsoft.Extensions.FileProviders;
+using System.IO;
 
 namespace Tss.Infrastructure.Helpers
 {
@@ -73,6 +75,28 @@ namespace Tss.Infrastructure.Helpers
                 PublicIds = input.Content.Select(e => _settings.CloudinaryFolderName + e.Name).ToList()
             };
             await _cloudinary.DeleteResourcesAsync(deletionParams);
+        }
+
+        public async Task<ImageUploadResponse> UploadImage(ImageUploadResquest input)
+        {
+            var uploadParams = new ImageUploadParams()
+            {
+                File = new FileDescription(input.Name, input.File.OpenReadStream()),
+                PublicId = _settings.CloudinaryFolderName + "/" + input.Name,
+                Overwrite = true,
+            };
+
+            ImageUploadResult result = await _cloudinary.UploadAsync(uploadParams);
+
+            return result == null ?
+                ImageUploadResponse.NoResponse :
+                new ImageUploadResponse(
+                    result.SecureUri,
+                    result.Version,
+                    result.StatusCode,
+                    string.IsNullOrWhiteSpace(result.Error?.Message) ? "success" : "Image Upload Failed",
+                    string.IsNullOrWhiteSpace(result.Error?.Message) ? string.Empty : result.Error.Message
+                );
         }
     }
 }

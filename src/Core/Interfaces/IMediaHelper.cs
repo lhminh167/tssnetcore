@@ -10,5 +10,6 @@ namespace Tss.Core.Interfaces
         List<ImageGetUploadTokenResponse> GetImageUploadToken(ImagesGetUploadTokenRequest input);
         Task Rename(ImagesRenameRequest input);
         Task Delete(ImagesDeleteRequest input);
+        Task<ImageUploadResponse> UploadImage(ImageUploadResquest input);
     }
 }

@@ -57,5 +57,27 @@ namespace Tss.Web.Controllers
             );
             return Ok(response);
         }
+
+        [HttpPost("Image")]
+        public async Task<IActionResult> UploadImage([FromBody] ImageUploadResquest input)
+        {
+            ImageUploadResponse content = await _mediaHelper.UploadImage(input);
+            Response response = new Response
+            (
+                HttpStatusCode.Created,
+                "Image was uploaded successfully.",
+                content
+            );
+            return CreatedAtAction(
+                string.Empty,
+                "Media",
+                new
+                {
+                    uri = content.Uri
+                },
+                response
+            );
+        }
+
     }
 }
