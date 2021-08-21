@@ -53,7 +53,7 @@ namespace Tss.Core.Entities
             SetTotalAmount();
         }
 
-        public Orders()
+        private Orders()
         {
             Audit = new HashSet<Audit>();
             OrderDetail = new HashSet<OrderDetail>();

@@ -22,7 +22,7 @@ namespace Tss.Core.Entities
             AddInfo(input);
         }
 
-        public Product()
+        private Product()
         {
             OrderDetail = new HashSet<OrderDetail>();
             ProductAttribute = new HashSet<ProductAttribute>();

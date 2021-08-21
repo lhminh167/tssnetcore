@@ -102,7 +102,7 @@ namespace Tss.Web.Controllers
             Response response = new Response
             (
                 HttpStatusCode.OK,
-                "Thank you for confirming the stock. We will send you shipping notiication once payment was taken.",
+                "Thank you for confirming the stock. A notification email will be sent to the customer.",
                 await _service.StockOk(orderId)
             );
             return Ok(response);
@@ -115,7 +115,7 @@ namespace Tss.Web.Controllers
             Response response = new Response
             (
                 HttpStatusCode.OK,
-                "Thank you for confirming the stock. We will send you shipping notiication once payment was taken.",
+                "Thank you for confirming the stock. The order was cancelled. A notification email will be sent to the customer.",
                 await _service.StockNotOk(orderId, comments)
             );
             return Ok(response);
@@ -129,7 +129,7 @@ namespace Tss.Web.Controllers
             Response response = new Response
             (
                 HttpStatusCode.OK,
-                "Thank you for confirming that the order has been dispatched. We will now send a notification to customer.",
+                "Thank you for confirming that the order has been delivered. A notification email will be sent to the customer.",
                 await _service.ShipOk(orderId)
             );
             return Ok(response);

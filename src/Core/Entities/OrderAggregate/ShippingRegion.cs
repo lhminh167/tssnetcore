@@ -4,7 +4,7 @@ namespace Tss.Core.Entities
 {
     public class ShippingRegion
     {
-        public ShippingRegion()
+        private ShippingRegion()
         {
             Customer = new HashSet<Customer>();
             Shipping = new HashSet<Shipping>();

@@ -4,7 +4,7 @@ namespace Tss.Core.Entities
 {
     public class Shipping
     {
-        public Shipping()
+        private Shipping()
         {
             Orders = new HashSet<Orders>();
         }

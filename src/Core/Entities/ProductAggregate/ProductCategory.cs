@@ -8,7 +8,7 @@
             CategoryId = categoryId;
         }
 
-        public ProductCategory()
+        private ProductCategory()
         {
         }
 

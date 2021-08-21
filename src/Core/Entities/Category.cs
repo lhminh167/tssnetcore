@@ -4,7 +4,7 @@ namespace Tss.Core.Entities
 {
     public class Category
     {
-        public Category()
+        private Category()
         {
             ProductCategory = new HashSet<ProductCategory>();
         }

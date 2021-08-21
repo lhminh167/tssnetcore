@@ -10,7 +10,7 @@ namespace Tss.Core.Entities
             AttributeValueId = attributeValueId;
         }
 
-        public ProductAttribute()
+        private ProductAttribute()
         {
         }
 

@@ -4,7 +4,7 @@ namespace Tss.Core.Entities
 {
     public class Tax
     {
-        public Tax()
+        private Tax()
         {
             Orders = new HashSet<Orders>();
         }

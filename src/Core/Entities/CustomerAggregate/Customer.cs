@@ -27,7 +27,7 @@ namespace Tss.Core.Entities
             Email = input.Email;
         }
 
-        public Customer()
+        private Customer()
         {
             CustomerAttribute = new HashSet<CustomerAttribute>();
             Orders = new HashSet<Orders>();
