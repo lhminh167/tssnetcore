@@ -27,7 +27,7 @@ namespace Tss.FunctionalTests.Web.ControllerTests.Product.Recommendations
         public async Task ReturnsOkResult()//done
         {
             var detailResponse = await new ProductRecommdationHelper(_fixture).Mock();
-            var request = new ProductRecommedationRequest(_fixture.TestProduct.ProductId);
+            var request = new ProductRecommendationRequest(_fixture.TestProduct.ProductId);
 
             var response = await _fixture.GetAsync<PaginatedList<Core.Entities.Product>>(
                 new ProductUrl().Recommendation(request),

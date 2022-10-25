@@ -106,7 +106,7 @@ namespace Tss.Web.Controllers
             Response response = new Response(
                 HttpStatusCode.OK,
                 "Products were successfully retrieved.",
-                await _service.GetRecommendations(new ProductRecommedationRequest(
+                await _service.GetRecommendations(new ProductRecommendationRequest(
                     pageIndex,
                     pageSize,
                     isPagingEnabled,
