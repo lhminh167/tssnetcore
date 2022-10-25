@@ -11,6 +11,6 @@ namespace Tss.FunctionalTests.Web.Urls
         public string Filter => _baseUrl + "Filter";
         public string Detail(int id) => _baseUrl + id;
         public string List(ProductGetRequest input) => _baseUrl + "?" + UrlHelper.ToQueryString(input);
-        public string Recommendation(ProductRecommedationRequest input) => Detail(input.ProductId) + "/Recommendation/" + "?" + UrlHelper.ToQueryString(input);
+        public string Recommendation(ProductRecommendationRequest input) => Detail(input.ProductId) + "/Recommendation/" + "?" + UrlHelper.ToQueryString(input);
     }
 }

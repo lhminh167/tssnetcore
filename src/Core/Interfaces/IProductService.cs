@@ -7,7 +7,7 @@ namespace Tss.Core.Interfaces
     public interface IProductService
     {
         Task<ProductFilterResponse> GetFilters();
-        Task<PaginatedList<Product>> GetRecommendations(ProductRecommedationRequest input);
+        Task<PaginatedList<Product>> GetRecommendations(ProductRecommendationRequest input);
         Task<ReviewGetResponse> GetReviews(ReviewGetRequest input);
         Task<ProductResponse> GetOne(int productId);
         Task<ProductResponse> Create(ProductCreateRequest input);

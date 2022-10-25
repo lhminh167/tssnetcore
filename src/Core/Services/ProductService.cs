@@ -88,7 +88,7 @@ namespace Tss.Core.Services
         }
 
         public async Task<PaginatedList<Product>> GetRecommendations(
-            ProductRecommedationRequest input
+            ProductRecommendationRequest input
         )
         {
             List<Product> list = await _orderDetailRepo.Get(new GetProductRecommendationSpecification(
@@ -117,7 +117,7 @@ namespace Tss.Core.Services
             return new ProductResponse(
                 product,
                 await GetReviews(new ReviewGetRequest(productId)),
-                await GetRecommendations(new ProductRecommedationRequest(productId))
+                await GetRecommendations(new ProductRecommendationRequest(productId))
             );
         }
 
