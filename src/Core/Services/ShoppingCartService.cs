@@ -161,7 +161,7 @@ namespace Tss.Core.Services
         }
 
 
-        public async Task<double> GetTotalCost(bool buyNow)
+        private async Task<double> GetTotalCost(bool buyNow)
         {
             List<ShoppingCart> items = await _shoppingCartRepo.Get(new GetShoppingCartSpecification(new ShoppingCartGetRequest(buyNow), _authHelper.GetShoppingCartId()));
 

@@ -14,7 +14,6 @@ namespace Tss.Core.Interfaces
         Task<ShoppingCart> RemoveItem(int itemId);
         Task<ShoppingCart> SaveItemForLater(int itemId);
         Task<ShoppingCart> MoveItemToCart(int itemId);
-        Task<double> GetTotalCost(bool buyNow);
         Task<int> GetTotalQuantity(bool buyNow);
     }
 }
