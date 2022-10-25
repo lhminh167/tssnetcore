@@ -1,0 +1,6 @@
+version: "3.8"
+services:
+  tssnetcore:
+    image: "lhminh167/tssnetcore"
+    ports:
+      - "80:80"

@@ -262,4 +262,9 @@ typings/
 .next
 
 # ignore appsettings
-**/appsettings.Development.json
+**/appsettings.**.json
+
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml

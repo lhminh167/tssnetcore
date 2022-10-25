@@ -1,8 +1,8 @@
 namespace Tss.FunctionalTests.Core.Models
 {
-    public class ProductRecommedationRequest : PaginationRequest
+    public class ProductRecommendationRequest : PaginationRequest
     {
-        public ProductRecommedationRequest(
+        public ProductRecommendationRequest(
             int productId
         )
         : base(0, 8, true, null, true)
@@ -10,7 +10,7 @@ namespace Tss.FunctionalTests.Core.Models
             ProductId = productId;
         }
 
-        public ProductRecommedationRequest(
+        public ProductRecommendationRequest(
             int pageIndex,
             int pageSize,
             bool isPagingEnabled,

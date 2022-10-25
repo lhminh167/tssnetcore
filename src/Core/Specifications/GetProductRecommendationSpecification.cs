@@ -8,7 +8,7 @@ namespace Tss.Core.Specifications
 {
     public class GetProductRecommendationSpecification : BaseSpecification<OrderDetail, Product>
     {
-        public GetProductRecommendationSpecification(ProductRecommedationRequest input, IAuthHelper authHelper)
+        public GetProductRecommendationSpecification(ProductRecommendationRequest input, IAuthHelper authHelper)
         : base(
             od
             => od.Order.OrderDetail.Any(od => od.ProductId == input.ProductId)
