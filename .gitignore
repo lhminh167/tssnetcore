@@ -262,7 +262,7 @@ typings/
 .next
 
 # ignore appsettings
-**/appsettings.**.json
+# **/appsettings.**.json
 
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
