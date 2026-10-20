@@ -140,6 +140,25 @@ In Travis CI, to define variables in Repository Settings, make sure you’re log
 
 ![settings-env-vars](https://docs.travis-ci.com/images/settings-env-vars.png)
 
+## Deploying to Vercel
+
+Create a Vercel project for this repository and deploy it with Vercel's Container Runtime (Beta). The root-level `Dockerfile.vercel` builds and runs the ASP.NET Core API. The database must be reachable from Vercel.
+
+This project targets .NET Core 3.1, which is out of support; upgrade the runtime before using this deployment for production.
+
+Set these backend environment variables in the Vercel project:
+
+- `ENV=production`
+- `AUTHORIZATION_TOKEN_SECRET`
+- `JAWSDB_CONNECTION` (ADO.NET MySQL connection string, e.g. `Server=<host>;Port=<port>;Database=<database>;User ID=<user>;Password=<password>;SslMode=Required`; do not use a `mysql://` URL)
+- `CLOUDINARY_CLOUD_NAME`
+- `CLOUDINARY_API_KEY`
+- `CLOUDINARY_API_SECRET`
+
+The application applies EF Core migrations during startup. Configure any additional integration variables required by the enabled email, payment, or image-upload features in `src/Core/Models/AppSettings.cs`.
+
+Deploy `tssnextjs` as a separate Vercel project and set its `API_URL` to the backend deployment URL, including the `/api/` path and trailing slash (for example, `https://<backend-domain>/api/`).
+
 ## Testing
 
 Use the following command `dotnet test --logger "console;verbosity=detailed" --filter "Priority=<priority>"` to run tests of specified priority. 
