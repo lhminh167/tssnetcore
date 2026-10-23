@@ -9,7 +9,7 @@ namespace Tss.FunctionalTests.Core.Helpers
     {
         public LoginRequest RootAdminAccount = new LoginRequest
         {
-            Email = "lhminh.phs@gmail.com",
+            Email = "lhminh167@gmail.com",
             Password = "string"
         };
 
