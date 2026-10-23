@@ -10,9 +10,7 @@ namespace Tss.Core.Specifications
             c => c
         )
         {
-            SetIsNoTracking(true);
-            AddInclude("CustomerAttribute.AttributeValue.Attribute");
-            AddInclude(c => c.ShippingRegion);
+            SetIsNoTracking(true);  
         }
     }
 }
