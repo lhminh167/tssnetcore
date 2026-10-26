@@ -7,6 +7,7 @@ namespace Tss.Core.Models
         public AppSettings()
         {
             SendgridApiKey = Environment.GetEnvironmentVariable("SENDGRID_API_KEY");
+            FrontendUrl = Environment.GetEnvironmentVariable("FRONTEND_URL") ?? "https://tssnextjs.vercel.app";
             StripeSecretKey = Environment.GetEnvironmentVariable("STRIPE_SECRET_KEY");
             StripePublicKey = Environment.GetEnvironmentVariable("STRIPE_PUBLIC_KEY");
             CustomerServiceEmail = Environment.GetEnvironmentVariable("CUSTOMER_SERVICE_EMAIL");
@@ -26,6 +27,7 @@ namespace Tss.Core.Models
         }
 
         public string SendgridApiKey { get; set; }
+        public string FrontendUrl { get; set; }
         public string StripeSecretKey { get; set; }
         public string StripePublicKey { get; set; }
         public string CustomerServiceEmail { get; set; }

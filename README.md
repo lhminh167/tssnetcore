@@ -1,166 +1,182 @@
-# ASP.NET Core Backend for the T-Shirt Shop Web App
+# T-Shirt Shop API
 
-[![Build status](https://ci.appveyor.com/api/projects/status/p3iet9wrmg8jxlmx?svg=true)](https://ci.appveyor.com/project/jincod/aspnet5demoapp)
+**A REST API for a full-stack e-commerce storefront, built with ASP.NET Core, C#, and MySQL.**
 
-## Usage
+This backend powers the [T-Shirt Shop frontend](https://github.com/lhminh167/tssnextjs), handling the catalog and customer journeys from browsing and authentication through checkout, order management, and email notifications. The codebase is organized into Core, Infrastructure, and Web layers, with separate unit, integration, and functional test projects.
 
-```bash
-npm install
-dotnet restore
-dotnet run -p src/Tss/Tss.csproj
-npm start
-```
+**Live API:** [tssnetcore.vercel.app](https://tssnetcore.vercel.app/) <br>
+**Interactive API docs:** [Swagger UI](https://tssnetcore.vercel.app/swagger) <br>
+**Frontend:** [tssnextjs.vercel.app](https://tssnextjs.vercel.app/)
 
-## Deploy to Heroku
+## What it does
 
-### Manual
+- **Catalog APIs:** homepage product collections, filtering, product details, recommendations, categories, departments, and attributes.
+- **Customer accounts:** registration, JWT login, customer profiles, password changes, and password-reset flows with email notifications.
+- **Shopping cart:** cart retrieval and updates, item quantities, save-for-later, move-to-cart, and product recommendations.
+- **Checkout and orders:** checkout form data, Stripe-backed payment processing, order creation and history, and stock/shipping status workflows.
+- **Reviews and media:** product reviews and review management, plus Cloudinary image-upload support.
+- **Store operations:** protected endpoints for managing products, customers, attributes, and order fulfilment.
+- **API contract and errors:** Swagger/OpenAPI documentation, request validation, consistent response envelopes, and centralized exception handling.
 
-Using custom buildpack [dotnetcore-buildpack](https://github.com/jincod/dotnetcore-buildpack)
+## Technology
 
-```bash
-heroku buildpacks:set https://github.com/jincod/dotnetcore-buildpack
-heroku buildpacks:add --index 1 heroku/nodejs
-```
+| Area | Tools |
+| --- | --- |
+| API | ASP.NET Core Web API, C# |
+| Persistence | Entity Framework Core, MySQL, Pomelo |
+| Authentication | JWT bearer tokens |
+| Payments and email | Stripe, SendGrid |
+| Product media | Cloudinary |
+| API documentation | Swagger / OpenAPI |
+| Tests | xUnit, ASP.NET Core test host, EF Core InMemory |
+| Deployment | Docker, Vercel Container Runtime |
 
-[Using Multiple Buildpacks for an App](https://devcenter.heroku.com/articles/using-multiple-buildpacks-for-an-app)
+> **Runtime note:** This repository currently targets .NET Core 3.1, which is out of support. Upgrade to a supported .NET release before using this stack for a new production system.
 
-### Heroku Deploy button
+## API capabilities
 
-Click the button below to set up this sample app on Heroku:
+Routes are grouped under `/api`:
 
-[![Deploy](https://www.herokucdn.com/deploy/button.svg)](https://heroku.com/deploy?template=https://github.com/jincod/AspNet5DemoApp)
+| Resource | Example operations |
+| --- | --- |
+| `Product` | `GET /Homepage`, `GET /Filter`, product details, recommendations, reviews, create/update/delete |
+| `Catalog`, `Category`, `Department` | Browse catalog metadata, categories, and departments |
+| `Customer` | Register, `POST /Login`, profile management, password change and recovery |
+| `ShoppingCart` | Read/update cart, recommendations, save for later, move items back to cart |
+| `Order` | Checkout data, payment, order creation/history, stock and shipping updates |
+| `Review` | Create, view, update, and delete reviews |
+| `Media` | Request an image-upload token, update or delete media |
+| `Attribute`, `AttributeValue` | Read and manage product/customer attributes |
 
-## Blog posts
+Most endpoints require a JWT bearer token. Login and password recovery are anonymous; administrative and order-fulfilment actions are authorization protected. Consult Swagger for request schemas and the full route list.
 
-- [Deploying ASP.NET Core on heroku](https://jincod.tumblr.com/post/152290263970/deploying-aspnet-core-on-heroku)
-- [Integrate ASP.NET 5 and Webpack with Hot Module Replacement plugin](http://jincod.tumblr.com/post/135043543538/integrate-aspnet-5-and-webpack-with-hot-module)
+## Getting started
 
-## Databases Setup
+### Requirements
 
-This app uses MySQL database in local development environment and ClearBD when deployed to Heroku.
+- .NET Core 3.1 SDK (the target framework in `src/Tss.csproj`)
+- MySQL database accessible from the development machine
+- Integration credentials for the services used by the features you want to run (for example, SendGrid, Stripe, or Cloudinary)
 
-In local environment, the connection string should be specified in the `appsettings.Development.json` file with following format:
-
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "server=localhost;uid=root;pwd=password;database=tshirtshop"
-  }
-}
-
-```
-
-To know how to extract connection string from the `appsettings.Development.json`, please refer to the below articles:
-
-- [How To Connect MySQL With ASP.NET Core
-](https://www.c-sharpcorner.com/article/how-to-connect-mysql-with-asp-net-core/)
-- [How to reverse engineer MySql Database EF Core
-](https://garywoodfine.com/how-to-reverse-engineer-mysql-database-ef-core/)
-
-To know how to get Heroku environment variables, please refer to:
-
-- [How to get Heroku environment variables](https://github.com/jincod/dotnetcore-buildpack/issues/33)
-
-To migrate the above local database to Heroku's ClearDB, you use the following command:
+### Restore and run
 
 ```bash
-heroku addons:create cleardb:ignite -a tssnetcore --name database-name --fork=mysql://user:password@myhostname.com/database-name
+dotnet restore Tss.sln
+dotnet build Tss.sln
+dotnet run --project src/Tss.csproj
 ```
 
-# T-Shirt Shop, aka. TSS, Project 
+The API uses the `Development` environment through the project launch profile and listens on the configured local ASP.NET Core ports. Swagger is available at `/swagger`.
 
-## Description
+For a custom local URL, set `ASPNETCORE_ENVIRONMENT=Development` and pass a URL:
 
-This app is an online shop for customers to order and buy T-shirt. 
-
-## Branching Model
-
-![git-model](https://nvie.com/img/git-model@2x.png)
-
-This repository follows the practices in [A successful Git branching model](https://nvie.com/posts/a-successful-git-branching-model/) article by [@nvie](https://twitter.com/nvie). Thus, we have the following additional branches:
-
-- Master branch: `HEAD` always reflects a production-ready state.
-
-- Dev branch: `HEAD` always reflects a state with the latest delivered development changes for the next release.
-
-- Feature branches: May branch off from:
-`dev`. Must merge back into: `dev`.
-
-- Release branches: May branch off from:
-`dev`. Must merge back into:
-`dev` and `master`.
-
-- Hotfix branches: May branch off from:
-`master`. Must merge back into:
-`dev` and `master`.
-
-I recommend you to use Git Flow which follows the above branching model. Git Flow is available in both Sourcetree and GitKraken. Personally, I would recommend you to use [GitKraken](https://www.gitkraken.com/) since they support more Git operations such as Drop a Commit.
-
-Additionally, both Sourcetree and GitKraken support [Git Large File Storage (LFS)](https://git-lfs.github.com/) to store large files in somewhere else, but you still be able to check them out from GitHub just like a normal file!
-
-## CI/CD Flow
-
-### Build flow for v1.0
-
-`.travis.yml > Dockerfile > package.json > server.js`
-
-`.travis.yml` first installs Minikube, Kubectl and Kubernetes. 
-
-Then, it installs Docker, build and run the image. During the run, the Dockerfile reads `package.json` file, installs npm packages, and runs npm start, which eventually run `server.js` file.
-
-Server.js file creates an Express server and responds to HTTP requests with the text "Hello world".
-
-The port to communicate with the server is by default `process.env.PORT` or `8080`.
-
-### CI/CD flow for v1.0
-
-CI is executed by Travis CI. If the build in Travis CI passes or fails, the user will be notified on GitHub or by email. 
-
-The passed build on master branch will be deployed to Heroku production server and exposed at `tshirtshopminh.herokuapp.com`. 
-
-To test a specific branch, you could change the branch name at deploy.app in `.travis.yml`. For example, if you want to deploy the branch `features/initial-setup`, the config at `deploy.app` would be     
-
-```yaml
-deploy:
-  provider: heroku
-  api_key:
-    secure: $HEROKU_API_KEY
-  app:
-    master: tshirtshopminh
-    features/initial-setup: tsstest
+```powershell
+$env:ASPNETCORE_ENVIRONMENT = "Development"
+dotnet run --project src/Tss.csproj --urls http://127.0.0.1:5009
 ```
 
-The passed build on this branch will be deployed to Heroku test server and exposed at `tsstest.herokuapp.com`.
+Provide local settings in `src/appsettings.Development.json` under an `AppSettings` object. Keep real credentials in local-only configuration or a secret manager; do not commit them. The project `.gitignore` excludes the development settings file.
 
-## Environment variables
+### Configuration
 
-The `$HEROKU_API_KEY` is set in the Settings options of Travis CI.
+In production (`ENV=production`), `AppSettings` reads these environment variables:
 
-In Travis CI, to define variables in Repository Settings, make sure you’re logged in, navigate to the repository in question, choose “Settings” from the cog menu, and click on “Add new variable” in the “Environment Variables” section.
+| Variable | Purpose |
+| --- | --- |
+| `JAWSDB_CONNECTION` | ADO.NET MySQL connection string |
+| `AUTHORIZATION_TOKEN_SECRET` | Signing secret for JWT authentication |
+| `SENDGRID_API_KEY` | SendGrid API key for outgoing email |
+| `CUSTOMER_SERVICE_EMAIL`, `CUSTOMER_SERVICE_NAME` | Sender identity for customer emails |
+| `SUPPLIER_EMAIL`, `SUPPLIER_NAME` | Supplier notification identity |
+| `ADMIN_EMAIL`, `ADMIN_NAME` | Administrative contact |
+| `STRIPE_SECRET_KEY`, `STRIPE_PUBLIC_KEY` | Stripe integration keys |
+| `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET` | Cloudinary integration credentials |
+| `CLOUDINARY_CLOUD_FOLDER` | Optional Cloudinary upload folder |
+| `FRONTEND_URL` | Frontend base URL for password-reset links; defaults to `https://tssnextjs.vercel.app` |
 
-![settings-env-vars](https://docs.travis-ci.com/images/settings-env-vars.png)
+Set `JAWSDB_CONNECTION` to a MySQL ADO.NET connection string, not a `mysql://` URL. Store its user name and password in the production environment or a secret manager.
 
-## Deploying to Vercel
+Use test/sandbox credentials during development. Never put live API keys, database passwords, JWT secrets, or other credentials in source control.
 
-Create a Vercel project for this repository and deploy it with Vercel's Container Runtime (Beta). The root-level `Dockerfile.vercel` builds and runs the ASP.NET Core API. The database must be reachable from Vercel.
+## Tests
 
-This project targets .NET Core 3.1, which is out of support; upgrade the runtime before using this deployment for production.
+The solution has three test projects:
 
-Set these backend environment variables in the Vercel project:
+```bash
+dotnet test tests/UnitTests/UnitTests.csproj
+dotnet test tests/IntegrationTests/IntegrationTests.csproj
+dotnet test tests/FunctionalTests/FunctionalTests.csproj
+```
 
-- `ENV=production`
-- `AUTHORIZATION_TOKEN_SECRET`
-- `JAWSDB_CONNECTION` (ADO.NET MySQL connection string, e.g. `Server=<host>;Port=<port>;Database=<database>;User ID=<user>;Password=<password>;SslMode=Required`; do not use a `mysql://` URL)
-- `CLOUDINARY_CLOUD_NAME`
-- `CLOUDINARY_API_KEY`
-- `CLOUDINARY_API_SECRET`
+To run tests by priority where the test has a `Priority` trait:
 
-The application applies EF Core migrations during startup. Configure any additional integration variables required by the enabled email, payment, or image-upload features in `src/Core/Models/AppSettings.cs`.
+```bash
+dotnet test Tss.sln --filter "Priority=1"
+```
 
-Deploy `tssnextjs` as a separate Vercel project and set its `API_URL` to the backend deployment URL, including the `/api/` path and trailing slash (for example, `https://<backend-domain>/api/`).
+Functional tests include API/controller scenarios and use the ASP.NET Core test host and EF Core InMemory provider. Check each test fixture for any additional configuration it requires.
 
-## Testing
+## Project structure
 
-Use the following command `dotnet test --logger "console;verbosity=detailed" --filter "Priority=<priority>"` to run tests of specified priority. 
+The solution separates business rules from external integrations and HTTP concerns:
 
-Highest priority is 1, which covers critical business cases.
+```text
+src/
+  Core/            Domain entities, use cases, interfaces, and business rules
+  Infrastructure/  Database access and integrations
+  Web/             ASP.NET Core controllers and HTTP configuration
+  Properties/      Local launch profiles
+  Log/             Runtime log output
+tests/
+  UnitTests/       Focused unit tests
+  IntegrationTests/Integration-level tests
+  FunctionalTests/ API, domain, and end-to-end behavior tests
+databases/         SQL database snapshots and maintenance scripts
+Dockerfile.vercel  Vercel container build and startup
+vercel.json        Vercel service routing
+```
+
+### `src/Core/` — domain and application rules
+
+- `Entities/` models customers, products, shopping carts, reviews, and orders. Aggregate-specific behavior lives in `CustomerAggregate/`, `ProductAggregate/`, and `OrderAggregate/`; customer and order email templates are grouped alongside their aggregates.
+- `Services/` coordinates application use cases such as customer, product, cart, and order workflows.
+- `Specifications/` describes reusable repository queries and filtering rules.
+- `Interfaces/` defines contracts for repositories and external services so Core is not tied to infrastructure implementations.
+- `Models/` contains API request/response and application-settings models.
+- `Guards/` and `Exceptions/` hold business validation and domain-specific errors.
+- `Helpers/`, `Extensions/`, and `Constants/` provide reusable domain utilities.
+
+### `src/Infrastructure/` — persistence and integrations
+
+- `Data/` contains `TssContext`, Entity Framework mappings, repositories, query evaluation, and `Migrations/`.
+- `Helpers/` implements integrations and technical services such as authentication/JWT, SendGrid email, Stripe payments, media, and request-related helpers.
+
+### `src/Web/` — HTTP and application host
+
+- `Controllers/` exposes the REST resources, including customers, products, orders, shopping carts, reviews, categories, departments, attributes, and media.
+- `Configs/` wires dependency injection, authentication, routing, persistence, Swagger, logging, and application services.
+- `ActionFilters/` contains request/model validation filters.
+- `Middlewares/` contains HTTP pipeline middleware, including centralized error handling.
+
+### `tests/` — verification at multiple levels
+
+- `UnitTests/` isolates individual business rules and utilities.
+- `IntegrationTests/` verifies behavior across collaborating components.
+- `FunctionalTests/Core/` tests domain entities, helpers, and models.
+- `FunctionalTests/Web/ControllerTests/` exercises controller behavior by feature; `Fixtures/` and `Urls/` hold reusable test setup and endpoint helpers.
+
+### `databases/` and deployment files
+
+- `databases/` contains versioned SQL snapshots and targeted database scripts for development/reference.
+- `Dockerfile.vercel` builds and runs the API container; `vercel.json` routes project traffic to the container service.
+- `docker-compose.yml`, `Dockerfile`, and pipeline configuration files support other local/container/CI workflows.
+
+## Deployment
+
+The API is deployed independently from the frontend using Vercel's Container Runtime. Configure production environment variables in the Vercel project, ensure the MySQL database permits connections from the deployment environment, and deploy from the repository root.
+
+The application applies EF Core migrations during startup. Review migrations and database backups before deploying schema changes. Point the frontend's `API_URL` at the deployed API base URL, including `/api/` and a trailing slash.
+
+## Related project
+
+The matching storefront is maintained in [tssnextjs](https://github.com/lhminh167/tssnextjs). The frontend provides the customer-facing Next.js experience; this repository supplies its API and commerce workflows.

@@ -1,6 +1,8 @@
 using Ardalis.GuardClauses;
 using Tss.Core.Interfaces;
 using Tss.Core.Models;
+using System;
+using System.Net;
 
 namespace Tss.Core.Entities
 {
@@ -34,19 +36,21 @@ namespace Tss.Core.Entities
         public string RecipientEmailAddress { get; }
         public string RecipientName { get; }
         public string Subject { get; }
-        public string PlainTextContent { get; }
+        public string PlainTextContent { get; private set; }
         public string HtmlContent { get; }
 
         private string GetMailBody()
         {
-            string body = $@"
-            Hi ${_customer.Name},
+            Guard.Against.NullOrWhiteSpace(_settings.FrontendUrl, nameof(_settings.FrontendUrl));
+            string resetUrl = new Uri(
+                new Uri(_settings.FrontendUrl.TrimEnd('/') + "/"),
+                $"user/{_customer.CustomerId}/reset-password/{Uri.EscapeDataString(_customer.ResetPasswordToken)}"
+            ).AbsoluteUri;
+            string customerName = WebUtility.HtmlEncode(_customer.Name);
+            string encodedResetUrl = WebUtility.HtmlEncode(resetUrl);
 
-            Please click on the following link ${_customer.ResetPasswordToken} to reset your password.
-            If you did not request this, please ignore this email and your password will remain unchanged.            
-            ";
-
-            return body;
+            PlainTextContent = $"Hi {_customer.Name},\n\nPlease click the following link to reset your password:\n{resetUrl}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.";
+            return $"<p>Hi {customerName},</p><p>Please click the following link to reset your password:</p><p><a href=\"{encodedResetUrl}\">Reset your password</a></p><p>If you did not request this, please ignore this email and your password will remain unchanged.</p>";
         }
     }
 }

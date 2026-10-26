@@ -12,7 +12,6 @@ namespace Tss.Core.Specifications
         {
             SetIsNoTracking(true);
             AddInclude("CustomerAttribute.AttributeValue.Attribute");
-            AddInclude(c => c.ShippingRegion);
         }
     }
 }
