@@ -154,6 +154,7 @@ Set these backend environment variables in the Vercel project:
 - `CLOUDINARY_CLOUD_NAME`
 - `CLOUDINARY_API_KEY`
 - `CLOUDINARY_API_SECRET`
+- `FRONTEND_URL` (optional; defaults to `https://tssnextjs.vercel.app` and is used to build password-reset links)
 
 The application applies EF Core migrations during startup. Configure any additional integration variables required by the enabled email, payment, or image-upload features in `src/Core/Models/AppSettings.cs`.
 
