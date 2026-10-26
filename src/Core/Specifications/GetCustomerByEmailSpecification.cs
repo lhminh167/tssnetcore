@@ -10,7 +10,8 @@ namespace Tss.Core.Specifications
             c => c
         )
         {
-            SetIsNoTracking(true);  
+            SetIsNoTracking(true);
+            AddInclude("CustomerAttribute.AttributeValue.Attribute");
         }
     }
 }
