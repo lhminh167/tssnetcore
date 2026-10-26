@@ -3,9 +3,11 @@ using Tss.Core.Interfaces;
 using SendGrid;
 using SendGrid.Helpers.Mail;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Logging;
 using Tss.Core.Models;
 using Ardalis.GuardClauses;
 using Tss.Core.Entities;
+using System.Net.Http;
 
 namespace Tss.Infrastructure.Helpers
 {
@@ -13,16 +15,20 @@ namespace Tss.Infrastructure.Helpers
     {
         private readonly AppSettings _settings;
         private readonly ISendGridClient _client;
+        private readonly ILogger<EmailHelper> _logger;
 
         public EmailHelper(
-            IOptions<AppSettings> settings
+            IOptions<AppSettings> settings,
+            ILogger<EmailHelper> logger
         )
         {
             Guard.Against.Null(settings, nameof(settings));
             Guard.Against.Null(settings.Value, nameof(settings.Value));
+            Guard.Against.Null(logger, nameof(logger));
 
             _settings = settings.Value;
             _client = new SendGridClient(_settings.SendgridApiKey);
+            _logger = logger;
         }
 
         private async Task SendEmailAsync(IEmail email)
@@ -32,7 +38,26 @@ namespace Tss.Infrastructure.Helpers
             var msg = MailHelper.CreateSingleEmail(from, to, email.Subject, email.PlainTextContent, email.HtmlContent);
             var res = await _client.SendEmailAsync(msg);
 
-            return;
+            if ((int)res.StatusCode < 200 || (int)res.StatusCode >= 300)
+            {
+                var responseBody = await res.Body.ReadAsStringAsync();
+                _logger.LogError(
+                    "SendGrid rejected {EmailType} with HTTP {StatusCode}: {ResponseBody}",
+                    email.GetType().Name,
+                    (int)res.StatusCode,
+                    responseBody
+                );
+
+                throw new HttpRequestException(
+                    $"SendGrid rejected the email with HTTP {(int)res.StatusCode}."
+                );
+            }
+
+            _logger.LogInformation(
+                "SendGrid accepted {EmailType} with HTTP {StatusCode}.",
+                email.GetType().Name,
+                (int)res.StatusCode
+            );
         }
 
         public async Task SendOrderInitialNotification(Orders order)
@@ -72,7 +97,7 @@ namespace Tss.Infrastructure.Helpers
 
         public async Task SendPasswordChangeConfirmationEmail(Customer customer)
         {
-            await SendEmailAsync(new ResetPasswordEmail(customer, _settings));
+            await SendEmailAsync(new PasswordChangeConfirmationEmail(customer, _settings));
         }
     }
 }
