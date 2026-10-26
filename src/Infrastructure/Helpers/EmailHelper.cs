@@ -97,7 +97,7 @@ namespace Tss.Infrastructure.Helpers
 
         public async Task SendPasswordChangeConfirmationEmail(Customer customer)
         {
-            await SendEmailAsync(new ResetPasswordEmail(customer, _settings));
+            await SendEmailAsync(new PasswordChangeConfirmationEmail(customer, _settings));
         }
     }
 }
