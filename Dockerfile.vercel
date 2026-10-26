@@ -5,7 +5,7 @@ COPY src/Tss.csproj ./
 RUN dotnet restore Tss.csproj
 
 COPY src/ ./
-RUN dotnet publish Tss.csproj -c Release -o /app/publish --no-restore
+RUN dotnet publish Tss.csproj -c Release -o /app/publish
 
 FROM mcr.microsoft.com/dotnet/aspnet:3.1
 WORKDIR /app
