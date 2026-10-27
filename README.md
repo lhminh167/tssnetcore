@@ -175,7 +175,7 @@ vercel.json        Vercel service routing
 
 The API is deployed independently from the frontend using Vercel's Container Runtime. Configure production environment variables in the Vercel project, ensure the MySQL database permits connections from the deployment environment, and deploy from the repository root.
 
-The application applies EF Core migrations during startup. The product-text collation migration converts existing `product` and `attribute` tables to `utf8mb4_0900_ai_ci`, preserving rows while enabling Unicode product names and descriptions. Review migrations and take database backups before deploying schema changes. Point the frontend's `API_URL` at the deployed API base URL, including `/api/` and a trailing slash.
+The application applies EF Core migrations during startup and serializes concurrent migration attempts with a MySQL advisory lock. Product names use a UTF-8 `varchar(255)` column and descriptions use `varchar(1000)`, supporting Vietnamese and other Unicode text. Review migrations and take database backups before deploying schema changes. Point the frontend's `API_URL` at the deployed API base URL, including `/api/` and a trailing slash.
 
 ## Related project
 
