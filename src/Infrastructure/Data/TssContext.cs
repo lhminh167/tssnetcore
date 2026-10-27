@@ -74,8 +74,8 @@ namespace Tss.Infrastructure.Data
                     .IsRequired()
                     .HasColumnName("name")
                     .HasColumnType("varchar(100)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
             });
 
             modelBuilder.Entity<AttributeValue>(entity =>
@@ -516,8 +516,8 @@ namespace Tss.Infrastructure.Data
                     .IsRequired()
                     .HasColumnName("description")
                     .HasColumnType("varchar(1000)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.DiscountedPrice)
                     .HasColumnName("discounted_price")
@@ -530,21 +530,21 @@ namespace Tss.Infrastructure.Data
                 entity.Property(e => e.Image)
                     .HasColumnName("image")
                     .HasColumnType("varchar(150)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Image2)
                     .HasColumnName("image_2")
                     .HasColumnType("varchar(150)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasColumnName("name")
                     .HasColumnType("varchar(100)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 entity.Property(e => e.Price)
                     .HasColumnName("price")
@@ -553,8 +553,8 @@ namespace Tss.Infrastructure.Data
                 entity.Property(e => e.Thumbnail)
                     .HasColumnName("thumbnail")
                     .HasColumnType("varchar(150)")
-                    .HasCharSet("latin1")
-                    .HasCollation("latin1_swedish_ci");
+                    .HasCharSet("utf8mb4")
+                    .HasCollation("utf8mb4_0900_ai_ci");
 
                 // entity.Ignore(e => e.Attributes);
 

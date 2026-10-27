@@ -28,8 +28,8 @@ namespace Tss.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnName("name")
                         .HasColumnType("varchar(100)")
-                        .HasAnnotation("MySql:CharSet", "latin1")
-                        .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
+                        .HasAnnotation("MySql:CharSet", "utf8mb4")
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_ai_ci");
 
                     b.HasKey("AttributeId");
 
@@ -425,8 +425,8 @@ namespace Tss.Infrastructure.Data.Migrations
                         .IsRequired()
                         .HasColumnName("description")
                         .HasColumnType("varchar(1000)")
-                        .HasAnnotation("MySql:CharSet", "latin1")
-                        .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
+                        .HasAnnotation("MySql:CharSet", "utf8mb4")
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_ai_ci");
 
                     b.Property<decimal>("DiscountedPrice")
                         .HasColumnName("discounted_price")
@@ -439,21 +439,21 @@ namespace Tss.Infrastructure.Data.Migrations
                     b.Property<string>("Image")
                         .HasColumnName("image")
                         .HasColumnType("varchar(150)")
-                        .HasAnnotation("MySql:CharSet", "latin1")
-                        .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
+                        .HasAnnotation("MySql:CharSet", "utf8mb4")
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_ai_ci");
 
                     b.Property<string>("Image2")
                         .HasColumnName("image_2")
                         .HasColumnType("varchar(150)")
-                        .HasAnnotation("MySql:CharSet", "latin1")
-                        .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
+                        .HasAnnotation("MySql:CharSet", "utf8mb4")
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_ai_ci");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnName("name")
                         .HasColumnType("varchar(100)")
-                        .HasAnnotation("MySql:CharSet", "latin1")
-                        .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
+                        .HasAnnotation("MySql:CharSet", "utf8mb4")
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_ai_ci");
 
                     b.Property<decimal>("Price")
                         .HasColumnName("price")
@@ -462,8 +462,8 @@ namespace Tss.Infrastructure.Data.Migrations
                     b.Property<string>("Thumbnail")
                         .HasColumnName("thumbnail")
                         .HasColumnType("varchar(150)")
-                        .HasAnnotation("MySql:CharSet", "latin1")
-                        .HasAnnotation("MySql:Collation", "latin1_swedish_ci");
+                        .HasAnnotation("MySql:CharSet", "utf8mb4")
+                        .HasAnnotation("MySql:Collation", "utf8mb4_0900_ai_ci");
 
                     b.HasKey("ProductId");
 
